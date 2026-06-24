@@ -7,43 +7,51 @@
     <title>Finance Dashboard</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <div class="header">
-        <h1>💰 Finance Dashboard</h1>
-        <span class="status">LIVE</span>
+        <div class="header">
+            <h1>💰 Finance Dashboard</h1>
+            <span class="status">LIVE</span>
+        </div>
+
+        <div class="kpi-grid">
+
+            <div class="card">
+                <div class="label">Patrimoine total</div>
+                <div class="value" id="networth">0 CHF</div>
+            </div>
+
+            <div class="card">
+                <div class="label">Cash</div>
+                <div class="value" id="cash">0 CHF</div>
+            </div>
+
+            <div class="card">
+                <div class="label">Investissements</div>
+                <div class="value" id="investments">0 CHF</div>
+            </div>
+
+            <div class="card">
+                <div class="label">Performance</div>
+                <div class="value" id="performance">0 %</div>
+            </div>
+
+        </div>
+
+        <div class="chart-card">
+            <div id="portfolioChart"></div>
+        </div>
+
     </div>
 
-    <div class="kpi-grid">
-
-        <div class="card">
-            <div class="label">Patrimoine total</div>
-            <div class="value" id="networth">0 CHF</div>
-        </div>
-
-        <div class="card">
-            <div class="label">Cash</div>
-            <div class="value" id="cash">0 CHF</div>
-        </div>
-
-        <div class="card">
-            <div class="label">Investissements</div>
-            <div class="value" id="investments">0 CHF</div>
-        </div>
-
-        <div class="card">
-            <div class="label">Performance</div>
-            <div class="value" id="performance">0 %</div>
-        </div>
-
-    </div>
-
-</div>
+    <script src="js/charts.js"></script>
 
 </body>
+
 </html>
-``
