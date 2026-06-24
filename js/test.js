@@ -1,1 +1,1 @@
-console.log("Connexion OK");
+alert("Connexion OK");
