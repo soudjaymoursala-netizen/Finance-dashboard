@@ -5,29 +5,29 @@
 }
 
 body{
-    background:#0b1120;
+    background:#0f172a;
     color:white;
     font-family:Segoe UI, sans-serif;
-    min-height:100vh;
 }
 
 .container{
     padding:30px;
 }
 
-header{
+.header{
     display:flex;
     justify-content:space-between;
     align-items:center;
     margin-bottom:30px;
 }
 
-header h1{
+.header h1{
     font-size:32px;
 }
 
-.badge{
-    background:#0f9d58;
+.status{
+    background:#22c55e;
+    color:white;
     padding:8px 15px;
     border-radius:20px;
     font-size:14px;
@@ -35,40 +35,23 @@ header h1{
 
 .kpi-grid{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
 }
 
 .card{
-    background:#172036;
-    border:1px solid #26324f;
+    background:#1e293b;
     border-radius:18px;
-    padding:20px;
+    padding:25px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.3);
 }
 
-.card h3{
-    color:#8fa4d4;
+.label{
+    color:#94a3b8;
     margin-bottom:10px;
-    font-size:14px;
 }
 
-.card span{
-    font-size:28px;
+.value{
+    font-size:32px;
     font-weight:bold;
-}
-
-@media(max-width:900px){
-
-    .kpi-grid{
-        grid-template-columns:1fr 1fr;
-    }
-
-}
-
-@media(max-width:600px){
-
-    .kpi-grid{
-        grid-template-columns:1fr;
-    }
-
 }
