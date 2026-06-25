@@ -5,16 +5,46 @@ async function chargerBudget() {
     try {
 
         const response = await fetch(URL_BUDGET);
-
         const csv = await response.text();
 
-        alert(csv.substring(0, 300));
+        const lignes = csv.trim().split("\n");
 
-    }
+        const donnees = {};
 
-    catch(error) {
+        for (let i = 1; i < lignes.length; i++) {
+
+            const morceaux = lignes[i].split(",");
+
+            const cle = morceaux[0];
+
+            let valeur = morceaux.slice(1).join(",");
+
+            valeur = valeur.replace(/"/g, "");
+            valeur = valeur.replace(/\s/g, "");
+            valeur = valeur.replace(",", ".");
+
+            donnees[cle] = parseFloat(valeur);
+        }
+
+        document.getElementById("networth").textContent =
+            Math.round(donnees.patrimoine_total).toLocaleString("fr-FR") + " €";
+
+        document.getElementById("cash").textContent =
+            Math.round(donnees.cash_dispo_total).toLocaleString("fr-FR") + " €";
+
+        document.getElementById("investments").textContent =
+            Math.round(donnees.investissements_total).toLocaleString("fr-FR") + " €";
+
+        document.getElementById("performance").textContent =
+            (donnees.taux_epargne_annuel * 100).toFixed(1) + " %";
+
+        console.log(donnees);
+
+    } catch (error) {
 
         alert("Erreur : " + error);
+
+        console.error(error);
 
     }
 
