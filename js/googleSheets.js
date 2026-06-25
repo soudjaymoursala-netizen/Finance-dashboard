@@ -2,40 +2,41 @@ const URL_BUDGET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_S
 
 async function chargerBudget() {
 
-    const response = await fetch(URL_BUDGET);
-    const csv = await response.text();
+    try {
 
-    const lignes = csv.trim().split("\n");
+        const response = await fetch(URL_BUDGET);
+        const csv = await response.text();
 
-    const donnees = {};
+        const lignes = csv.trim().split("\n");
 
-    for (let i = 1; i < lignes.length; i++) {
+        const donnees = {};
 
-        const ligne = lignes[i];
+        for (let i = 1; i < lignes.length; i++) {
 
-        const premiereVirgule = ligne.indexOf(",");
+            const ligne = lignes[i];
 
-        const cle = ligne.substring(0, premiereVirgule);
+            const premiereVirgule = ligne.indexOf(",");
 
-        let valeur = ligne.substring(premiereVirgule + 1);
+            const cle = ligne.substring(0, premiereVirgule);
 
-        valeur = valeur.replace(/"/g, "");
-        valeur = valeur.replace(",", ".");
+            let valeur = ligne.substring(premiereVirgule + 1);
 
-        donnees[cle] = parseFloat(valeur);
+            valeur = valeur.replace(/"/g, "");
+            valeur = valeur.replace(",", ".");
+
+            donnees[cle] = parseFloat(valeur);
+        }
+
+        alert(JSON.stringify(donnees));
+
     }
 
-    document.getElementById("networth").innerText =
-        Math.round(donnees.patrimoine_total).toLocaleString("fr-FR") + " €";
+    catch(error) {
 
-    document.getElementById("cash").innerText =
-        Math.round(donnees.cash_dispo_total).toLocaleString("fr-FR") + " €";
+        alert("ERREUR : " + error);
 
-    document.getElementById("investments").innerText =
-        Math.round(donnees.investissements_total).toLocaleString("fr-FR") + " €";
+    }
 
-    document.getElementById("performance").innerText =
-        (donnees.taux_epargne_annuel * 100).toFixed(1) + " %";
 }
 
 document.addEventListener("DOMContentLoaded", chargerBudget);
