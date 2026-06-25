@@ -1,1 +1,6 @@
-console.log("Google Sheets prêt");
+window.addEventListener("DOMContentLoaded", () => {
+
+    alert("Google Sheets prêt ✅");
+
+});
+``
