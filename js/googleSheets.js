@@ -9,34 +9,19 @@ async function chargerBudget() {
 
         const lignes = csv.trim().split("\n");
 
-        const donnees = {};
+        let resultat = "";
 
-        for (let i = 1; i < lignes.length; i++) {
-
-            const ligne = lignes[i];
-
-            const premiereVirgule = ligne.indexOf(",");
-
-            const cle = ligne.substring(0, premiereVirgule);
-
-            let valeur = ligne.substring(premiereVirgule + 1);
-
-            valeur = valeur.replace(/"/g, "");
-            valeur = valeur.replace(",", ".");
-
-            donnees[cle] = parseFloat(valeur);
+        for (let i = 0; i < lignes.length; i++) {
+            resultat += lignes[i] + "\n";
         }
 
-        alert(JSON.stringify(donnees));
+        alert(resultat);
+
+    } catch (error) {
+
+        alert("ERREUR : " + error.message);
 
     }
-
-    catch(error) {
-
-        alert("ERREUR : " + error);
-
-    }
-
 }
 
 document.addEventListener("DOMContentLoaded", chargerBudget);
