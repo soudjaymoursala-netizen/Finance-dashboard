@@ -8,20 +8,46 @@ async function chargerBudget() {
         const csv = await response.text();
 
         const lignes = csv.trim().split("\n");
+        const donnees = {};
 
-        let resultat = "";
+        for (let i = 1; i < lignes.length; i++) {
 
-        for (let i = 0; i < lignes.length; i++) {
-            resultat += lignes[i] + "\n";
+            const ligne = lignes[i];
+
+            const premiereVirgule = ligne.indexOf(",");
+
+            const cle = ligne.substring(0, premiereVirgule);
+
+            let valeur = ligne.substring(premiereVirgule + 1);
+
+            valeur = valeur
+                .replace(/"/g, "")
+                .replace(/\s/g, "")
+                .replace(",", ".");
+
+            donnees[cle] = Number(valeur);
         }
 
-        alert(resultat);
+        document.getElementById("networth").textContent =
+            Math.round(donnees.patrimoine_total).toLocaleString("fr-FR") + " €";
 
-    } catch (error) {
+        document.getElementById("cash").textContent =
+            Math.round(donnees.cash_dispo_total).toLocaleString("fr-FR") + " €";
 
-        alert("ERREUR : " + error.message);
+        document.getElementById("investments").textContent =
+            Math.round(donnees.investissements_total).toLocaleString("fr-FR") + " €";
+
+        document.getElementById("performance").textContent =
+            (donnees.taux_epargne_annuel * 100).toFixed(1) + " %";
 
     }
+
+    catch(error) {
+
+        console.error(error);
+
+    }
+
 }
 
 document.addEventListener("DOMContentLoaded", chargerBudget);
