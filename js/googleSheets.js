@@ -1,4 +1,4 @@
-const URL_BUDGET =
+  const URL_BUDGET =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_ScwMcwclQIBBNIaegUQopTKc385hG86xC6bpnamp-JGWUDALv_f9rg/pub?gid=519498006&single=true&output=csv";
 
 const URL_CTO =
@@ -147,73 +147,3 @@ async function chargerDashboard() {
         }
 
         const objectifCsv = await objectifResponse.text();
-            alert(objectifCsv);
-
-        const lignesObjectifs =
-            objectifCsv.trim().split("\n");
-
-        for (let i = 1; i < lignesObjectifs.length; i++) {
-
-            const ligne =
-                lignesObjectifs[i]
-                    .replace(/\r/g, "");
-
-            const morceaux =
-                ligne.split("\t");
-
-            if (morceaux.length < 3) continue;
-
-            const objectif =
-                morceaux[0].trim();
-
-            const cible =
-                nettoyerNombre(morceaux[1]);
-
-            const actuel =
-                nettoyerNombre(morceaux[2]);
-
-            if (!cible) continue;
-
-            const pourcentage =
-                Math.min(
-                    (actuel / cible) * 100,
-                    100
-                );
-
-            const label =
-                document.getElementById(
-                    "goal-" + objectif
-                );
-
-            const barre =
-                document.getElementById(
-                    "bar-" + objectif
-                );
-
-            if (label) {
-                label.textContent =
-                    pourcentage.toFixed(1) + "%";
-            }
-
-            if (barre) {
-                barre.style.width =
-                    pourcentage.toFixed(1) + "%";
-            }
-        }
-
-        console.log("Dashboard chargé ✅");
-
-    } catch (error) {
-
-        console.error(
-            "Erreur Dashboard :",
-            error
-        );
-
-    }
-}
-
-document.addEventListener(
-    "DOMContentLoaded",
-    chargerDashboard
-);
