@@ -17,16 +17,17 @@ function nettoyerNombre(valeur) {
 
     if (!valeur) return 0;
 
-    return parseFloat(
-        valeur
-            .toString()
-            .replace(/"/g, "")
-            .replace(/â€¯/g, "")
-            .replace(/\u202F/g, "")
-            .replace(/\u00A0/g, "")
-            .replace(/\s/g, "")
-            .replace(",", ".")
-    ) || 0;
+    valeur = valeur
+        .toString()
+        .replace(/"/g, "")
+        .replace(/â€¯/g, "")
+        .replace(/\u202F/g, "")
+        .replace(/\u00A0/g, "")
+        .replace(/\s/g, "");
+
+    valeur = valeur.split(",")[0];
+
+    return Number(valeur) || 0;
 }
 
 function lireCSVKPI(csv) {
@@ -37,7 +38,6 @@ function lireCSVKPI(csv) {
     for (let i = 1; i < lignes.length; i++) {
 
         const ligne = lignes[i];
-
         const indexVirgule = ligne.indexOf(",");
 
         if (indexVirgule === -1) continue;
@@ -108,7 +108,6 @@ async function chargerDashboard() {
                 pea.pea_valeur || 0,
                 ctoEuro || 0
             );
-
         }
 
         const evolutionCsv = await evolutionResponse.text();
@@ -148,9 +147,7 @@ async function chargerDashboard() {
         }
 
         const objectifCsv = await objectifResponse.text();
-
-        const lignesObjectifs =
-            objectifCsv.trim().split("\n");
+        const lignesObjectifs = objectifCsv.trim().split("\n");
 
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
@@ -162,16 +159,14 @@ async function chargerDashboard() {
             if (!match) continue;
 
             const objectif = match[1].trim();
+
             const cible = nettoyerNombre(match[2]);
             const actuel = nettoyerNombre(match[3]);
 
             if (!cible) continue;
 
             const pourcentage =
-                Math.min(
-                    (actuel / cible) * 100,
-                    100
-                );
+                (actuel / cible) * 100;
 
             const label =
                 document.getElementById(
@@ -193,7 +188,7 @@ async function chargerDashboard() {
             if (barre) {
 
                 barre.style.width =
-                    pourcentage.toFixed(1) + "%";
+                    Math.min(pourcentage, 100) + "%";
 
             }
         }
