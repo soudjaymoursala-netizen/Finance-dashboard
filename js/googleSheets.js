@@ -17,9 +17,11 @@ function nettoyerNombre(valeur) {
 
     if (!valeur) return 0;
 
-    return Number(
+    return parseFloat(
         valeur
+            .toString()
             .replace(/"/g, "")
+            .replace(/â€¯/g, "")
             .replace(/\u202F/g, "")
             .replace(/\u00A0/g, "")
             .replace(/\s/g, "")
@@ -77,28 +79,22 @@ async function chargerDashboard() {
             (cto.eur_chf || 0);
 
         document.getElementById("networth").textContent =
-            Math.round(budget.patrimoine_total)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(budget.patrimoine_total).toLocaleString("fr-FR") + " €";
 
         document.getElementById("cash").textContent =
-            Math.round(budget.cash_dispo_total)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(budget.cash_dispo_total).toLocaleString("fr-FR") + " €";
 
         document.getElementById("investments").textContent =
-            Math.round(budget.investissements_total)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(budget.investissements_total).toLocaleString("fr-FR") + " €";
 
         document.getElementById("pea").textContent =
-            Math.round(pea.pea_valeur)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(pea.pea_valeur).toLocaleString("fr-FR") + " €";
 
         document.getElementById("cto").textContent =
-            Math.round(ctoEuro)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(ctoEuro).toLocaleString("fr-FR") + " €";
 
         document.getElementById("performance").textContent =
-            ((budget.taux_epargne_annuel || 0) * 100)
-                .toFixed(1) + " %";
+            ((budget.taux_epargne_annuel || 0) * 100).toFixed(1) + " %";
 
         if (typeof updateAllocationChart === "function") {
 
@@ -147,37 +143,24 @@ async function chargerDashboard() {
         }
 
         const objectifCsv = await objectifResponse.text();
-
-        const lignesObjectifs =
-            objectifCsv.trim().split("\n");
+        const lignesObjectifs = objectifCsv.trim().split("\n");
 
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
-            const ligne =
-                lignesObjectifs[i]
-                    .replace(/\r/g, "");
+            const ligne = lignesObjectifs[i];
 
-            const morceaux =
-                ligne.split("\t");
+            const match = ligne.match(/^([^,]+),"([^"]+)","([^"]+)"/);
 
-            if (morceaux.length < 3) continue;
+            if (!match) continue;
 
-            const objectif =
-                morceaux[0].trim();
-
-            const cible =
-                nettoyerNombre(morceaux[1]);
-
-            const actuel =
-                nettoyerNombre(morceaux[2]);
+            const objectif = match[1].trim();
+            const cible = nettoyerNombre(match[2]);
+            const actuel = nettoyerNombre(match[3]);
 
             if (!cible) continue;
 
             const pourcentage =
-                Math.min(
-                    (actuel / cible) * 100,
-                    100
-                );
+                Math.min((actuel / cible) * 100, 100);
 
             const label =
                 document.getElementById(
@@ -204,10 +187,7 @@ async function chargerDashboard() {
 
     } catch (error) {
 
-        console.error(
-            "Erreur Dashboard :",
-            error
-        );
+        console.error("Erreur Dashboard :", error);
 
     }
 }
