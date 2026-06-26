@@ -20,6 +20,8 @@ function nettoyerNombre(valeur) {
     return Number(
         valeur
             .replace(/"/g, "")
+            .replace(/\u202F/g, "")
+            .replace(/\u00A0/g, "")
             .replace(/\s/g, "")
             .replace(",", ".")
     ) || 0;
@@ -145,14 +147,18 @@ async function chargerDashboard() {
         }
 
         const objectifCsv = await objectifResponse.text();
-        const lignesObjectifs = objectifCsv.trim().split("\n");
+
+        const lignesObjectifs =
+            objectifCsv.trim().split("\n");
 
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
-            const ligne = lignesObjectifs[i].replace(/\r/g, "");
+            const ligne =
+                lignesObjectifs[i]
+                    .replace(/\r/g, "");
 
-            const morceaux = ligne.split("\t");
-            console.log(morceaux);
+            const morceaux =
+                ligne.split("\t");
 
             if (morceaux.length < 3) continue;
 
