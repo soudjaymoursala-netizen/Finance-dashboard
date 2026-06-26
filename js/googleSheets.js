@@ -43,7 +43,6 @@ function lireCSVKPI(csv) {
         if (indexVirgule === -1) continue;
 
         const cle = ligne.substring(0, indexVirgule);
-
         const valeur = ligne.substring(indexVirgule + 1);
 
         resultat[cle] = nettoyerNombre(valeur);
@@ -79,22 +78,28 @@ async function chargerDashboard() {
             (cto.eur_chf || 0);
 
         document.getElementById("networth").textContent =
-            Math.round(budget.patrimoine_total).toLocaleString("fr-FR") + " €";
+            Math.round(budget.patrimoine_total)
+                .toLocaleString("fr-FR") + " €";
 
         document.getElementById("cash").textContent =
-            Math.round(budget.cash_dispo_total).toLocaleString("fr-FR") + " €";
+            Math.round(budget.cash_dispo_total)
+                .toLocaleString("fr-FR") + " €";
 
         document.getElementById("investments").textContent =
-            Math.round(budget.investissements_total).toLocaleString("fr-FR") + " €";
+            Math.round(budget.investissements_total)
+                .toLocaleString("fr-FR") + " €";
 
         document.getElementById("pea").textContent =
-            Math.round(pea.pea_valeur).toLocaleString("fr-FR") + " €";
+            Math.round(pea.pea_valeur)
+                .toLocaleString("fr-FR") + " €";
 
         document.getElementById("cto").textContent =
-            Math.round(ctoEuro).toLocaleString("fr-FR") + " €";
+            Math.round(ctoEuro)
+                .toLocaleString("fr-FR") + " €";
 
         document.getElementById("performance").textContent =
-            ((budget.taux_epargne_annuel || 0) * 100).toFixed(1) + " %";
+            ((budget.taux_epargne_annuel || 0) * 100)
+                .toFixed(1) + " %";
 
         if (typeof updateAllocationChart === "function") {
 
@@ -143,13 +148,16 @@ async function chargerDashboard() {
         }
 
         const objectifCsv = await objectifResponse.text();
-        const lignesObjectifs = objectifCsv.trim().split("\n");
+
+        const lignesObjectifs =
+            objectifCsv.trim().split("\n");
 
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
             const ligne = lignesObjectifs[i];
 
-            const match = ligne.match(/^([^,]+),"([^"]+)","([^"]+)"/);
+            const match =
+                ligne.match(/^([^,]+),"([^"]+)","([^"]+)"/);
 
             if (!match) continue;
 
@@ -160,7 +168,10 @@ async function chargerDashboard() {
             if (!cible) continue;
 
             const pourcentage =
-                Math.min((actuel / cible) * 100, 100);
+                Math.min(
+                    (actuel / cible) * 100,
+                    100
+                );
 
             const label =
                 document.getElementById(
@@ -173,13 +184,17 @@ async function chargerDashboard() {
                 );
 
             if (label) {
+
                 label.textContent =
-                    pourcentage.toFixed(1) + "%";
+                    `${actuel.toLocaleString("fr-FR")} € / ${cible.toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
+
             }
 
             if (barre) {
+
                 barre.style.width =
                     pourcentage.toFixed(1) + "%";
+
             }
         }
 
@@ -187,8 +202,10 @@ async function chargerDashboard() {
 
     } catch (error) {
 
-        console.error("Erreur Dashboard :", error);
-
+        console.error(
+            "Erreur Dashboard :",
+            error
+        );
     }
 }
 
