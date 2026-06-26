@@ -93,6 +93,16 @@ async function chargerDashboard() {
             ((budget.taux_epargne_annuel || 0) * 100)
                 .toFixed(1) + " %";
 
+        if (typeof updateAllocationChart === "function") {
+
+            updateAllocationChart(
+                budget.cash_dispo_total || 0,
+                pea.pea_valeur || 0,
+                ctoEuro || 0
+            );
+
+        }
+
         const evolutionCsv = await evolutionResponse.text();
         const lignesEvolution = evolutionCsv.trim().split("\n");
 
