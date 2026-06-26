@@ -147,6 +147,7 @@ async function chargerDashboard() {
         }
 
         const objectifCsv = await objectifResponse.text();
+            alert(objectifCsv);
 
         const lignesObjectifs =
             objectifCsv.trim().split("\n");
