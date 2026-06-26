@@ -144,54 +144,44 @@ async function chargerDashboard() {
             updatePatrimoineChart(labels, valeurs);
         }
 
-        const objectifCsv = await objectifResponse.text();
-        const lignesObjectifs = objectifCsv.trim().split("\n");
+       const objectifCsv = await objectifResponse.text();
+const lignesObjectifs = objectifCsv.trim().split("\n");
 
-        for (let i = 1; i < lignesObjectifs.length; i++) {
+ const ligne = lignesObjectifs[i];for (let i = 1; i < lignesObjectifs.length; i++) {
 
-            const ligne = lignesObjectifs[i];
-            const morceaux = ligne.split(",");
+    const morceaux = ligne.split(",");
 
-            if (morceaux.length < 3) continue;
+    if (morceaux.length < 3) continue;
 
-            const objectif = morceaux[0].trim();
+    const objectif = morceaux[0].trim();
 
-            const cible =
-                nettoyerNombre(morceaux[1]);
+    const cible = Number(morceaux[1].replace(/"/g, "").replace(",", "."));
 
-            const actuel =
-                nettoyerNombre(morceaux[2]);
+    const actuel = Number(morceaux[2].replace(/"/g, "").replace(",", "."));
 
-            const pourcentage =
-                Math.min(
-                    (actuel / cible) * 100,
-                    100
-                );
+    if (!cible || !actuel) continue;
 
-            const label =
-                document.getElementById(
-                    "goal-" + objectif
-                );
+    const pourcentage =
+        Math.min((actuel / cible) * 100, 100);
 
-            const barre =
-                document.getElementById(
-                    "bar-" + objectif
-                );
+    const label = document.getElementById(
+        "goal-" + objectif
+    );
 
-            if (label) {
+    const barre = document.getElementById(
+        "bar-" + objectif
+    );
 
-                label.textContent =
-                    pourcentage.toFixed(1) + "%";
+    if (label) {
+        label.textContent =
+            pourcentage.toFixed(1) + "%";
+    }
 
-            }
-
-            if (barre) {
-
-                barre.style.width =
-                    pourcentage + "%";
-
-            }
-        }
+    if (barre) {
+        barre.style.width =
+            pourcentage + "%";
+    }
+}
 
         console.log("Dashboard chargé ✅");
 
