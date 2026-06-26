@@ -10,6 +10,9 @@ const URL_PEA =
 const URL_EVOLUTION =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_ScwMcwclQIBBNIaegUQopTKc385hG86xC6bpnamp-JGWUDALv_f9rg/pub?gid=810332816&single=true&output=csv";
 
+const URL_OBJECTIF =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_ScwMcwclQIBBNIaegUQopTKc385hG86xC6bpnamp-JGWUDALv_f9rg/pub?gid=1700667008&single=true&output=csv";
+
 function nettoyerNombre(valeur) {
 
     if (!valeur) return 0;
@@ -53,12 +56,14 @@ async function chargerDashboard() {
             budgetResponse,
             ctoResponse,
             peaResponse,
-            evolutionResponse
+            evolutionResponse,
+            objectifResponse
         ] = await Promise.all([
             fetch(URL_BUDGET),
             fetch(URL_CTO),
             fetch(URL_PEA),
-            fetch(URL_EVOLUTION)
+            fetch(URL_EVOLUTION),
+            fetch(URL_OBJECTIF)
         ]);
 
         const budget = lireCSVKPI(await budgetResponse.text());
@@ -118,7 +123,6 @@ async function chargerDashboard() {
             if (morceaux.length < 2) continue;
 
             const mois = morceaux[0];
-
             const valeur = nettoyerNombre(morceaux[1]);
 
             if (!valeur) continue;
@@ -140,11 +144,63 @@ async function chargerDashboard() {
             updatePatrimoineChart(labels, valeurs);
         }
 
+        const objectifCsv = await objectifResponse.text();
+        const lignesObjectifs = objectifCsv.trim().split("\n");
+
+        for (let i = 1; i < lignesObjectifs.length; i++) {
+
+            const ligne = lignesObjectifs[i];
+            const morceaux = ligne.split(",");
+
+            if (morceaux.length < 3) continue;
+
+            const objectif = morceaux[0].trim();
+
+            const cible =
+                nettoyerNombre(morceaux[1]);
+
+            const actuel =
+                nettoyerNombre(morceaux[2]);
+
+            const pourcentage =
+                Math.min(
+                    (actuel / cible) * 100,
+                    100
+                );
+
+            const label =
+                document.getElementById(
+                    "goal-" + objectif
+                );
+
+            const barre =
+                document.getElementById(
+                    "bar-" + objectif
+                );
+
+            if (label) {
+
+                label.textContent =
+                    pourcentage.toFixed(1) + "%";
+
+            }
+
+            if (barre) {
+
+                barre.style.width =
+                    pourcentage + "%";
+
+            }
+        }
+
         console.log("Dashboard chargé ✅");
 
     } catch (error) {
 
-        console.error("Erreur Dashboard :", error);
+        console.error(
+            "Erreur Dashboard :",
+            error
+        );
 
     }
 }
