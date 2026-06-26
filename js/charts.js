@@ -1,6 +1,12 @@
 let patrimoineChart = null;
+let allocationChart = null;
 
 function updatePatrimoineChart(labels, valeurs) {
+
+    const chartElement =
+        document.querySelector("#patrimoineChart");
+
+    if (!chartElement) return;
 
     if (patrimoineChart) {
         patrimoineChart.destroy();
@@ -9,29 +15,49 @@ function updatePatrimoineChart(labels, valeurs) {
     const options = {
 
         chart: {
-            type: 'area',
+            type: "area",
             height: 350,
             toolbar: {
                 show: false
-            }
+            },
+            background: "transparent"
         },
 
         series: [{
-            name: 'Patrimoine',
+            name: "Patrimoine",
             data: valeurs
         }],
 
         xaxis: {
-            categories: labels
+            categories: labels,
+            labels: {
+                style: {
+                    colors: "#94a3b8"
+                }
+            }
+        },
+
+        yaxis: {
+            labels: {
+                style: {
+                    colors: "#94a3b8"
+                },
+                formatter: function(value) {
+                    return Math.round(value)
+                        .toLocaleString("fr-FR") + " €";
+                }
+            }
         },
 
         stroke: {
-            curve: 'smooth',
-            width: 3
+            curve: "smooth",
+            width: 4
         },
 
+        colors: ["#22c55e"],
+
         fill: {
-            type: 'gradient',
+            type: "gradient",
             gradient: {
                 shadeIntensity: 1,
                 opacityFrom: 0.4,
@@ -39,33 +65,94 @@ function updatePatrimoineChart(labels, valeurs) {
             }
         },
 
-        colors: ['#22c55e'],
-
-        theme: {
-            mode: 'dark'
+        dataLabels: {
+            enabled: true
         },
 
-        yaxis: {
-            labels: {
+        tooltip: {
+            y: {
                 formatter: function(value) {
-                    return Math.round(value).toLocaleString("fr-FR") + " €";
+                    return Math.round(value)
+                        .toLocaleString("fr-FR") + " €";
                 }
+            }
+        },
+
+        theme: {
+            mode: "dark"
+        },
+
+        grid: {
+            borderColor: "#334155"
+        }
+    };
+
+    patrimoineChart =
+        new ApexCharts(chartElement, options);
+
+    patrimoineChart.render();
+}
+
+function updateAllocationChart(cash, pea, cto) {
+
+    const chartElement =
+        document.querySelector("#allocationChart");
+
+    if (!chartElement) return;
+
+    if (allocationChart) {
+        allocationChart.destroy();
+    }
+
+    const options = {
+
+        chart: {
+            type: "donut",
+            height: 350,
+            background: "transparent"
+        },
+
+        series: [
+            cash,
+            pea,
+            cto
+        ],
+
+        labels: [
+            "Cash",
+            "PEA",
+            "CTO"
+        ],
+
+        colors: [
+            "#22c55e",
+            "#3b82f6",
+            "#f59e0b"
+        ],
+
+        legend: {
+            position: "bottom",
+            labels: {
+                colors: "#ffffff"
             }
         },
 
         tooltip: {
             y: {
                 formatter: function(value) {
-                    return Math.round(value).toLocaleString("fr-FR") + " €";
+                    return Math.round(value)
+                        .toLocaleString("fr-FR") + " €";
                 }
             }
+        },
+
+        theme: {
+            mode: "dark"
         }
     };
 
-    patrimoineChart = new ApexCharts(
-        document.querySelector("#patrimoineChart"),
-        options
-    );
+    allocationChart =
+        new ApexCharts(chartElement, options);
 
-    patrimoineChart.render();
+    allocationChart.render();
 }
