@@ -19,7 +19,7 @@ function nettoyerNombre(valeur) {
             .replace(/"/g, "")
             .replace(/\s/g, "")
             .replace(",", ".")
-    );
+    ) || 0;
 }
 
 function lireCSVKPI(csv) {
@@ -143,4 +143,3 @@ document.addEventListener(
     "DOMContentLoaded",
     chargerDashboard
 );
-``
