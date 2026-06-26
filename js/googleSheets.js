@@ -151,7 +151,8 @@ async function chargerDashboard() {
 
             const ligne = lignesObjectifs[i].replace(/\r/g, "");
 
-            const morceaux = ligne.split(",");
+            const morceaux = ligne.split("\t");
+            console.log(morceaux);
 
             if (morceaux.length < 3) continue;
 
