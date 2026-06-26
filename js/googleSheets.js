@@ -1,4 +1,4 @@
- const URL_BUDGET =
+const URL_BUDGET =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_ScwMcwclQIBBNIaegUQopTKc385hG86xC6bpnamp-JGWUDALv_f9rg/pub?gid=519498006&single=true&output=csv";
 
 const URL_CTO =
@@ -20,6 +20,8 @@ function nettoyerNombre(valeur) {
     return Number(
         valeur
             .replace(/"/g, "")
+            .replace(/\u202F/g, "")
+            .replace(/\u00A0/g, "")
             .replace(/\s/g, "")
             .replace(",", ".")
     ) || 0;
@@ -144,45 +146,59 @@ async function chargerDashboard() {
             updatePatrimoineChart(labels, valeurs);
         }
 
-       const objectifCsv = await objectifResponse.text();
-     alert("JE PASSE ICI");
-const lignesObjectifs = objectifCsv.trim().split("\n");
+        const objectifCsv = await objectifResponse.text();
 
- const ligne = lignesObjectifs[i];for (let i = 1; i < lignesObjectifs.length; i++) {
+        const lignesObjectifs =
+            objectifCsv.trim().split("\n");
 
-    const morceaux = ligne.split(",");
+        for (let i = 1; i < lignesObjectifs.length; i++) {
 
-    if (morceaux.length < 3) continue;
+            const ligne =
+                lignesObjectifs[i]
+                    .replace(/\r/g, "");
 
-    const objectif = morceaux[0].trim();
+            const morceaux =
+                ligne.split("\t");
 
-    const cible = Number(morceaux[1].replace(/"/g, "").replace(",", "."));
+            if (morceaux.length < 3) continue;
 
-    const actuel = Number(morceaux[2].replace(/"/g, "").replace(",", "."));
+            const objectif =
+                morceaux[0].trim();
 
-    if (!cible || !actuel) continue;
+            const cible =
+                nettoyerNombre(morceaux[1]);
 
-    const pourcentage =
-        Math.min((actuel / cible) * 100, 100);
+            const actuel =
+                nettoyerNombre(morceaux[2]);
 
-    const label = document.getElementById(
-        "goal-" + objectif
-    );
+            if (!cible) continue;
 
-    const barre = document.getElementById(
-        "bar-" + objectif
-    );
+            const pourcentage =
+                Math.min(
+                    (actuel / cible) * 100,
+                    100
+                );
 
-    if (label) {
-        label.textContent =
-            pourcentage.toFixed(1) + "%";
-    }
+            const label =
+                document.getElementById(
+                    "goal-" + objectif
+                );
 
-    if (barre) {
-        barre.style.width =
-            pourcentage + "%";
-    }
-}
+            const barre =
+                document.getElementById(
+                    "bar-" + objectif
+                );
+
+            if (label) {
+                label.textContent =
+                    pourcentage.toFixed(1) + "%";
+            }
+
+            if (barre) {
+                barre.style.width =
+                    pourcentage.toFixed(1) + "%";
+            }
+        }
 
         console.log("Dashboard chargé ✅");
 
