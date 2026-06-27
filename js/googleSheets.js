@@ -36,9 +36,10 @@ function lireCSVKPI(csv) {
 
     for (let i = 1; i < lignes.length; i++) {
 
-        const colonnes = lignes[i]
-            .replace(/\r/g, "")
-            .split("\t");
+        const colonnes =
+            lignes[i]
+                .replace(/\r/g, "")
+                .split("\t");
 
         if (colonnes.length < 2) continue;
 
@@ -111,7 +112,6 @@ async function chargerDashboard() {
                 pea.pea_valeur || 0,
                 ctoEuro || 0
             );
-
         }
 
         const evolutionCsv =
@@ -155,22 +155,10 @@ async function chargerDashboard() {
 
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
-            const ligne =
+            const colonnes =
                 lignesObjectifs[i]
                     .replace(/\r/g, "")
-                    .trim();
-
-            if (!ligne) continue;
-
-            let colonnes = ligne.split("\t");
-
-            if (colonnes.length < 3) {
-                colonnes = ligne.split(/ {2,}/);
-            }
-
-            if (colonnes.length < 3) {
-                colonnes = ligne.match(/[^\s]+/g) || [];
-            }
+                    .split("\t");
 
             if (colonnes.length < 3) continue;
 
@@ -183,10 +171,10 @@ async function chargerDashboard() {
             const actuel =
                 nettoyerNombre(colonnes[2]);
 
-            if (!cible) continue;
-
             const pourcentage =
-                (actuel / cible) * 100;
+                cible > 0
+                    ? (actuel / cible) * 100
+                    : 0;
 
             const label =
                 document.getElementById(
@@ -202,7 +190,6 @@ async function chargerDashboard() {
 
                 label.textContent =
                     `${Math.round(actuel).toLocaleString("fr-FR")} € / ${Math.round(cible).toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
-
             }
 
             if (barre) {
@@ -212,15 +199,12 @@ async function chargerDashboard() {
                         pourcentage,
                         100
                     ) + "%";
-
             }
         }
 
         console.log("Dashboard chargé ✅");
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "Erreur Dashboard :",
