@@ -17,17 +17,17 @@ function nettoyerNombre(valeur) {
 
     if (!valeur) return 0;
 
-    valeur = valeur
-        .toString()
-        .replace(/"/g, "")
-        .replace(/â€¯/g, "")
-        .replace(/\u202F/g, "")
-        .replace(/\u00A0/g, "")
-        .replace(/\s/g, "");
-
-    valeur = valeur.split(",")[0];
-
-    return Number(valeur) || 0;
+    return Number(
+        valeur
+            .toString()
+            .replace(/"/g, "")
+            .replace(/â€¯/g, "")
+            .replace(/\u202F/g, "")
+            .replace(/\u00A0/g, "")
+            .replace(/\s/g, "")
+            .replace(",", ".")
+            .split(".")[0]
+    ) || 0;
 }
 
 function lireCSVKPI(csv) {
@@ -38,11 +38,13 @@ function lireCSVKPI(csv) {
     for (let i = 1; i < lignes.length; i++) {
 
         const ligne = lignes[i];
+
         const indexVirgule = ligne.indexOf(",");
 
         if (indexVirgule === -1) continue;
 
         const cle = ligne.substring(0, indexVirgule);
+
         const valeur = ligne.substring(indexVirgule + 1);
 
         resultat[cle] = nettoyerNombre(valeur);
@@ -78,28 +80,22 @@ async function chargerDashboard() {
             (cto.eur_chf || 0);
 
         document.getElementById("networth").textContent =
-            Math.round(budget.patrimoine_total)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(budget.patrimoine_total).toLocaleString("fr-FR") + " €";
 
         document.getElementById("cash").textContent =
-            Math.round(budget.cash_dispo_total)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(budget.cash_dispo_total).toLocaleString("fr-FR") + " €";
 
         document.getElementById("investments").textContent =
-            Math.round(budget.investissements_total)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(budget.investissements_total).toLocaleString("fr-FR") + " €";
 
         document.getElementById("pea").textContent =
-            Math.round(pea.pea_valeur)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(pea.pea_valeur).toLocaleString("fr-FR") + " €";
 
         document.getElementById("cto").textContent =
-            Math.round(ctoEuro)
-                .toLocaleString("fr-FR") + " €";
+            Math.round(ctoEuro).toLocaleString("fr-FR") + " €";
 
         document.getElementById("performance").textContent =
-            ((budget.taux_epargne_annuel || 0) * 100)
-                .toFixed(1) + " %";
+            ((budget.taux_epargne_annuel || 0) * 100).toFixed(1) + " %";
 
         if (typeof updateAllocationChart === "function") {
 
@@ -108,6 +104,7 @@ async function chargerDashboard() {
                 pea.pea_valeur || 0,
                 ctoEuro || 0
             );
+
         }
 
         const evolutionCsv = await evolutionResponse.text();
@@ -147,21 +144,26 @@ async function chargerDashboard() {
         }
 
         const objectifCsv = await objectifResponse.text();
-        const lignesObjectifs = objectifCsv.trim().split("\n");
+
+        const lignesObjectifs =
+            objectifCsv.trim().split("\n");
 
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
             const ligne = lignesObjectifs[i];
 
-            const match =
-                ligne.match(/^([^,]+),"([^"]+)","([^"]+)"/);
+            const colonnes =
+                ligne.match(/([^,]+),"([^"]+)","([^"]+)"/);
 
-            if (!match) continue;
+            if (!colonnes) continue;
 
-            const objectif = match[1].trim();
+            const objectif = colonnes[1];
 
-            const cible = nettoyerNombre(match[2]);
-            const actuel = nettoyerNombre(match[3]);
+            const cible =
+                nettoyerNombre(colonnes[2]);
+
+            const actuel =
+                nettoyerNombre(colonnes[3]);
 
             if (!cible) continue;
 
@@ -181,21 +183,31 @@ async function chargerDashboard() {
             if (label) {
 
                 label.textContent =
-                    `${actuel.toLocaleString("fr-FR")} € / ${cible.toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
+                    actuel.toLocaleString("fr-FR") +
+                    " € / " +
+                    cible.toLocaleString("fr-FR") +
+                    " € (" +
+                    pourcentage.toFixed(1) +
+                    "%)";
 
             }
 
             if (barre) {
 
                 barre.style.width =
-                    Math.min(pourcentage, 100) + "%";
+                    Math.min(
+                        pourcentage,
+                        100
+                    ) + "%";
 
             }
         }
 
         console.log("Dashboard chargé ✅");
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Erreur Dashboard :",
