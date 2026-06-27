@@ -1,35 +1,32 @@
 const URL_BUDGET =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_ScwMcwclQIBBNIaegUQopTKc385hG86xC6bpnamp-JGWUDALv_f9rg/pub?gid=519498006&single=true&output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSq5EMGQYPvA9CZrUkdteiVl09VLnBQyHK6mQQJwzPkf0xTJO1Igb8YnelcKpnt-X9U84QcQsSsjR5U/pub?gid=519498006&single=true&output=csv";
 
 const URL_CTO =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vRua8tbeOUeO8TYpCthF1iXVQsxqmexyi-HvitZFz9i-SySYqUHOfI-58ugboXfgh_5n3YTWmtwQO_c/pub?output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRua8tbeOUeO8TYpCthF1iXVQsxqmexyi-HvitZFz9i-SySYqUHOfI-58ugboXfgh_5n3YTWmtwQO_c/pub?gid=1361663202&single=true&output=csv";
 
 const URL_PEA =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQf31wN50iBv_V-YVhgc1qsmxvuPYXOZvPGrwYQyMcZ8NIbMRVNf59CjmiBr-CjRgL3OVORVFGAWe_s/pub?gid=1971681206&single=true&output=csv";
 
 const URL_EVOLUTION =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_ScwMcwclQIBBNIaegUQopTKc385hG86xC6bpnamp-JGWUDALv_f9rg/pub?gid=810332816&single=true&output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSq5EMGQYPvA9CZrUkdteiVl09VLnBQyHK6mQQJwzPkf0xTJO1Igb8YnelcKpnt-X9U84QcQsSsjR5U/pub?gid=810332816&single=true&output=csv";
 
 const URL_OBJECTIF =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vT9KHpZTDI_ScwMcwclQIBBNIaegUQopTKc385hG86xC6bpnamp-JGWUDALv_f9rg/pub?gid=1700667008&single=true&output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSq5EMGQYPvA9CZrUkdteiVl09VLnBQyHK6mQQJwzPkf0xTJO1Igb8YnelcKpnt-X9U84QcQsSsjR5U/pub?gid=1700667008&single=true&output=csv";
 
 function nettoyerNombre(valeur) {
 
     if (!valeur) return 0;
 
-    valeur = valeur
-        .toString()
-        .replace(/"/g, "")
-        .replace(/â€¯/g, "")
-        .replace(/\u202F/g, "")
-        .replace(/\u00A0/g, "")
-        .replace(/\s/g, "");
-
-    const nombre = parseFloat(
-        valeur.replace(",", ".")
-    );
-
-    return isNaN(nombre) ? 0 : nombre;
+    return parseFloat(
+        valeur
+            .toString()
+            .replace(/"/g, "")
+            .replace(/â€¯/g, "")
+            .replace(/\u202F/g, "")
+            .replace(/\u00A0/g, "")
+            .replace(/\s/g, "")
+            .replace(",", ".")
+    ) || 0;
 }
 
 function lireCSVKPI(csv) {
@@ -39,15 +36,15 @@ function lireCSVKPI(csv) {
 
     for (let i = 1; i < lignes.length; i++) {
 
-        const ligne = lignes[i];
-        const indexVirgule = ligne.indexOf(",");
+        const colonnes =
+            lignes[i]
+                .replace(/\r/g, "")
+                .split("\t");
 
-        if (indexVirgule === -1) continue;
+        if (colonnes.length < 2) continue;
 
-        const cle = ligne.substring(0, indexVirgule).trim();
-        const valeur = ligne.substring(indexVirgule + 1);
-
-        resultat[cle] = nettoyerNombre(valeur);
+        resultat[colonnes[0].trim()] =
+            nettoyerNombre(colonnes[1]);
     }
 
     return resultat;
@@ -71,13 +68,18 @@ async function chargerDashboard() {
             fetch(URL_OBJECTIF)
         ]);
 
-        const budget = lireCSVKPI(await budgetResponse.text());
-        const cto = lireCSVKPI(await ctoResponse.text());
-        const pea = lireCSVKPI(await peaResponse.text());
+        const budget =
+            lireCSVKPI(await budgetResponse.text());
+
+        const cto =
+            lireCSVKPI(await ctoResponse.text());
+
+        const pea =
+            lireCSVKPI(await peaResponse.text());
 
         const ctoEuro =
             (cto.cto_valeur_chf || 0) *
-            (cto.eur_chf || 0);
+            (cto.eur_chf || 1);
 
         document.getElementById("networth").textContent =
             Math.round(budget.patrimoine_total || 0)
@@ -110,54 +112,64 @@ async function chargerDashboard() {
                 pea.pea_valeur || 0,
                 ctoEuro || 0
             );
-
         }
 
-        const evolutionCsv = await evolutionResponse.text();
-        const lignesEvolution = evolutionCsv.trim().split("\n");
+        const evolutionCsv =
+            await evolutionResponse.text();
+
+        const lignesEvolution =
+            evolutionCsv.trim().split("\n");
 
         const labels = [];
         const valeurs = [];
 
         for (let i = 1; i < lignesEvolution.length; i++) {
 
-            const morceaux = lignesEvolution[i].split(",");
+            const colonnes =
+                lignesEvolution[i]
+                    .replace(/\r/g, "")
+                    .split("\t");
 
-            if (morceaux.length < 2) continue;
+            if (colonnes.length < 2) continue;
 
-            const mois = morceaux[0];
-            const valeur = nettoyerNombre(morceaux[1]);
+            labels.push(colonnes[0]);
 
-            if (valeur <= 0) continue;
-
-            labels.push(mois);
-            valeurs.push(valeur);
+            valeurs.push(
+                nettoyerNombre(colonnes[1])
+            );
         }
 
         if (typeof updatePatrimoineChart === "function") {
-            updatePatrimoineChart(labels, valeurs);
+
+            updatePatrimoineChart(
+                labels,
+                valeurs
+            );
         }
 
-        const objectifCsv = await objectifResponse.text();
-
-        console.log("CSV OBJECTIFS :", objectifCsv);
+        const objectifCsv =
+            await objectifResponse.text();
 
         const lignesObjectifs =
             objectifCsv.trim().split("\n");
 
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
-            const ligne = lignesObjectifs[i];
+            const colonnes =
+                lignesObjectifs[i]
+                    .replace(/\r/g, "")
+                    .split("\t");
 
-            const match =
-                ligne.match(/^([^,]+),"([^"]+)","([^"]+)"/);
+            if (colonnes.length < 3) continue;
 
-            if (!match) continue;
+            const objectif =
+                colonnes[0].trim();
 
-            const objectif = match[1].trim();
+            const cible =
+                nettoyerNombre(colonnes[1]);
 
-            const cible = nettoyerNombre(match[2]);
-            const actuel = nettoyerNombre(match[3]);
+            const actuel =
+                nettoyerNombre(colonnes[2]);
 
             const pourcentage =
                 cible > 0
@@ -175,13 +187,18 @@ async function chargerDashboard() {
                 );
 
             if (label) {
+
                 label.textContent =
                     `${Math.round(actuel).toLocaleString("fr-FR")} € / ${Math.round(cible).toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
             }
 
             if (barre) {
+
                 barre.style.width =
-                    Math.min(pourcentage, 100) + "%";
+                    Math.min(
+                        pourcentage,
+                        100
+                    ) + "%";
             }
         }
 
@@ -193,7 +210,6 @@ async function chargerDashboard() {
             "Erreur Dashboard :",
             error
         );
-
     }
 }
 
