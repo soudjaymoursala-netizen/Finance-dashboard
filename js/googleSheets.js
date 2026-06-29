@@ -195,22 +195,46 @@ async function chargerDashboard() {
                     patrimoine
                 ) * 100
                 : 0;
+        
+      // ==========================
+      //  Projection basée sur l'évolution réelle du patrimoine
+      // ==========================
+        
+let progressionMensuelle = 0;
 
-        const epargneAnnuelle =
-            budget.epargne_annuelle || 0;
+if (valeurs.length >= 2) {
 
-        const anneesRestantes =
-            epargneAnnuelle > 0
-                ? restant250k /
-                  epargneAnnuelle
-                : 0;
+    const premierPatrimoine =
+        valeurs[0];
 
-        const projectionAnnee =
-            new Date().getFullYear()
-            +
-            Math.ceil(
-                anneesRestantes
-            );
+    const dernierPatrimoine =
+        valeurs[valeurs.length - 1];
+
+    const nombreMois =
+        valeurs.length - 1;
+
+    progressionMensuelle =
+        (dernierPatrimoine - premierPatrimoine)
+        /
+        nombreMois;
+}
+
+const moisRestants =
+    progressionMensuelle > 0
+        ? restant250k / progressionMensuelle
+        : 0;
+
+const anneesRestantes =
+    moisRestants / 12;
+
+const dateProjection =
+    new Date();
+
+dateProjection.setMonth(
+    dateProjection.getMonth()
+    +
+    Math.round(moisRestants)
+);
 
         // ==========================
         // KPI PRINCIPAUX
