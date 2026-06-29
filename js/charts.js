@@ -1,22 +1,37 @@
 let patrimoineChart = null;
 let allocationChart = null;
 
-function updatePatrimoineChart(labels, valeurs) {
+function updatePatrimoineChart(
+    labels,
+    valeurs
+) {
 
     const chartElement =
-        document.querySelector("#patrimoineChart");
+        document.querySelector(
+            "#patrimoineChart"
+        );
 
     if (!chartElement) return;
 
     if (patrimoineChart) {
+
         patrimoineChart.destroy();
+
     }
+
+    const objectifData =
+        labels.map(
+            () => 250000
+        );
 
     const options = {
 
         chart: {
+
             type: "area",
+
             height: 420,
+
             background: "transparent",
 
             toolbar: {
@@ -24,37 +39,59 @@ function updatePatrimoineChart(labels, valeurs) {
             },
 
             animations: {
+
                 enabled: true,
+
                 easing: "easeinout",
+
                 speed: 1200
             }
         },
 
-        series: [{
-            name: "Patrimoine",
-            data: valeurs
-        }],
+        series: [
+
+            {
+                name: "Patrimoine",
+
+                data: valeurs
+            },
+
+            {
+                name: "Objectif 250k",
+
+                data: objectifData
+            }
+
+        ],
 
         colors: [
-            "#22c55e"
+
+            "#22c55e",
+            "#94a3b8"
+
         ],
 
         stroke: {
+
             curve: "smooth",
-            width: 4
+
+            width: [4, 3],
+
+            dashArray: [0, 8]
         },
 
         fill: {
 
-            type: "gradient",
+            type: [
+                "gradient",
+                "solid"
+            ],
 
             gradient: {
 
                 shade: "dark",
 
-                type: "vertical",
-
-                shadeIntensity: 0.4,
+                shadeIntensity: 0.5,
 
                 opacityFrom: 0.45,
 
@@ -68,18 +105,16 @@ function updatePatrimoineChart(labels, valeurs) {
 
             size: 5,
 
-            colors: ["#22c55e"],
-
-            strokeColors: "#ffffff",
-
             strokeWidth: 2,
 
             hover: {
+
                 size: 8
             }
         },
 
         dataLabels: {
+
             enabled: false
         },
 
@@ -87,7 +122,17 @@ function updatePatrimoineChart(labels, valeurs) {
 
             borderColor: "#334155",
 
-            strokeDashArray: 5
+            strokeDashArray: 4
+        },
+
+        legend: {
+
+            position: "top",
+
+            labels: {
+
+                colors: "#ffffff"
+            }
         },
 
         xaxis: {
@@ -98,9 +143,7 @@ function updatePatrimoineChart(labels, valeurs) {
 
                 style: {
 
-                    colors: "#94a3b8",
-
-                    fontSize: "12px"
+                    colors: "#94a3b8"
                 }
             }
         },
@@ -114,11 +157,15 @@ function updatePatrimoineChart(labels, valeurs) {
                     colors: "#94a3b8"
                 },
 
-                formatter: function (value) {
+                formatter: function (
+                    value
+                ) {
 
                     return (
                         Math.round(value)
-                            .toLocaleString("fr-FR")
+                            .toLocaleString(
+                                "fr-FR"
+                            )
                         + " €"
                     );
 
@@ -132,11 +179,15 @@ function updatePatrimoineChart(labels, valeurs) {
 
             y: {
 
-                formatter: function (value) {
+                formatter: function (
+                    value
+                ) {
 
                     return (
                         Math.round(value)
-                            .toLocaleString("fr-FR")
+                            .toLocaleString(
+                                "fr-FR"
+                            )
                         + " €"
                     );
 
@@ -145,6 +196,7 @@ function updatePatrimoineChart(labels, valeurs) {
         },
 
         theme: {
+
             mode: "dark"
         }
     };
@@ -178,7 +230,9 @@ function updateAllocationChart(
     }
 
     const total =
-        cash + pea + cto;
+        cash +
+        pea +
+        cto;
 
     const options = {
 
@@ -192,21 +246,27 @@ function updateAllocationChart(
         },
 
         series: [
+
             cash,
             pea,
             cto
+
         ],
 
         labels: [
+
             "Cash",
             "PEA",
             "CTO"
+
         ],
 
         colors: [
+
             "#22c55e",
             "#3b82f6",
             "#f59e0b"
+
         ],
 
         legend: {
@@ -216,6 +276,7 @@ function updateAllocationChart(
             fontSize: "14px",
 
             labels: {
+
                 colors: "#ffffff"
             }
         },
@@ -226,29 +287,50 @@ function updateAllocationChart(
 
                 donut: {
 
-                    size: "70%",
+                    size: "72%",
 
                     labels: {
 
                         show: true,
 
+                        name: {
+
+                            show: true,
+
+                            color: "#94a3b8"
+                        },
+
+                        value: {
+
+                            show: true,
+
+                            color: "#ffffff"
+                        },
+
                         total: {
 
                             show: true,
 
-                            label: "Patrimoine",
+                            label:
+                                "Patrimoine",
 
-                            color: "#ffffff",
+                            color:
+                                "#ffffff",
 
-                            formatter: function () {
+                            formatter:
+                                function () {
 
-                                return (
-                                    Math.round(total)
-                                        .toLocaleString("fr-FR")
-                                    + " €"
-                                );
+                                    return (
+                                        Math.round(
+                                            total
+                                        )
+                                        .toLocaleString(
+                                            "fr-FR"
+                                        )
+                                        + " €"
+                                    );
 
-                            }
+                                }
                         }
                     }
                 }
@@ -259,16 +341,19 @@ function updateAllocationChart(
 
             enabled: true,
 
-            formatter: function (
-                value
-            ) {
+            formatter:
+                function (
+                    value
+                ) {
 
-                return (
-                    value.toFixed(1)
-                    + "%"
-                );
+                    return (
+                        value.toFixed(
+                            1
+                        )
+                        + "%"
+                    );
 
-            }
+                }
         },
 
         tooltip: {
@@ -277,17 +362,22 @@ function updateAllocationChart(
 
             y: {
 
-                formatter: function (
-                    value
-                ) {
+                formatter:
+                    function (
+                        value
+                    ) {
 
-                    return (
-                        Math.round(value)
-                            .toLocaleString("fr-FR")
-                        + " €"
-                    );
+                        return (
+                            Math.round(
+                                value
+                            )
+                            .toLocaleString(
+                                "fr-FR"
+                            )
+                            + " €"
+                        );
 
-                }
+                    }
             }
         },
 
@@ -302,12 +392,19 @@ function updateAllocationChart(
                     chart: {
 
                         height: 320
+                    },
+
+                    legend: {
+
+                        position:
+                            "bottom"
                     }
                 }
             }
         ],
 
         theme: {
+
             mode: "dark"
         }
     };
