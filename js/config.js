@@ -1,3 +1,7 @@
+/* ========================================== */
+/* CONFIGURATION GLOBALE                      */
+/* ========================================== */
+
 window.CONFIG = {
 
     URL_BUDGET:
@@ -16,3 +20,6 @@ window.CONFIG = {
         "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_CTO/export?format=csv&gid=1361663202"
 
 };
+
+/* Compatibilité maximale */
+const CONFIG = window.CONFIG;
