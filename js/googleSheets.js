@@ -147,6 +147,41 @@ async function chargerDashboard() {
             );
         }
 
+        // ===== TRAITEMENT DES OBJECTIFS =====
+        const objectifCsv = await objectifResponse.text();
+        const lignesObjectif = objectifCsv.trim().split("\n");
+
+        for (let i = 1; i < lignesObjectif.length; i++) {
+
+            const colonnes = lignesObjectif[i]
+                .replace(/\r/g, "")
+                .split("\t");
+
+            if (colonnes.length < 3) continue;
+
+            const nom = colonnes[0].trim().toLowerCase();
+            const actuel = nettoyerNombre(colonnes[1]);
+            const objectif = nettoyerNombre(colonnes[2]);
+
+            if (objectif > 0) {
+                const pourcentage = Math.min(100, (actuel / objectif) * 100);
+
+                // Mise à jour de la barre de progression
+                const barElement = document.getElementById(`bar-${nom}`);
+                if (barElement) {
+                    barElement.style.width = pourcentage + "%";
+                }
+
+                // Mise à jour du pourcentage affiché
+                const goalElement = document.getElementById(`goal-${nom}`);
+                if (goalElement) {
+                    goalElement.textContent = Math.round(pourcentage) + "%";
+                }
+
+                console.log(`Objectif ${nom}: ${Math.round(pourcentage)}%`);
+            }
+        }
+
         console.log("Dashboard chargé ✅");
 
     } catch (error) {
