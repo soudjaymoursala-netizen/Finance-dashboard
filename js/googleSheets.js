@@ -325,11 +325,11 @@ async function chargerDashboard() {
             objectifResponse
         ] = await Promise.all([
 
-            fetch(CONFIG.URL_BUDGET),
-            fetch(CONFIG.URL_CTO),
-            fetch(CONFIG.URL_PEA),
-            fetch(CONFIG.URL_EVOLUTION),
-            fetch(CONFIG.URL_OBJECTIF)
+             fetch(window.CONFIG.URL_BUDGET),
+             fetch(window.CONFIG.URL_CTO),
+             fetch(window.CONFIG.URL_PEA),
+             fetch(window.CONFIG.URL_EVOLUTION),
+             fetch(window.CONFIG.URL_OBJECTIF)
 
         ]);
 
