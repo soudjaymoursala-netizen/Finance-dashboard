@@ -29,18 +29,23 @@ function lireCSVKPI(csv) {
         const indexVirgule =
             ligne.indexOf(",");
 
-        if (indexVirgule === -1) continue;
+        if (indexVirgule === -1)
+            continue;
 
         const cle =
-            ligne.substring(
-                0,
-                indexVirgule
-            ).trim();
+            ligne
+                .substring(
+                    0,
+                    indexVirgule
+                )
+                .trim();
 
         const valeur =
-            ligne.substring(
-                indexVirgule + 1
-            ).trim();
+            ligne
+                .substring(
+                    indexVirgule + 1
+                )
+                .trim();
 
         resultat[cle] =
             nettoyerNombre(valeur);
@@ -61,7 +66,8 @@ function animerValeur(
     const pas = 30;
 
     const increment =
-        valeurFinale / (duree / pas);
+        valeurFinale /
+        (duree / pas);
 
     let valeur = 0;
 
@@ -70,17 +76,22 @@ function animerValeur(
 
             valeur += increment;
 
-            if (valeur >= valeurFinale) {
+            if (
+                valeur >= valeurFinale
+            ) {
 
                 valeur = valeurFinale;
 
-                clearInterval(timer);
-
+                clearInterval(
+                    timer
+                );
             }
 
             element.textContent =
                 Math.round(valeur)
-                    .toLocaleString("fr-FR")
+                    .toLocaleString(
+                        "fr-FR"
+                    )
                 + suffixe;
 
         }, pas);
@@ -121,9 +132,28 @@ async function chargerDashboard() {
                 await peaResponse.text()
             );
 
-        const ctoEuro =
+        /* ==========================
+           CONVERSION CTO CHF → EUR
+        ========================== */
+
+        const tauxChange =
+            cto.eur_chf || 1;
+
+        const ctoValeurEUR =
             (cto.cto_valeur_chf || 0)
-            * (cto.eur_chf || 1);
+            * tauxChange;
+
+        const ctoInvestiEUR =
+            (cto.cto_investi_chf || 0)
+            * tauxChange;
+
+        const ctoPlusValueEUR =
+            (cto.cto_plusvalue_chf || 0)
+            * tauxChange;
+
+        /* ==========================
+           PATRIMOINE
+        ========================== */
 
         const patrimoine =
             budget.patrimoine_total || 0;
@@ -132,15 +162,93 @@ async function chargerDashboard() {
             250000;
 
         const progression250k =
-            patrimoine /
-            objectif250k *
-            100;
+            patrimoine > 0
+                ? (
+                    patrimoine /
+                    objectif250k
+                ) * 100
+                : 0;
 
         const restant250k =
-            objectif250k -
-            patrimoine;
+            Math.max(
+                0,
+                objectif250k -
+                patrimoine
+            );
 
-        // KPI
+        /* ==========================
+           PERFORMANCE
+        ========================== */
+
+        const plusValueTotale =
+            (pea.pea_plusvalue || 0)
+            +
+            ctoPlusValueEUR;
+
+        const capitalInvesti =
+            (pea.pea_investi || 0)
+            +
+            ctoInvestiEUR;
+
+        const performanceGlobale =
+            capitalInvesti > 0
+            ?
+            (
+                plusValueTotale /
+                capitalInvesti
+            ) * 100
+            :
+            0;
+
+        const ratioInvesti =
+            patrimoine > 0
+            ?
+            (
+                (
+                    budget.investissements_total || 0
+                )
+                /
+                patrimoine
+            ) * 100
+            :
+            0;
+
+        /* ==========================
+           PROJECTION FIRE
+           basée sur l'épargne réelle
+        ========================== */
+
+        const revenusAnnuels =
+            budget.revenus_annuel || 0;
+
+        const depensesAnnuelles =
+            budget.depenses_annuel || 0;
+
+        const epargneAnnuelle =
+            Math.max(
+                0,
+                revenusAnnuels -
+                depensesAnnuelles
+            );
+
+        const anneesRestantes =
+            epargneAnnuelle > 0
+            ?
+            restant250k /
+            epargneAnnuelle
+            :
+            0;
+
+        const projectionAnnee =
+            new Date().getFullYear()
+            +
+            Math.ceil(
+                anneesRestantes
+            );
+
+        /* ==========================
+           KPI PRINCIPAUX
+        ========================== */
 
         animerValeur(
             document.getElementById(
@@ -178,7 +286,7 @@ async function chargerDashboard() {
             document.getElementById(
                 "cto"
             ),
-            ctoEuro || 0,
+            ctoValeurEUR,
             " €"
         );
 
@@ -190,8 +298,89 @@ async function chargerDashboard() {
                 * 100
             ).toFixed(0)
             + " %";
+/* ==========================
+           RESUME
+        ==========================        ========================== */
 
-        // Résumé
+                "Patrimoine : "
+                +
+                patrimoine.toLocaleString(
+                    "fr-FR"
+                )
+                +
+                " €<br>"
+
+                +
+
+                "Objectif : 250 000 €<br>"
+
+                +
+
+                "Progression : "
+                +
+                progression250k.toFixed(
+                    1
+                )
+                +
+                " %<br>"
+
+                +
+
+                "Reste : "
+                +
+                restant250k.toLocaleString(
+                    "fr-FR"
+                )
+                +
+                " €<br>"
+
+                +
+
+                "Projection : "
+                +
+                projectionAnnee
+                +
+                " (~"
+                +
+                anneesRestantes.toFixed(
+                    1
+                )
+                +
+                " ans)";
+
+        }
+
+        if (fireBar) {
+
+            fireBar.style.width =
+                Math.min(
+                    progression250k,
+                    100
+                )
+                + "%";
+
+        }
+
+        /* ==========================
+           DATE SYNCHRO
+        ========================== */
+
+        const updateElement =
+            document.getElementById(
+                "lastUpdate"
+            );
+
+        if (updateElement) {
+
+            updateElement.textContent =
+                "Dernière synchronisation : "
+                +
+                new Date()
+                    .toLocaleString(
+                        "fr-FR"
+                    );
+
+        }
 
         const summaryNetworth =
             document.getElementById(
@@ -206,16 +395,6 @@ async function chargerDashboard() {
         const summaryRemaining =
             document.getElementById(
                 "summaryRemaining"
-            );
-
-        const fireProgress =
-            document.getElementById(
-                "fireProgress"
-            );
-
-        const mainGoalProgress =
-            document.getElementById(
-                "mainGoalProgress"
             );
 
         if (summaryNetworth) {
@@ -247,6 +426,123 @@ async function chargerDashboard() {
 
         }
 
+        /* ==========================
+           KPI V5
+        ========================== */
+
+        const totalGain =
+            document.getElementById(
+                "totalGain"
+            );
+
+        const globalPerformance =
+            document.getElementById(
+                "globalPerformance"
+            );
+
+        const capitalInvestiElement =
+            document.getElementById(
+                "capitalInvesti"
+            );
+
+        const ratioInvestiElement =
+            document.getElementById(
+                "ratioInvesti"
+            );
+
+        if (totalGain) {
+
+            totalGain.textContent =
+                plusValueTotale
+                    .toLocaleString(
+                        "fr-FR",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )
+                + " €";
+
+        }
+
+        if (globalPerformance) {
+
+            globalPerformance.textContent =
+                performanceGlobale
+                    .toFixed(1)
+                + " %";
+
+        }
+
+        if (capitalInvestiElement) {
+
+            capitalInvestiElement.textContent =
+                capitalInvesti
+                    .toLocaleString(
+                        "fr-FR",
+                        {
+                            maximumFractionDigits: 0
+                        }
+                    )
+                + " €";
+
+        }
+
+        if (ratioInvestiElement) {
+
+            ratioInvestiElement.textContent =
+                ratioInvesti
+                    .toFixed(1)
+                + " %";
+
+        }
+
+        /* ==========================
+           PROJECTION FIRE
+        ========================== */
+
+        const projectionDate =
+            document.getElementById(
+                "projectionDate"
+            );
+
+        if (projectionDate) {
+
+            projectionDate.innerHTML =
+                projectionAnnee
+                +
+                "<br><small>"
+                +
+                anneesRestantes.toFixed(1)
+                +
+                " ans</small>";
+
+        }
+
+        /* ==========================
+           FIRE TRACKER
+        ========================== */
+
+        const fireProgress =
+            document.getElementById(
+                "fireProgress"
+            );
+
+        const fireDetails =
+            document.getElementById(
+                "fireDetails"
+            );
+
+        const fireBar =
+            document.getElementById(
+                "fireBar"
+            );
+
+        const mainGoalProgress =
+            document.getElementById(
+                "mainGoalProgress"
+            );
+
         if (fireProgress) {
 
             fireProgress.textContent =
@@ -260,32 +556,19 @@ async function chargerDashboard() {
 
             mainGoalProgress.textContent =
                 "🎯 "
-                + progression250k
-                    .toFixed(1)
-                + "% vers 250k";
-        }
-
-        // Date de synchronisation
-
-        const updateElement =
-            document.getElementById(
-                "lastUpdate"
-            );
-
-        if (updateElement) {
-
-            const maintenant =
-                new Date();
-
-            updateElement.textContent =
-                "Dernière synchronisation : "
-                + maintenant.toLocaleString(
-                    "fr-FR"
-                );
+                +
+                progression250k.toFixed(
+                    1
+                )
+                +
+                "% vers 250k";
 
         }
 
-        // Donut
+        if (fireDetails) {
+/* ==========================
+           DONUT ALLOCATION
+        ========================== */
 
         if (
             typeof updateAllocationChart ===
@@ -295,11 +578,14 @@ async function chargerDashboard() {
             updateAllocationChart(
                 budget.cash_dispo_total || 0,
                 pea.pea_valeur || 0,
-                ctoEuro || 0
+                ctoValeurEUR || 0
             );
+
         }
 
-        // Evolution
+        /* ==========================
+           EVOLUTION PATRIMOINE
+        ========================== */
 
         const evolutionCsv =
             await evolutionResponse.text();
@@ -336,6 +622,7 @@ async function chargerDashboard() {
                     colonnes[1]
                 )
             );
+
         }
 
         if (
@@ -347,9 +634,12 @@ async function chargerDashboard() {
                 labels,
                 valeurs
             );
+
         }
 
-        // Objectifs
+        /* ==========================
+           OBJECTIFS
+        ========================== */
 
         const objectifCsv =
             await objectifResponse.text();
@@ -368,7 +658,7 @@ async function chargerDashboard() {
 
             const colonnes =
                 lignesObjectifs[i]
-                .split(",");
+                    .split(",");
 
             if (
                 colonnes.length < 3
@@ -392,8 +682,10 @@ async function chargerDashboard() {
             ) continue;
 
             const pourcentage =
-                (actuel / cible)
-                * 100;
+                (
+                    actuel /
+                    cible
+                ) * 100;
 
             const label =
                 document.getElementById(
@@ -450,11 +742,69 @@ async function chargerDashboard() {
                         "#22c55e";
 
                 }
+
             }
+
+        }
+
+        /* ==========================
+           THEME LIGHT / DARK
+        ========================== */
+
+        const themeButton =
+            document.getElementById(
+                "themeToggle"
+            );
+
+        if (themeButton) {
+
+            if (
+                localStorage.getItem(
+                    "theme"
+                ) === "light"
+            ) {
+
+                document.body.classList.add(
+                    "light"
+                );
+
+                themeButton.textContent =
+                    "☀️";
+
+            }
+
+            themeButton.addEventListener(
+                "click",
+                () => {
+
+                    document.body.classList.toggle(
+                        "light"
+                    );
+
+                    const isLight =
+                        document.body.classList.contains(
+                            "light"
+                        );
+
+                    themeButton.textContent =
+                        isLight
+                        ? "☀️"
+                        : "🌙";
+
+                    localStorage.setItem(
+                        "theme",
+                        isLight
+                        ? "light"
+                        : "dark"
+                    );
+
+                }
+            );
+
         }
 
         console.log(
-            "Dashboard chargé ✅"
+            "Dashboard V5 chargé ✅"
         );
 
     }
@@ -464,7 +814,9 @@ async function chargerDashboard() {
             "Erreur Dashboard :",
             error
         );
+
     }
+
 }
 
 document.addEventListener(
