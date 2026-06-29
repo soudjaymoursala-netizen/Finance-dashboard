@@ -16,11 +16,18 @@ function updatePatrimoineChart(labels, valeurs) {
 
         chart: {
             type: "area",
-            height: 350,
+            height: 420,
+            background: "transparent",
+
             toolbar: {
                 show: false
             },
-            background: "transparent"
+
+            animations: {
+                enabled: true,
+                easing: "easeinout",
+                speed: 1200
+            }
         },
 
         series: [{
@@ -28,87 +35,159 @@ function updatePatrimoineChart(labels, valeurs) {
             data: valeurs
         }],
 
-        xaxis: {
-            categories: labels,
-            labels: {
-                style: {
-                    colors: "#94a3b8"
-                }
-            }
-        },
-
-        yaxis: {
-            labels: {
-                style: {
-                    colors: "#94a3b8"
-                },
-                formatter: function(value) {
-                    return Math.round(value)
-                        .toLocaleString("fr-FR") + " €";
-                }
-            }
-        },
+        colors: [
+            "#22c55e"
+        ],
 
         stroke: {
             curve: "smooth",
             width: 4
         },
 
-        colors: ["#22c55e"],
-
         fill: {
+
             type: "gradient",
+
             gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.4,
-                opacityTo: 0.05
+
+                shade: "dark",
+
+                type: "vertical",
+
+                shadeIntensity: 0.4,
+
+                opacityFrom: 0.45,
+
+                opacityTo: 0.03,
+
+                stops: [0, 100]
+            }
+        },
+
+        markers: {
+
+            size: 5,
+
+            colors: ["#22c55e"],
+
+            strokeColors: "#ffffff",
+
+            strokeWidth: 2,
+
+            hover: {
+                size: 8
             }
         },
 
         dataLabels: {
-            enabled: true
+            enabled: false
+        },
+
+        grid: {
+
+            borderColor: "#334155",
+
+            strokeDashArray: 5
+        },
+
+        xaxis: {
+
+            categories: labels,
+
+            labels: {
+
+                style: {
+
+                    colors: "#94a3b8",
+
+                    fontSize: "12px"
+                }
+            }
+        },
+
+        yaxis: {
+
+            labels: {
+
+                style: {
+
+                    colors: "#94a3b8"
+                },
+
+                formatter: function (value) {
+
+                    return (
+                        Math.round(value)
+                            .toLocaleString("fr-FR")
+                        + " €"
+                    );
+
+                }
+            }
         },
 
         tooltip: {
+
+            theme: "dark",
+
             y: {
-                formatter: function(value) {
-                    return Math.round(value)
-                        .toLocaleString("fr-FR") + " €";
+
+                formatter: function (value) {
+
+                    return (
+                        Math.round(value)
+                            .toLocaleString("fr-FR")
+                        + " €"
+                    );
+
                 }
             }
         },
 
         theme: {
             mode: "dark"
-        },
-
-        grid: {
-            borderColor: "#334155"
         }
     };
 
     patrimoineChart =
-        new ApexCharts(chartElement, options);
+        new ApexCharts(
+            chartElement,
+            options
+        );
 
     patrimoineChart.render();
 }
 
-function updateAllocationChart(cash, pea, cto) {
+function updateAllocationChart(
+    cash,
+    pea,
+    cto
+) {
 
     const chartElement =
-        document.querySelector("#allocationChart");
+        document.querySelector(
+            "#allocationChart"
+        );
 
     if (!chartElement) return;
 
     if (allocationChart) {
+
         allocationChart.destroy();
+
     }
+
+    const total =
+        cash + pea + cto;
 
     const options = {
 
         chart: {
+
             type: "donut",
-            height: 350,
+
+            height: 420,
+
             background: "transparent"
         },
 
@@ -131,20 +210,102 @@ function updateAllocationChart(cash, pea, cto) {
         ],
 
         legend: {
+
             position: "bottom",
+
+            fontSize: "14px",
+
             labels: {
                 colors: "#ffffff"
             }
         },
 
-        tooltip: {
-            y: {
-                formatter: function(value) {
-                    return Math.round(value)
-                        .toLocaleString("fr-FR") + " €";
+        plotOptions: {
+
+            pie: {
+
+                donut: {
+
+                    size: "70%",
+
+                    labels: {
+
+                        show: true,
+
+                        total: {
+
+                            show: true,
+
+                            label: "Patrimoine",
+
+                            color: "#ffffff",
+
+                            formatter: function () {
+
+                                return (
+                                    Math.round(total)
+                                        .toLocaleString("fr-FR")
+                                    + " €"
+                                );
+
+                            }
+                        }
+                    }
                 }
             }
         },
+
+        dataLabels: {
+
+            enabled: true,
+
+            formatter: function (
+                value
+            ) {
+
+                return (
+                    value.toFixed(1)
+                    + "%"
+                );
+
+            }
+        },
+
+        tooltip: {
+
+            theme: "dark",
+
+            y: {
+
+                formatter: function (
+                    value
+                ) {
+
+                    return (
+                        Math.round(value)
+                            .toLocaleString("fr-FR")
+                        + " €"
+                    );
+
+                }
+            }
+        },
+
+        responsive: [
+
+            {
+
+                breakpoint: 768,
+
+                options: {
+
+                    chart: {
+
+                        height: 320
+                    }
+                }
+            }
+        ],
 
         theme: {
             mode: "dark"
@@ -152,7 +313,10 @@ function updateAllocationChart(cash, pea, cto) {
     };
 
     allocationChart =
-        new ApexCharts(chartElement, options);
+        new ApexCharts(
+            chartElement,
+            options
+        );
 
     allocationChart.render();
 }
