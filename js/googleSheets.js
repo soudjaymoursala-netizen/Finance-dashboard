@@ -26,21 +26,64 @@ function lireCSVKPI(csv) {
 
         const ligne = lignes[i];
 
-        const indexVirgule = ligne.indexOf(",");
+        const indexVirgule =
+            ligne.indexOf(",");
 
         if (indexVirgule === -1) continue;
 
         const cle =
-            ligne.substring(0, indexVirgule).trim();
+            ligne.substring(
+                0,
+                indexVirgule
+            ).trim();
 
         const valeur =
-            ligne.substring(indexVirgule + 1).trim();
+            ligne.substring(
+                indexVirgule + 1
+            ).trim();
 
         resultat[cle] =
             nettoyerNombre(valeur);
     }
 
     return resultat;
+}
+
+function animerValeur(
+    element,
+    valeurFinale,
+    suffixe = ""
+) {
+
+    if (!element) return;
+
+    const duree = 1000;
+    const pas = 30;
+
+    const increment =
+        valeurFinale / (duree / pas);
+
+    let valeur = 0;
+
+    const timer =
+        setInterval(() => {
+
+            valeur += increment;
+
+            if (valeur >= valeurFinale) {
+
+                valeur = valeurFinale;
+
+                clearInterval(timer);
+
+            }
+
+            element.textContent =
+                Math.round(valeur)
+                    .toLocaleString("fr-FR")
+                + suffixe;
+
+        }, pas);
 }
 
 async function chargerDashboard() {
@@ -54,67 +97,206 @@ async function chargerDashboard() {
             evolutionResponse,
             objectifResponse
         ] = await Promise.all([
+
             fetch(CONFIG.URL_BUDGET),
             fetch(CONFIG.URL_CTO),
             fetch(CONFIG.URL_PEA),
             fetch(CONFIG.URL_EVOLUTION),
             fetch(CONFIG.URL_OBJECTIF)
+
         ]);
 
         const budget =
-            lireCSVKPI(await budgetResponse.text());
+            lireCSVKPI(
+                await budgetResponse.text()
+            );
 
         const cto =
-            lireCSVKPI(await ctoResponse.text());
+            lireCSVKPI(
+                await ctoResponse.text()
+            );
 
         const pea =
-            lireCSVKPI(await peaResponse.text());
+            lireCSVKPI(
+                await peaResponse.text()
+            );
 
         const ctoEuro =
-            (cto.cto_valeur_chf || 0) *
-            (cto.eur_chf || 1);
+            (cto.cto_valeur_chf || 0)
+            * (cto.eur_chf || 1);
+
+        const patrimoine =
+            budget.patrimoine_total || 0;
+
+        const objectif250k =
+            250000;
+
+        const progression250k =
+            patrimoine /
+            objectif250k *
+            100;
+
+        const restant250k =
+            objectif250k -
+            patrimoine;
 
         // KPI
 
-        document.getElementById("networth").textContent =
-            Math.round(
-                budget.patrimoine_total || 0
-            ).toLocaleString("fr-FR") + " €";
+        animerValeur(
+            document.getElementById(
+                "networth"
+            ),
+            patrimoine,
+            " €"
+        );
 
-        document.getElementById("cash").textContent =
-            Math.round(
-                budget.cash_dispo_total || 0
-            ).toLocaleString("fr-FR") + " €";
+        animerValeur(
+            document.getElementById(
+                "cash"
+            ),
+            budget.cash_dispo_total || 0,
+            " €"
+        );
 
-        document.getElementById("investments").textContent =
-            Math.round(
-                budget.investissements_total || 0
-            ).toLocaleString("fr-FR") + " €";
+        animerValeur(
+            document.getElementById(
+                "investments"
+            ),
+            budget.investissements_total || 0,
+            " €"
+        );
 
-        document.getElementById("pea").textContent =
-            Math.round(
-                pea.pea_valeur || 0
-            ).toLocaleString("fr-FR") + " €";
+        animerValeur(
+            document.getElementById(
+                "pea"
+            ),
+            pea.pea_valeur || 0,
+            " €"
+        );
 
-        document.getElementById("cto").textContent =
-            Math.round(
-                ctoEuro || 0
-            ).toLocaleString("fr-FR") + " €";
+        animerValeur(
+            document.getElementById(
+                "cto"
+            ),
+            ctoEuro || 0,
+            " €"
+        );
 
-        document.getElementById("performance").textContent =
-            ((budget.taux_epargne_annuel || 0) * 100)
-                .toFixed(0) + " %";
+        document.getElementById(
+            "performance"
+        ).textContent =
+            (
+                (budget.taux_epargne_annuel || 0)
+                * 100
+            ).toFixed(0)
+            + " %";
+
+        // Résumé
+
+        const summaryNetworth =
+            document.getElementById(
+                "summaryNetworth"
+            );
+
+        const summaryProgress =
+            document.getElementById(
+                "summaryProgress"
+            );
+
+        const summaryRemaining =
+            document.getElementById(
+                "summaryRemaining"
+            );
+
+        const fireProgress =
+            document.getElementById(
+                "fireProgress"
+            );
+
+        const mainGoalProgress =
+            document.getElementById(
+                "mainGoalProgress"
+            );
+
+        if (summaryNetworth) {
+
+            summaryNetworth.textContent =
+                patrimoine.toLocaleString(
+                    "fr-FR"
+                ) + " €";
+
+        }
+
+        if (summaryProgress) {
+
+            summaryProgress.textContent =
+                progression250k
+                    .toFixed(1)
+                + " %";
+
+        }
+
+        if (summaryRemaining) {
+
+            summaryRemaining.textContent =
+                restant250k
+                    .toLocaleString(
+                        "fr-FR"
+                    )
+                + " €";
+
+        }
+
+        if (fireProgress) {
+
+            fireProgress.textContent =
+                progression250k
+                    .toFixed(1)
+                + " %";
+
+        }
+
+        if (mainGoalProgress) {
+
+            mainGoalProgress.textContent =
+                "🎯 "
+                + progression250k
+                    .toFixed(1)
+                + "% vers 250k";
+        }
+
+        // Date de synchronisation
+
+        const updateElement =
+            document.getElementById(
+                "lastUpdate"
+            );
+
+        if (updateElement) {
+
+            const maintenant =
+                new Date();
+
+            updateElement.textContent =
+                "Dernière synchronisation : "
+                + maintenant.toLocaleString(
+                    "fr-FR"
+                );
+
+        }
 
         // Donut
 
-        if (typeof updateAllocationChart === "function") {
+        if (
+            typeof updateAllocationChart ===
+            "function"
+        ) {
 
             updateAllocationChart(
                 budget.cash_dispo_total || 0,
                 pea.pea_valeur || 0,
                 ctoEuro || 0
             );
-
         }
 
         // Evolution
@@ -131,12 +313,19 @@ async function chargerDashboard() {
         const labels = [];
         const valeurs = [];
 
-        for (let i = 1; i < lignesEvolution.length; i++) {
+        for (
+            let i = 1;
+            i < lignesEvolution.length;
+            i++
+        ) {
 
             const colonnes =
-                lignesEvolution[i].split(",");
+                lignesEvolution[i]
+                    .split(",");
 
-            if (colonnes.length < 2) continue;
+            if (
+                colonnes.length < 2
+            ) continue;
 
             labels.push(
                 colonnes[0].trim()
@@ -149,13 +338,15 @@ async function chargerDashboard() {
             );
         }
 
-        if (typeof updatePatrimoineChart === "function") {
+        if (
+            typeof updatePatrimoineChart ===
+            "function"
+        ) {
 
             updatePatrimoineChart(
                 labels,
                 valeurs
             );
-
         }
 
         // Objectifs
@@ -169,12 +360,19 @@ async function chargerDashboard() {
                 .trim()
                 .split("\n");
 
-        for (let i = 1; i < lignesObjectifs.length; i++) {
+        for (
+            let i = 1;
+            i < lignesObjectifs.length;
+            i++
+        ) {
 
             const colonnes =
-                lignesObjectifs[i].split(",");
+                lignesObjectifs[i]
+                .split(",");
 
-            if (colonnes.length < 3) continue;
+            if (
+                colonnes.length < 3
+            ) continue;
 
             const objectif =
                 colonnes[0].trim();
@@ -189,10 +387,13 @@ async function chargerDashboard() {
                     colonnes[2]
                 );
 
-            if (cible <= 0) continue;
+            if (
+                cible <= 0
+            ) continue;
 
             const pourcentage =
-                (actuel / cible) * 100;
+                (actuel / cible)
+                * 100;
 
             const label =
                 document.getElementById(
@@ -214,24 +415,36 @@ async function chargerDashboard() {
             if (barre) {
 
                 barre.style.width =
-                    `${Math.min(pourcentage, 100)}%`;
+                    `${Math.min(
+                        pourcentage,
+                        100
+                    )}%`;
 
-                if (pourcentage < 25) {
+                if (
+                    pourcentage < 25
+                ) {
 
                     barre.style.background =
                         "#ef4444";
 
-                } else if (pourcentage < 50) {
+                }
+                else if (
+                    pourcentage < 50
+                ) {
 
                     barre.style.background =
                         "#f59e0b";
 
-                } else if (pourcentage < 75) {
+                }
+                else if (
+                    pourcentage < 75
+                ) {
 
                     barre.style.background =
                         "#3b82f6";
 
-                } else {
+                }
+                else {
 
                     barre.style.background =
                         "#22c55e";
@@ -240,9 +453,12 @@ async function chargerDashboard() {
             }
         }
 
-        console.log("Dashboard chargé ✅");
+        console.log(
+            "Dashboard chargé ✅"
+        );
 
-    } catch (error) {
+    }
+    catch (error) {
 
         console.error(
             "Erreur Dashboard :",
