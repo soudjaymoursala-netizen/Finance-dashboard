@@ -2,25 +2,40 @@
 <html lang="fr">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
     <title>Finance Dashboard</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
 </head>
 
 <body>
 
     <div class="container">
 
-        <div class="header">
-            <h1>💰 Finance Dashboard</h1>
-            <span class="status">LIVE</span>
-        </div>
+        <header class="header">
 
-        <div class="kpi-grid">
+            <h1>💰 Finance Dashboard</h1>
+
+            <span class="status">
+                LIVE
+            </span>
+
+        </header>
+
+        <!-- KPI -->
+
+        <section class="kpi-grid">
 
             <div class="card">
                 <div class="label">Patrimoine total</div>
@@ -52,82 +67,190 @@
                 <div class="value" id="performance">...</div>
             </div>
 
-        </div>
+        </section>
 
-        <div class="chart-card">
-            <h2>📈 Évolution du patrimoine</h2>
-            <div id="patrimoineChart"></div>
-        </div>
+        <!-- Graphiques -->
 
-        <div class="chart-card">
-            <h2>🥧 Allocation du patrimoine</h2>
-            <div id="allocationChart"></div>
-        </div>
+        <section class="chart-grid">
 
-        <div class="chart-card">
-            <h2>🎯 Objectifs financiers</h2>
+            <div class="chart-card">
+
+                <h2>
+                    📈 Évolution du patrimoine
+                </h2>
+
+                <div id="patrimoineChart"></div>
+
+            </div>
+
+            <div class="chart-card">
+
+                <h2>
+                    🥧 Allocation du patrimoine
+                </h2>
+
+                <div id="allocationChart"></div>
+
+            </div>
+
+        </section>
+
+        <!-- Objectifs -->
+
+        <section class="chart-card">
+
+            <h2>
+                🎯 Objectifs financiers
+            </h2>
 
             <div id="goalsContainer">
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>🏠 Appartement</span>
-                        <span id="goal-appartement">0%</span>
+
+                        <span>
+                            🏠 Appartement
+                        </span>
+
+                        <span
+                            id="goal-appartement">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-appartement" class="progress-fill"></div>
+
+                        <div
+                            id="bar-appartement"
+                            class="progress-fill">
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>🚗 Voiture</span>
-                        <span id="goal-voiture">0%</span>
+
+                        <span>
+                            🚗 Voiture
+                        </span>
+
+                        <span
+                            id="goal-voiture">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-voiture" class="progress-fill"></div>
+
+                        <div
+                            id="bar-voiture"
+                            class="progress-fill">
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>✈️ Vacances</span>
-                        <span id="goal-vacances">0%</span>
+
+                        <span>
+                            ✈️ Vacances
+                        </span>
+
+                        <span
+                            id="goal-vacances">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-vacances" class="progress-fill"></div>
+
+                        <div
+                            id="bar-vacances"
+                            class="progress-fill">
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>💰 Fonds urgence</span>
-                        <span id="goal-fonds_urgence">0%</span>
+
+                        <span>
+                            💰 Fonds d'urgence
+                        </span>
+
+                        <span
+                            id="goal-fonds_urgence">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-fonds_urgence" class="progress-fill"></div>
+
+                        <div
+                            id="bar-fonds_urgence"
+                            class="progress-fill">
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>🎯 Patrimoine 250k</span>
-                        <span id="goal-patrimoine_total">0%</span>
+
+                        <span>
+                            🎯 Patrimoine 250k
+                        </span>
+
+                        <span
+                            id="goal-patrimoine_total">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-patrimoine_total" class="progress-fill"></div>
+
+                        <div
+                            id="bar-patrimoine_total"
+                            class="progress-fill">
+                        </div>
+
                     </div>
+
                 </div>
 
             </div>
-        </div>
+
+        </section>
 
     </div>
 
+    <!-- Scripts -->
+
     <script src="js/config.js"></script>
+
     <script src="js/charts.js"></script>
+
     <script src="js/errorHandler.js"></script>
+
     <script src="js/googleSheets.js"></script>
+
     <script src="js/test.js"></script>
 
 </body>
