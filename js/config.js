@@ -1,4 +1,4 @@
-const CONFIG = {
+CONFIGCONFIG = {
 
     URL_BUDGET:
         "https://docs.google.com/spreadsheets/d/1AshVCjcmoXl9SOajgGtzl00nOeSwnFeFLCy-7jvfRAw/export?format=csv&gid=519498006",
