@@ -1,4 +1,4 @@
-CONFIGCONFIG = {
+window.CONFIG = {
 
     URL_BUDGET:
         "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_BUDGET/export?format=csv&gid=519498006",
