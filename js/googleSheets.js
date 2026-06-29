@@ -31,13 +31,16 @@ function lireCSVKPI(csv) {
 
         if (indexVirgule === -1) continue;
 
-        const cle =
-            ligne.substring(0, indexVirgule).trim();
+        const cle = ligne
+            .substring(0, indexVirgule)
+            .trim();
 
-        const valeur =
-            ligne.substring(indexVirgule + 1).trim();
+        const valeur = ligne
+            .substring(indexVirgule + 1)
+            .trim();
 
-        resultat[cle] = nettoyerNombre(valeur);
+        resultat[cle] =
+            nettoyerNombre(valeur);
     }
 
     return resultat;
@@ -100,7 +103,7 @@ async function chargerDashboard() {
             ((budget.taux_epargne_annuel || 0) * 100)
                 .toFixed(0) + " %";
 
-        // Donut
+        // Allocation
 
         if (typeof updateAllocationChart === "function") {
 
@@ -109,6 +112,7 @@ async function chargerDashboard() {
                 pea.pea_valeur || 0,
                 ctoEuro || 0
             );
+
         }
 
         // Evolution
@@ -128,14 +132,19 @@ async function chargerDashboard() {
         for (let i = 1; i < lignesEvolution.length; i++) {
 
             const colonnes =
-                lignesEvolution[i].split(",");
+                lignesEvolution[i]
+                    .split(",");
 
             if (colonnes.length < 2) continue;
 
-            labels.push(colonnes[0]);
+            labels.push(
+                colonnes[0].trim()
+            );
 
             valeurs.push(
-                nettoyerNombre(colonnes[1])
+                nettoyerNombre(
+                    colonnes[1]
+                )
             );
         }
 
@@ -145,6 +154,7 @@ async function chargerDashboard() {
                 labels,
                 valeurs
             );
+
         }
 
         // Objectifs
@@ -161,7 +171,8 @@ async function chargerDashboard() {
         for (let i = 1; i < lignesObjectifs.length; i++) {
 
             const colonnes =
-                lignesObjectifs[i].split(",");
+                lignesObjectifs[i]
+                    .split(",");
 
             if (colonnes.length < 3) continue;
 
@@ -169,10 +180,14 @@ async function chargerDashboard() {
                 colonnes[0].trim();
 
             const cible =
-                nettoyerNombre(colonnes[1]);
+                nettoyerNombre(
+                    colonnes[1]
+                );
 
             const actuel =
-                nettoyerNombre(colonnes[2]);
+                nettoyerNombre(
+                    colonnes[2]
+                );
 
             if (cible <= 0) continue;
 
@@ -193,16 +208,21 @@ async function chargerDashboard() {
 
                 label.textContent =
                     `${Math.round(actuel).toLocaleString("fr-FR")} € / ${Math.round(cible).toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
+
             }
 
             if (barre) {
 
                 barre.style.width =
                     `${Math.min(pourcentage, 100)}%`;
+
             }
         }
 
         console.log("Dashboard chargé ✅");
+        console.log("Budget :", budget);
+        console.log("PEA :", pea);
+        console.log("CTO :", cto);
 
     } catch (error) {
 
@@ -210,6 +230,7 @@ async function chargerDashboard() {
             "Erreur Dashboard :",
             error
         );
+
     }
 }
 
