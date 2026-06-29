@@ -10,18 +10,36 @@ window.onerror = function (
     error
 ) {
 
-    console.error(
-        "Erreur JS :",
-        {
-            message,
-            source,
-            line,
-            column,
-            error
-        }
-    );
+    console.group("🚨 ERREUR JAVASCRIPT");
 
+    console.error("Message :", message);
+    console.error("Source  :", source);
+    console.error("Ligne   :", line);
+    console.error("Colonne :", column);
+
+    if (error) {
+        console.error("Objet erreur :", error);
+        console.error("Stack :", error.stack);
+    }
+
+    console.groupEnd();
+
+    return false;
 };
+
+window.addEventListener("unhandledrejection", function (event) {
+
+    console.group("🚨 PROMISE REJETÉE");
+
+    console.error("Reason :", event.reason);
+
+    if (event.reason?.stack) {
+        console.error("Stack :", event.reason.stack);
+    }
+
+    console.groupEnd();
+
+});
 
 function showError(message) {
 
