@@ -329,13 +329,22 @@ console.log("CONFIG =", window.CONFIG);
 if (!window.CONFIG) {
     throw new Error("window.CONFIG introuvable");
 }
-             fetch(window.CONFIG.URL_BUDGET),
-             fetch(window.CONFIG.URL_CTO),
-             fetch(window.CONFIG.URL_PEA),
-             fetch(window.CONFIG.URL_EVOLUTION),
-             fetch(window.CONFIG.URL_OBJECTIF)
 
-        ]);
+const [
+    budgetResponse,
+    ctoResponse,
+    peaResponse,
+    evolutionResponse,
+    objectifResponse
+] = await Promise.all([
+
+    fetch(window.CONFIG.URL_BUDGET),
+    fetch(window.CONFIG.URL_CTO),
+    fetch(window.CONFIG.URL_PEA),
+    fetch(window.CONFIG.URL_EVOLUTION),
+    fetch(window.CONFIG.URL_OBJECTIF)
+
+]);
 
         /* ========================================== */
         /* PARSING CSV                                */
