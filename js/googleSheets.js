@@ -400,19 +400,49 @@ dateProjection.setMonth(
                 + " %";
         }
 
-        if (projectionDate) {
+if (projectionDate) {
 
-            projectionDate.innerHTML =
-                projectionAnnee
-                +
-                "<br><small>"
-                +
-                anneesRestantes.toFixed(
-                    1
-                )
-                +
-                " ans</small>";
-        }
+    const mois = [
+        "Jan",
+        "Fév",
+        "Mar",
+        "Avr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Aoû",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Déc"
+    ];
+
+    projectionDate.innerHTML =
+
+        mois[
+            dateProjection.getMonth()
+        ]
+
+        +
+
+        " "
+
+        +
+
+        dateProjection.getFullYear()
+
+        +
+
+        "<br><small>"
+
+        +
+
+        anneesRestantes.toFixed(1)
+
+        +
+
+        " ans</small>";
+}
 
         // ==========================
         // FIRE TRACKER
