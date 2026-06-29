@@ -1,3 +1,7 @@
+/* ========================================== */
+/* CONFIGURATION GLOBALE                      */
+/* ========================================== */
+
 window.CONFIG = {
 
     URL_BUDGET:
@@ -16,3 +20,6 @@ window.CONFIG = {
         "https://docs.google.com/spreadsheets/d/1o9CIjVSRq_0A3IYZTyBmnGMfu4XMeKdf1WAMpfTw3k4/export?format=csv&gid=1361663202"
 
 };
+
+/* Compatibilité maximale */
+const CONFIG = window.CONFIG;
