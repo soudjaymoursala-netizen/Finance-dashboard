@@ -313,17 +313,10 @@ async function chargerDashboard() {
 
     try {
 
-        /* ========================================== */
-        /* CHARGEMENT DES SOURCES                     */
-        /* ========================================== */
+ /* ========================================== */
+/* CHARGEMENT DES SOURCES                     */
+/* ========================================== */
 
-        const [
-            budgetResponse,
-            ctoResponse,
-            peaResponse,
-            evolutionResponse,
-            objectifResponse
-        ] = await Promise.all([
 console.log("CONFIG =", window.CONFIG);
 
 if (!window.CONFIG) {
