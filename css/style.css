@@ -1,3 +1,15 @@
+:root{
+    --bg:#081229;
+    --card:#1b2942;
+    --card-hover:#243754;
+    --text:#ffffff;
+    --muted:#94a3b8;
+    --green:#22c55e;
+    --green-dark:#16a34a;
+    --shadow:0 10px 30px rgba(0,0,0,.25);
+    --radius:18px;
+}
+
 *{
     margin:0;
     padding:0;
@@ -5,115 +17,272 @@
 }
 
 body{
-    background:#0f172a;
-    color:white;
-    font-family:Segoe UI, sans-serif;
+    background:linear-gradient(
+        180deg,
+        #081229 0%,
+        #0f172a 100%
+    );
+    color:var(--text);
+    font-family:"Segoe UI",sans-serif;
+    min-height:100vh;
 }
 
 .container{
-    padding:30px;
+    max-width:1800px;
+    margin:auto;
+    padding:24px;
 }
 
 .header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:30px;
+    margin-bottom:24px;
 }
 
 .header h1{
-    font-size:32px;
+    font-size:2rem;
+    font-weight:700;
 }
 
 .status{
-    background:#22c55e;
+    background:var(--green);
     color:white;
-    padding:8px 15px;
-    border-radius:20px;
-    font-size:14px;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    box-shadow:0 0 15px rgba(34,197,94,.4);
 }
 
 .kpi-grid{
+
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(230px,1fr));
+
+    gap:18px;
+
+    margin-bottom:24px;
 }
 
 .card{
-    background:#1e293b;
-    border-radius:18px;
-    padding:25px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.3);
+
+    background:var(--card);
+
+    border-radius:var(--radius);
+
+    padding:20px;
+
+    box-shadow:var(--shadow);
+
+    transition:
+    transform .25s ease,
+    background .25s ease;
+}
+
+.card:hover{
+
+    transform:translateY(-4px);
+
+    background:
+    var(--card-hover);
 }
 
 .label{
-    color:#94a3b8;
-    margin-bottom:10px;
+
+    color:var(--muted);
+
+    font-size:.85rem;
+
+    margin-bottom:12px;
 }
 
 .value{
-    font-size:32px;
-    font-weight:bold;
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
 }
 
 .chart-card{
-    background:#1e293b;
-    border-radius:18px;
-    padding:25px;
-    margin-top:20px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.3);
+
+    background:var(--card);
+
+    border-radius:var(--radius);
+
+    padding:24px;
+
+    margin-bottom:24px;
+
+    box-shadow:var(--shadow);
 }
 
 .chart-card h2{
+
     margin-bottom:20px;
+
+    font-size:1.1rem;
+
+    font-weight:600;
+}
+
+#patrimoineChart{
+
+    min-height:400px;
+}
+
+#allocationChart{
+
+    min-height:320px;
 }
 
 .goal{
-    margin-bottom:25px;
+
+    margin-bottom:22px;
 }
 
 .goal-header{
+
     display:flex;
+
     justify-content:space-between;
+
+    align-items:center;
+
     margin-bottom:10px;
-    font-size:16px;
+
+    font-size:.95rem;
 }
 
 .progress-bar{
+
     width:100%;
-    height:14px;
+
+    height:12px;
+
     background:#334155;
+
     border-radius:999px;
+
     overflow:hidden;
 }
 
 .progress-fill{
+
     height:100%;
-    width:0%;
-    background:linear-gradient(
-        90deg,
-        #22c55e,
-        #16a34a
+
+    width:0;
+
+    border-radius:999px;
+
+    background:
+    linear-gradient(
+    90deg,
+    var(--green),
+    var(--green-dark)
     );
+
     transition:width 1s ease;
 }
 
-@media(max-width:768px){
+.goal:hover .progress-fill{
+
+    filter:brightness(1.15);
+}
+
+.chart-card,
+.card{
+
+    border:1px solid rgba(
+        255,
+        255,
+        255,
+        .04
+    );
+}
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#334155;
+    border-radius:999px;
+}
+
+@media (max-width:1200px){
+
+    .value{
+
+        font-size:1.8rem;
+    }
+}
+
+@media (max-width:768px){
 
     .container{
-        padding:20px;
+        padding:16px;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
     }
 
     .header h1{
-        font-size:24px;
+        font-size:1.5rem;
+    }
+
+    .kpi-grid{
+
+        grid-template-columns:
+        repeat(2,1fr);
     }
 
     .value{
-        font-size:24px;
+
+        font-size:1.5rem;
+    }
+
+    .goal-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:5px;
+    }
+
+    #patrimoineChart{
+        min-height:300px;
+    }
+
+    #allocationChart{
+        min-height:250px;
+    }
+}
+
+@media (max-width:480px){
+
+    .kpi-grid{
+
+        grid-template-columns:1fr;
+    }
+
+    .card{
+        padding:18px;
+    }
+
+    .value{
+        font-size:1.4rem;
     }
 
     .chart-card{
-        padding:20px;
+        padding:18px;
     }
-
 }
