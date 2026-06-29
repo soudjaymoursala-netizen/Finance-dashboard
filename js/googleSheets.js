@@ -324,7 +324,11 @@ async function chargerDashboard() {
             evolutionResponse,
             objectifResponse
         ] = await Promise.all([
+console.log("CONFIG =", window.CONFIG);
 
+if (!window.CONFIG) {
+    throw new Error("window.CONFIG introuvable");
+}
              fetch(window.CONFIG.URL_BUDGET),
              fetch(window.CONFIG.URL_CTO),
              fetch(window.CONFIG.URL_PEA),
