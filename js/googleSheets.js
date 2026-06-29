@@ -13,6 +13,72 @@ const URL_EVOLUTION =
 const URL_OBJECTIF =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq5EMGQYPvA9CZrUkdteiVl09VLnBQyHK6mQQJwzPkf0xTJO1Igb8YnelcKpnt-X9U84QcQsSsjR5U/pub?gid=1700667008&single=true&output=csv";
 
+// ===== AFFICHAGE DES ERREURS À L'ÉCRAN =====
+function afficherErreur(message) {
+    console.error("❌ Erreur Dashboard :", message);
+    
+    const container = document.getElementById("error-display");
+    if (container) {
+        container.style.display = "block";
+        container.textContent = "⚠️ " + message;
+    }
+}
+
+function afficherDebug(message) {
+    console.log("🔍 DEBUG:", message);
+    
+    const container = document.getElementById("debug-display");
+    if (container) {
+        container.textContent = "ℹ️ " + message;
+    }
+}
+
+// Créer les conteneurs d'affichage au chargement
+function creerConteneurErreur() {
+    if (!document.getElementById("error-display")) {
+        const errDiv = document.createElement("div");
+        errDiv.id = "error-display";
+        errDiv.style.cssText = `
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            right: 20px;
+            background: #dc2626;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            word-wrap: break-word;
+        `;
+        document.body.appendChild(errDiv);
+    }
+    
+    if (!document.getElementById("debug-display")) {
+        const debugDiv = document.createElement("div");
+        debugDiv.id = "debug-display";
+        debugDiv.style.cssText = `
+            display: block;
+            position: fixed;
+            top: 140px;
+            left: 20px;
+            right: 20px;
+            background: #0066cc;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            word-wrap: break-word;
+        `;
+        debugDiv.textContent = "ℹ️ Chargement des données...";
+        document.body.appendChild(debugDiv);
+    }
+}
+
 function nettoyerNombre(valeur) {
 
     if (!valeur) return 0;
@@ -53,20 +119,28 @@ function lireCSVKPI(csv) {
 async function chargerDashboard() {
 
     try {
+        creerConteneurErreur();
+        afficherDebug("🔄 Récupération des données...");
 
-        const [
-            budgetResponse,
-            ctoResponse,
-            peaResponse,
-            evolutionResponse,
-            objectifResponse
-        ] = await Promise.all([
-            fetch(URL_BUDGET),
-            fetch(URL_CTO),
-            fetch(URL_PEA),
-            fetch(URL_EVOLUTION),
-            fetch(URL_OBJECTIF)
-        ]);
+        afficherDebug("📊 Fetching Budget...");
+        const budgetResponse = await fetch(URL_BUDGET);
+        if (!budgetResponse.ok) throw new Error("Budget: HTTP " + budgetResponse.status);
+        
+        afficherDebug("📊 Fetching CTO...");
+        const ctoResponse = await fetch(URL_CTO);
+        if (!ctoResponse.ok) throw new Error("CTO: HTTP " + ctoResponse.status);
+        
+        afficherDebug("📊 Fetching PEA...");
+        const peaResponse = await fetch(URL_PEA);
+        if (!peaResponse.ok) throw new Error("PEA: HTTP " + peaResponse.status);
+        
+        afficherDebug("📊 Fetching Evolution...");
+        const evolutionResponse = await fetch(URL_EVOLUTION);
+        if (!evolutionResponse.ok) throw new Error("Evolution: HTTP " + evolutionResponse.status);
+        
+        afficherDebug("📊 Fetching Objectifs...");
+        const objectifResponse = await fetch(URL_OBJECTIF);
+        if (!objectifResponse.ok) throw new Error("Objectifs: HTTP " + objectifResponse.status);
 
         const budget =
             lireCSVKPI(await budgetResponse.text());
@@ -76,6 +150,8 @@ async function chargerDashboard() {
 
         const pea =
             lireCSVKPI(await peaResponse.text());
+
+        afficherDebug("✅ Données reçues! Traitement...");
 
         const ctoEuro =
             (cto.cto_valeur_chf || 0) *
@@ -182,10 +258,15 @@ async function chargerDashboard() {
             }
         }
 
-        console.log("Dashboard chargé ✅");
+        afficherDebug("✅ Dashboard chargé avec succès!");
+        setTimeout(() => {
+            const debugDiv = document.getElementById("debug-display");
+            if (debugDiv) debugDiv.style.display = "none";
+        }, 3000);
 
     } catch (error) {
 
+        afficherErreur("Erreur: " + error.message);
         console.error(
             "Erreur Dashboard :",
             error
