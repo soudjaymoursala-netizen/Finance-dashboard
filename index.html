@@ -11,11 +11,9 @@
 
     <title>Finance Dashboard V5</title>
 
-    <link
-        rel="stylesheet"
-        href="css/style.css">
+    css/style.css
 
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    ://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 </head>
 
@@ -23,7 +21,9 @@
 
     <div class="container">
 
+        <!-- ===================================== -->
         <!-- HEADER -->
+        <!-- ===================================== -->
 
         <header class="header">
 
@@ -61,9 +61,21 @@
 
         </header>
 
-        <!-- KPI PRINCIPAUX -->
+        <!-- ===================================== -->
+        <!-- ALERTES FUTURES -->
+        <!-- ===================================== -->
 
-        <section class="kpi-grid">
+        <section id="alerts">
+
+        </section>
+
+        <!-- ===================================== -->
+        <!-- KPI PRINCIPAUX -->
+        <!-- ===================================== -->
+
+        <section
+            id="kpi-main"
+            class="kpi-grid">
 
             <div class="card card-main">
 
@@ -170,10 +182,13 @@
             </div>
 
         </section>
+    <!-- ===================================== -->
+        <!-- KPI AVANCES -->
+        <!-- ===================================== -->
 
-        <!-- KPI V5 -->
-
-        <section class="summary-grid">
+        <section
+            id="kpi-advanced"
+            class="summary-grid">
 
             <div class="summary-card">
 
@@ -241,9 +256,13 @@
 
         </section>
 
+        <!-- ===================================== -->
         <!-- FIRE TRACKER -->
+        <!-- ===================================== -->
 
-        <section class="fire-tracker">
+        <section
+            id="fire-tracker"
+            class="fire-tracker">
 
             <div class="fire-header">
 
@@ -252,16 +271,16 @@
             </div>
 
             <div
-                class="fire-percentage"
-                id="fireProgress">
+                id="fireProgress"
+                class="fire-percentage">
 
                 ...
 
             </div>
 
             <div
-                class="fire-details"
-                id="fireDetails">
+                id="fireDetails"
+                class="fire-details">
 
                 ...
 
@@ -270,8 +289,8 @@
             <div class="fire-progress">
 
                 <div
-                    class="fire-progress-fill"
-                    id="fireBar">
+                    id="fireBar"
+                    class="fire-progress-fill">
 
                 </div>
 
@@ -279,9 +298,23 @@
 
         </section>
 
-        <!-- PROJECTION -->
+        <!-- ===================================== -->
+        <!-- STATISTIQUES FUTURES -->
+        <!-- ===================================== -->
 
-        <section class="summary-grid">
+        <section
+            id="statistics"
+            class="summary-grid">
+
+        </section>
+
+        <!-- ===================================== -->
+        <!-- PROJECTION OBJECTIF -->
+        <!-- ===================================== -->
+
+        <section
+            id="projection-section"
+            class="summary-grid">
 
             <div class="summary-card projection-card">
 
@@ -292,8 +325,8 @@
                 </div>
 
                 <div
-                    class="summary-value"
-                    id="projectionDate">
+                    id="projectionDate"
+                    class="summary-value">
 
                     ...
 
@@ -310,8 +343,8 @@
                 </div>
 
                 <div
-                    class="summary-value"
-                    id="summaryRemaining">
+                    id="summaryRemaining"
+                    class="summary-value">
 
                     ...
 
@@ -328,8 +361,8 @@
                 </div>
 
                 <div
-                    class="summary-value"
-                    id="summaryNetworth">
+                    id="summaryNetworth"
+                    class="summary-value">
 
                     ...
 
@@ -346,8 +379,8 @@
                 </div>
 
                 <div
-                    class="summary-value"
-                    id="summaryProgress">
+                    id="summaryProgress"
+                    class="summary-value">
 
                     ...
 
@@ -357,9 +390,22 @@
 
         </section>
 
-        <!-- GRAPHIQUES -->
+        <!-- ===================================== -->
+        <!-- KPI FUTURES (V6 / V7) -->
+        <!-- ===================================== -->
 
-        <section class="chart-grid">
+        <section
+            id="future-kpi-container"
+            class="summary-grid">
+
+        </section>
+    <!-- ===================================== -->
+        <!-- GRAPHIQUES -->
+        <!-- ===================================== -->
+
+        <section
+            id="charts"
+            class="chart-grid">
 
             <div class="chart-card">
 
@@ -383,9 +429,13 @@
 
         </section>
 
-        <!-- OBJECTIFS -->
+        <!-- ===================================== -->
+        <!-- OBJECTIFS FINANCIERS -->
+        <!-- ===================================== -->
 
-        <section class="chart-card">
+        <section
+            id="goals"
+            class="chart-card">
 
             <h2>
                 🎯 Objectifs financiers
@@ -393,54 +443,136 @@
 
             <div id="goalsContainer">
 
+                <!-- Objectifs dynamiques -->
+
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>🏠 Appartement</span>
-                        <span id="goal-appartement">0%</span>
+
+                        <span>
+                            🏠 Appartement
+                        </span>
+
+                        <span id="goal-appartement">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-appartement" class="progress-fill"></div>
+
+                        <div
+                            id="bar-appartement"
+                            class="progress-fill">
+
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>🚗 Voiture</span>
-                        <span id="goal-voiture">0%</span>
+
+                        <span>
+                            🚗 Voiture
+                        </span>
+
+                        <span id="goal-voiture">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-voiture" class="progress-fill"></div>
+
+                        <div
+                            id="bar-voiture"
+                            class="progress-fill">
+
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>✈️ Vacances</span>
-                        <span id="goal-vacances">0%</span>
+
+                        <span>
+                            ✈️ Vacances
+                        </span>
+
+                        <span id="goal-vacances">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-vacances" class="progress-fill"></div>
+
+                        <div
+                            id="bar-vacances"
+                            class="progress-fill">
+
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>🛟 Fonds d'urgence</span>
-                        <span id="goal-fonds_urgence">0%</span>
+
+                        <span>
+                            🛟 Fonds d'urgence
+                        </span>
+
+                        <span id="goal-fonds_urgence">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-fonds_urgence" class="progress-fill"></div>
+
+                        <div
+                            id="bar-fonds_urgence"
+                            class="progress-fill">
+
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="goal">
+
                     <div class="goal-header">
-                        <span>🎯 Patrimoine 250k</span>
-                        <span id="goal-patrimoine_total">0%</span>
+
+                        <span>
+                            🎯 Patrimoine 250k
+                        </span>
+
+                        <span id="goal-patrimoine_total">
+                            0%
+                        </span>
+
                     </div>
+
                     <div class="progress-bar">
-                        <div id="bar-patrimoine_total" class="progress-fill"></div>
+
+                        <div
+                            id="bar-patrimoine_total"
+                            class="progress-fill">
+
+                        </div>
+
                     </div>
+
                 </div>
 
             </div>
@@ -448,6 +580,10 @@
         </section>
 
     </div>
+
+    <!-- ===================================== -->
+    <!-- JAVASCRIPT -->
+    <!-- ===================================== -->
 
     <script src="js/config.js"></script>
 
@@ -457,6 +593,10 @@
 
     <script src="js/googleSheets.js"></script>
 
+    <!--
+    Utilisé uniquement pour les tests.
+    Désactiver en production si inutile.
+    -->
     <script src="js/test.js"></script>
 
 </body>
