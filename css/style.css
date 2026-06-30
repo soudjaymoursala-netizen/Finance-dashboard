@@ -167,32 +167,55 @@ h6 {
   margin-top: var(--space-sm);
 }
 
-/ FIRE TRACKER V6 - SLATE PREMIUM /
+/* =====================================
+   FIRE TRACKER V6 - SLATE PREMIUM
+===================================== */
 
 .fire-tracker {
+
     background:
     linear-gradient(
         135deg,
-        #334155,
-        #475569
+        #2b3648 0%,
+        #44546b 100%
     );
 
     color: white;
+
     border-radius: 28px;
+
     padding: 32px;
+
+    margin-bottom: var(--space-xl);
+
     border:
-    1px solid rgba(255,255,255,0.08);
+    1px solid rgba(255,255,255,.08);
+
     box-shadow:
-    0 12px 30px rgba(0,0,0,0.15);
+    0 12px 30px rgba(0,0,0,.15);
+
     overflow: hidden;
-    margin-bottom:
-    var(--space-xl);
+
+    transition:
+    transform .25s ease,
+    box-shadow .25s ease;
+
+}
+
+.fire-tracker:hover {
+
+    transform:
+    translateY(-3px);
+
+    box-shadow:
+    0 18px 40px rgba(0,0,0,.20);
 
 }
 
 .fire-tracker h2,
 .fire-tracker #fireProgress,
 .fire-tracker #fireDetails {
+
     color: white;
 
 }
@@ -201,9 +224,10 @@ h6 {
 
     font-size:
     clamp(1.3rem, 2vw, 1.8rem);
+
     font-weight: 700;
-    margin-bottom:
-    var(--space-md);
+
+    margin-bottom: var(--space-md);
 
 }
 
@@ -211,40 +235,53 @@ h6 {
 
     font-size:
     clamp(3rem, 6vw, 4.5rem);
+
     font-weight: 800;
+
     line-height: 1;
-    margin-bottom:
-    var(--space-lg);
+
+    margin-bottom: var(--space-lg);
 
 }
 
 .fire-details {
 
     display: grid;
+
     grid-template-columns:
     repeat(
         auto-fit,
         minmax(220px,1fr)
     );
 
-    gap:
-    var(--space-md);
-    margin-bottom:
-    var(--space-lg);
+    gap: var(--space-md);
+
+    margin-bottom: var(--space-lg);
+
     line-height: 1.8;
 
 }
 
 .fire-progress {
-    background:
-    rgba(255,255,255,0.15);
-    border-radius: 9999px;
-    height: 20px;
-    overflow: hidden;
+
     width: 100%;
+
+    height: 20px;
+
+    background:
+    rgba(255,255,255,.15);
+
+    border-radius: 9999px;
+
+    overflow: hidden;
+
 }
 
 .fire-progress-fill {
+
+    width: 0;
+
+    height: 100%;
 
     background:
     linear-gradient(
@@ -253,23 +290,24 @@ h6 {
         #4ade80
     );
 
-    height: 100%;
     transition:
     width 1.5s ease;
-    width: 0;
 
 }
 
 @media (max-width:768px){
 
     .fire-tracker{
+
         padding:24px;
 
     }
 
     .fire-details{
+
         grid-template-columns:
         repeat(2,1fr);
+
         gap:12px;
 
     }
