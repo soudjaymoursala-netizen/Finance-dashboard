@@ -167,151 +167,47 @@ h6 {
   margin-top: var(--space-sm);
 }
 
-/* =====================================
-   FIRE TRACKER V6 - SLATE PREMIUM
-===================================== */
-
+/* FIRE Tracker */
 .fire-tracker {
-
-    background:
-    linear-gradient(
-        135deg,
-        #2b3648 0%,
-        #44546b 100%
-    );
-
-    color: white;
-
-    border-radius: 28px;
-
-    padding: 32px;
-
-    margin-bottom: var(--space-xl);
-
-    border:
-    1px solid rgba(255,255,255,.08);
-
-    box-shadow:
-    0 12px 30px rgba(0,0,0,.15);
-
-    overflow: hidden;
-
-    transition:
-    transform .25s ease,
-    box-shadow .25s ease;
-
-}
-
-.fire-tracker:hover {
-
-    transform:
-    translateY(-3px);
-
-    box-shadow:
-    0 18px 40px rgba(0,0,0,.20);
-
-}
-
-.fire-tracker h2,
-.fire-tracker #fireProgress,
-.fire-tracker #fireDetails {
-
-    color: white;
-
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-xl);
 }
 
 .fire-header {
-
-    font-size:
-    clamp(1.3rem, 2vw, 1.8rem);
-
-    font-weight: 700;
-
-    margin-bottom: var(--space-md);
-
+  font-size: 1.8rem;
+  margin-bottom: var(--space-md);
 }
 
 .fire-percentage {
-
-    font-size:
-    clamp(3rem, 6vw, 4.5rem);
-
-    font-weight: 800;
-
-    line-height: 1;
-
-    margin-bottom: var(--space-lg);
-
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
 }
 
 .fire-details {
-
-    display: grid;
-
-    grid-template-columns:
-    repeat(
-        auto-fit,
-        minmax(220px,1fr)
-    );
-
-    gap: var(--space-md);
-
-    margin-bottom: var(--space-lg);
-
-    line-height: 1.8;
-
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-bottom: var(--space-lg);
 }
 
 .fire-progress {
-
-    width: 100%;
-
-    height: 20px;
-
-    background:
-    rgba(255,255,255,.15);
-
-    border-radius: 9999px;
-
-    overflow: hidden;
-
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  height: 20px;
+  overflow: hidden;
+  width: 100%;
 }
 
 .fire-progress-fill {
-
-    width: 0;
-
-    height: 100%;
-
-    background:
-    linear-gradient(
-        90deg,
-        #22c55e,
-        #4ade80
-    );
-
-    transition:
-    width 1.5s ease;
-
-}
-
-@media (max-width:768px){
-
-    .fire-tracker{
-
-        padding:24px;
-
-    }
-
-    .fire-details{
-
-        grid-template-columns:
-        repeat(2,1fr);
-
-        gap:12px;
-
-    }
-
+  background: linear-gradient(135deg, var(--positive-color), #9ae6b4);
+  height: 100%;
+  transition: width 1.5s ease;
+  width: 0;
 }
 
 /* Graphiques */
@@ -362,24 +258,12 @@ width: 0;
 }
 /* Mode clair */
 body.light {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #e2e8f0;
-  --surface: #ffffff;
-  --surface-hover: #f1f5f9;
-  --text-color: #1a202c;
-  --text-secondary-color: #718096;
-
-  /* Ajout des styles spécifiques au FIRE Tracker en mode clair */
-  .fire-tracker {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-  }
-
-  .fire-tracker .fire-header,
-  .fire-tracker .fire-percentage,
-  .fire-tracker .fire-details {
-    color: white;
-  }
+--bg-primary: #f8fafc;
+--bg-secondary: #e2e8f0;
+--surface: #ffffff;
+--surface-hover: #f1f5f9;
+--text-color: #1a202c;
+--text-secondary-color: #718096;
 }
 /* Responsive */
 @media screen and (max-width: 1200px) {
