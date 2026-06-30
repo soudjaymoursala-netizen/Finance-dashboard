@@ -28,16 +28,18 @@ const CONFIG = window.CONFIG;
 /* GESTION DU THEME                           */
 /* ========================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+(function () {
 
-    const themeToggle = document.getElementById('themeToggle');
+    const themeToggle =
+        document.getElementById('themeToggle');
 
     if (!themeToggle) {
         console.error('themeToggle introuvable');
         return;
     }
 
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme =
+        localStorage.getItem('theme');
 
     if (savedTheme === 'light') {
         document.body.classList.add('light');
@@ -46,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('light');
         themeToggle.textContent = '🌙';
     }
+
+    console.log('Listener thème installé');
 
     themeToggle.addEventListener('click', () => {
 
@@ -69,4 +73,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-});
+})();
