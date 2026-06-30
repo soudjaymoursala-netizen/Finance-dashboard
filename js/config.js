@@ -31,12 +31,14 @@ const CONFIG = window.CONFIG;
 document.addEventListener('DOMContentLoaded', () => {
 
     const themeToggle = document.getElementById('themeToggle');
+
     if (!themeToggle) {
         console.error('themeToggle introuvable');
         return;
     }
 
     const savedTheme = localStorage.getItem('theme');
+
     if (savedTheme === 'light') {
         document.body.classList.add('light');
         themeToggle.textContent = '☀️';
@@ -46,19 +48,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     themeToggle.addEventListener('click', () => {
+
         document.body.classList.toggle('light');
+
         const isLight =
             document.body.classList.contains('light');
+
         localStorage.setItem(
             'theme',
             isLight ? 'light' : 'dark'
         );
+
         themeToggle.textContent =
             isLight ? '☀️' : '🌙';
+
         console.log(
             'Thème changé :',
             isLight ? 'clair' : 'sombre'
         );
+
     });
 
 });
