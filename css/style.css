@@ -167,12 +167,9 @@ h6 {
   margin-top: var(--space-sm);
 }
 
-/* =====================================
-   FIRE TRACKER V6 - SLATE PREMIUM
-===================================== */
+/ FIRE TRACKER V6 - SLATE PREMIUM /
 
 .fire-tracker {
-
     background:
     linear-gradient(
         135deg,
@@ -181,19 +178,13 @@ h6 {
     );
 
     color: white;
-
     border-radius: 28px;
-
     padding: 32px;
-
     border:
     1px solid rgba(255,255,255,0.08);
-
     box-shadow:
     0 12px 30px rgba(0,0,0,0.15);
-
     overflow: hidden;
-
     margin-bottom:
     var(--space-xl);
 
@@ -202,7 +193,6 @@ h6 {
 .fire-tracker h2,
 .fire-tracker #fireProgress,
 .fire-tracker #fireDetails {
-
     color: white;
 
 }
@@ -211,9 +201,7 @@ h6 {
 
     font-size:
     clamp(1.3rem, 2vw, 1.8rem);
-
     font-weight: 700;
-
     margin-bottom:
     var(--space-md);
 
@@ -223,11 +211,8 @@ h6 {
 
     font-size:
     clamp(3rem, 6vw, 4.5rem);
-
     font-weight: 800;
-
     line-height: 1;
-
     margin-bottom:
     var(--space-lg);
 
@@ -236,7 +221,6 @@ h6 {
 .fire-details {
 
     display: grid;
-
     grid-template-columns:
     repeat(
         auto-fit,
@@ -245,27 +229,19 @@ h6 {
 
     gap:
     var(--space-md);
-
     margin-bottom:
     var(--space-lg);
-
     line-height: 1.8;
 
 }
 
 .fire-progress {
-
     background:
     rgba(255,255,255,0.15);
-
     border-radius: 9999px;
-
     height: 20px;
-
     overflow: hidden;
-
     width: 100%;
-
 }
 
 .fire-progress-fill {
@@ -278,10 +254,8 @@ h6 {
     );
 
     height: 100%;
-
     transition:
     width 1.5s ease;
-
     width: 0;
 
 }
@@ -289,22 +263,18 @@ h6 {
 @media (max-width:768px){
 
     .fire-tracker{
-
         padding:24px;
 
     }
 
     .fire-details{
-
         grid-template-columns:
         repeat(2,1fr);
-
         gap:12px;
 
     }
 
 }
-
 
 /* Graphiques */
 .chart-grid {
