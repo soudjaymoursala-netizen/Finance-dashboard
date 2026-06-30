@@ -1055,6 +1055,18 @@ const [
             "Objectifs OK ✅"
         );
 
+    }
+    catch (error) {
+
+        console.error(
+            "Erreur Dashboard :",
+            error
+        );
+
+    }
+
+}
+
 /* ================================================== */
 /* INITIALISATION                                     */
 /* ================================================== */
