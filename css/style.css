@@ -167,50 +167,144 @@ h6 {
   margin-top: var(--space-sm);
 }
 
-/* FIRE Tracker */
+/* =====================================
+   FIRE TRACKER V6 - SLATE PREMIUM
+===================================== */
+
 .fire-tracker {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+
+    background:
+    linear-gradient(
+        135deg,
+        #334155,
+        #475569
+    );
+
+    color: white;
+
+    border-radius: 28px;
+
+    padding: 32px;
+
+    border:
+    1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+    0 12px 30px rgba(0,0,0,0.15);
+
+    overflow: hidden;
+
+    margin-bottom:
+    var(--space-xl);
+
 }
 
 .fire-tracker h2,
 .fire-tracker #fireProgress,
 .fire-tracker #fireDetails {
-  color: white;
+
+    color: white;
+
 }
 
 .fire-header {
-  font-size: 1.8rem;
-  margin-bottom: var(--space-md);
+
+    font-size:
+    clamp(1.3rem, 2vw, 1.8rem);
+
+    font-weight: 700;
+
+    margin-bottom:
+    var(--space-md);
+
 }
 
 .fire-percentage {
-  font-size: 4rem;
-  font-weight: 700;
-  margin-bottom: var(--space-lg);
+
+    font-size:
+    clamp(3rem, 6vw, 4.5rem);
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    margin-bottom:
+    var(--space-lg);
+
 }
 
 .fire-details {
-  display: grid;
-  gap: var(--space-md);
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  margin-bottom: var(--space-lg);
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(
+        auto-fit,
+        minmax(220px,1fr)
+    );
+
+    gap:
+    var(--space-md);
+
+    margin-bottom:
+    var(--space-lg);
+
+    line-height: 1.8;
+
 }
 
 .fire-progress {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
-  height: 20px;
-  overflow: hidden;
-  width: 100%;
+
+    background:
+    rgba(255,255,255,0.15);
+
+    border-radius: 9999px;
+
+    height: 20px;
+
+    overflow: hidden;
+
+    width: 100%;
+
 }
 
 .fire-progress-fill {
-  background: linear-gradient(135deg, var(--positive-color), #9ae6b4);
-  height: 100%;
-  transition: width 1.5s ease;
-  width: 0;
+
+    background:
+    linear-gradient(
+        90deg,
+        #22c55e,
+        #4ade80
+    );
+
+    height: 100%;
+
+    transition:
+    width 1.5s ease;
+
+    width: 0;
+
 }
+
+@media (max-width:768px){
+
+    .fire-tracker{
+
+        padding:24px;
+
+    }
+
+    .fire-details{
+
+        grid-template-columns:
+        repeat(2,1fr);
+
+        gap:12px;
+
+    }
+
+}
+
 
 /* Graphiques */
 .chart-grid {
