@@ -1,5 +1,12 @@
 :root{
 
+    /* Espacements */
+    --space-xs:8px;
+    --space-sm:12px;
+    --space-md:20px;
+    --space-lg:28px;
+    --space-xl:40px;
+
     /* Backgrounds */
     --bg-primary:#0b1220;
     --bg-secondary:#111827;
@@ -62,11 +69,13 @@ body{
 
 .container{
 
-    max-width:1600px;
+    width:min(98%, 1900px);
 
     margin:auto;
 
-    padding:25px;
+    padding:
+    clamp(16px,2vw,32px);
+
 }
 
 .header{
@@ -139,12 +148,12 @@ body{
     grid-template-columns:
     repeat(
         auto-fit,
-        minmax(230px,1fr)
+        minmax(260px,1fr)
     );
 
-    gap:20px;
+    gap:
+    clamp(12px,1.2vw,24px);
 
-    margin-bottom:25px;
 }
 
 .card{
@@ -188,7 +197,11 @@ body{
 
 .card-main{
 
-    grid-column:span 2;
+    grid-column:
+    span 2;
+
+    min-height:
+    140px;
 
     background:
     linear-gradient(
@@ -380,9 +393,11 @@ body{
     display:grid;
 
     grid-template-columns:
-    2fr 1fr;
+    minmax(700px,2fr)
+    minmax(350px,1fr);
 
-    gap:25px;
+    gap:
+    clamp(16px,1
 
     margin-bottom:25px;
 }
@@ -405,12 +420,22 @@ body{
 
 #patrimoineChart{
 
-    min-height:450px;
+    min-height:
+    clamp(
+        380px,
+        45vh,
+        650
 }
 
 #allocationChart{
 
-    min-height:450px;
+    min-height:
+    clamp(
+        320px,
+        40vh,
+        550px
+    );
+
 }
 
 /* ===================
@@ -474,37 +499,41 @@ body.light{
  MOBILE
 =================== */
 
+@media (max-width:1400px){
+
+    .card-main{
+        grid-column:span 1;
+    }
+
+}
+
 @media (max-width:1200px){
 
     .chart-grid{
-
         grid-template-columns:1fr;
     }
+
 }
 
 @media (max-width:768px){
 
     .header{
-
         flex-direction:column;
-
         align-items:flex-start;
-
         gap:15px;
     }
 
     .card-main{
-
         grid-column:span 1;
     }
 
     .value{
-
         font-size:24px;
     }
 
     .fire-percentage{
-
         font-size:36px;
     }
+
 }
+``
