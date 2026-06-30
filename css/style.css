@@ -258,12 +258,24 @@ width: 0;
 }
 /* Mode clair */
 body.light {
---bg-primary: #f8fafc;
---bg-secondary: #e2e8f0;
---surface: #ffffff;
---surface-hover: #f1f5f9;
---text-color: #1a202c;
---text-secondary-color: #718096;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #e2e8f0;
+  --surface: #ffffff;
+  --surface-hover: #f1f5f9;
+  --text-color: #1a202c;
+  --text-secondary-color: #718096;
+
+  /* Ajout des styles spécifiques au FIRE Tracker en mode clair */
+  .fire-tracker {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+  }
+
+  .fire-tracker .fire-header,
+  .fire-tracker .fire-percentage,
+  .fire-tracker .fire-details {
+    color: white;
+  }
 }
 /* Responsive */
 @media screen and (max-width: 1200px) {
