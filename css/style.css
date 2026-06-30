@@ -193,7 +193,7 @@ body{
 .card{
 
     background:
-    rgba(17,24,39,.92);
+    var(--surface);
 
     border:
     1px solid rgba(255,255,255,.05);
@@ -216,7 +216,7 @@ body{
 
 }
 
-.card:hover{
+.card-hover{
 
     transform:
     translateY(-6px);
@@ -333,7 +333,7 @@ body{
 .summary-card{
 
     background:
-    rgba(17,24,39,.92);
+    var(--surface);
 
     border:
     1px solid rgba(255,255,255,.05);
@@ -534,7 +534,7 @@ body{
 .chart-card{
 
     background:
-    rgba(17,24,39,.92);
+    var(--surface);
 
     border:
     1px solid rgba(255,255,255,.05);
@@ -637,15 +637,25 @@ body{
 
 body.light{
 
-    --bg:#f1f5f9;
+    --bg-primary:#f8fafc;
+    --bg-secondary:#e2e8f0;
 
-    --card:#ffffff;
+    --surface:#ffffff;
+    --surface-hover:#f1f5f9;
 
-    --text:#0f172a;
+    --text-primary:#0f172a;
+    --text-secondary:#475569;
 
-    --muted:#475569;
+    background:
+    linear-gradient(
+        180deg,
+        var(--bg-primary),
+        var(--bg-secondary)
+    );
 
-    background:#f1f5f9;
+    color:
+    var(--text-primary);
+
 }
 
 /* ===================
