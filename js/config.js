@@ -24,17 +24,21 @@ window.CONFIG = {
 /* Compatibilité maximale */
 const CONFIG = window.CONFIG;
 
-/* ========================================== */
+========================================== */
 /* GESTION DU THEME                           */
 /* ========================================== */
 
+
 const themeToggle = document.getElementById('themeToggle');
+
 
 if (!themeToggle) {
     console.error('themeToggle introuvable');
 } else {
 
+
     const savedTheme = localStorage.getItem('theme');
+
 
     if (savedTheme === 'light') {
         document.body.classList.add('light');
@@ -44,25 +48,34 @@ if (!themeToggle) {
         themeToggle.textContent = '🌙';
     }
 
+
     console.log('Listener thème installé');
 
-themeToggle.addEventListener('click', () => {
 
-    if (document.body.classList.contains('light')) {
-    document.body.classList.remove('light');
-} else {
-    document.body.classList.add('light');
+    themeToggle.addEventListener('click', () => {
+
+
+        document.body.classList.toggle('light');
+
+
+        const isLight = document.body.classList.contains('light');
+
+
+        localStorage.setItem(
+            'theme',
+            isLight ? 'light' : 'dark'
+        );
+
+
+        themeToggle.textContent =
+            isLight ? '☀️' : '🌙';
+
+
+        console.log(
+            'Thème changé :',
+            isLight ? 'clair' : 'sombre'
+        );
+    });
+
+
 }
-
-const isLight = document.body.classList.contains('light');
-
-console.log(
-    'BODY CLASS =',
-    document.body.className);
-
-    localStorage.setItem( 'theme', isLight ? 'light' : 'dark'  );
-
-    themeToggle.textContent =
-        isLight ? '☀️' : '🌙';
-
-});
