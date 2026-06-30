@@ -28,18 +28,13 @@ const CONFIG = window.CONFIG;
 /* GESTION DU THEME                           */
 /* ========================================== */
 
-(function () {
+const themeToggle = document.getElementById('themeToggle');
 
-    const themeToggle =
-        document.getElementById('themeToggle');
+if (!themeToggle) {
+    console.error('themeToggle introuvable');
+} else {
 
-    if (!themeToggle) {
-        console.error('themeToggle introuvable');
-        return;
-    }
-
-    const savedTheme =
-        localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem('theme');
 
     if (savedTheme === 'light') {
         document.body.classList.add('light');
@@ -55,8 +50,7 @@ const CONFIG = window.CONFIG;
 
         document.body.classList.toggle('light');
 
-        const isLight =
-            document.body.classList.contains('light');
+        const isLight = document.body.classList.contains('light');
 
         localStorage.setItem(
             'theme',
@@ -70,7 +64,6 @@ const CONFIG = window.CONFIG;
             'Thème changé :',
             isLight ? 'clair' : 'sombre'
         );
-
     });
 
-})();
+}
