@@ -1,26 +1,38 @@
 :root{
-    --bg:#07131f;
-    --card:#132235;
-    --card2:#1c3352;
 
-    --text:#ffffff;
-    --muted:#94a3b8;
+    /* Backgrounds */
+    --bg-primary:#0b1220;
+    --bg-secondary:#111827;
 
-    --green:#22c55e;
-    --blue:#3b82f6;
-    --orange:#f59e0b;
-    --red:#ef4444;
+    /* Surfaces */
+    --surface:#111827;
+    --surface-hover:#1f2937;
 
-    --radius:20px;
+    /* Text */
+    --text-primary:#f8fafc;
+    --text-secondary:#94a3b8;
 
-    --shadow:
-    0 10px 25px rgba(0,0,0,.25);
-}
+    /* Colors */
+    --primary:#3b82f6;
+    --success:#22c55e;
+    --warning:#f59e0b;
+    --danger:#ef4444;
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+    /* Radius */
+    --radius-sm:12px;
+    --radius-md:20px;
+    --radius-lg:28px;
+
+    /* Shadows */
+    --shadow-sm:
+    0 4px 12px rgba(0,0,0,.15);
+
+    --shadow-md:
+    0 8px 24px rgba(0,0,0,.20);
+
+    --shadow-lg:
+    0 16px 40px rgba(0,0,0,.30);
+
 }
 
 body{
@@ -28,18 +40,24 @@ body{
     background:
     linear-gradient(
         180deg,
-        #07131f,
-        #0f1f33
+        var(--bg-primary),
+        var(--bg-secondary)
     );
 
-    color:var(--text);
+    color:var(--text-primary);
 
     font-family:
+    "Inter",
     "Segoe UI",
-    Arial,
     sans-serif;
 
     min-height:100vh;
+
+    line-height:1.5;
+
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+
 }
 
 .container{
