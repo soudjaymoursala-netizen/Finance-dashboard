@@ -1055,6 +1055,71 @@ const [
             "Objectifs OK ✅"
         );
 
+        /* ================================================== */
+        /* SECTION : THEME                                    */
+        /* ================================================== */
+
+        const themeButton =
+            document.getElementById(
+                "themeToggle"
+            );
+
+        if (themeButton) {
+
+            if (
+                localStorage.getItem(
+                    "theme"
+                ) === "light"
+            ) {
+
+                document.body.classList.add(
+                    "light"
+                );
+
+                themeButton.textContent =
+                    "☀️";
+
+            }
+
+            themeButton.addEventListener(
+                "click",
+                () => {
+
+                    document.body.classList.toggle(
+                        "light"
+                    );
+
+                    const isLight =
+
+                        document.body.classList.contains(
+                            "light"
+                        );
+
+                    themeButton.textContent =
+
+                        isLight
+                        ? "☀️"
+                        : "🌙";
+
+                    localStorage.setItem(
+
+                        "theme",
+
+                        isLight
+                        ? "light"
+                        : "dark"
+
+                    );
+
+                }
+            );
+
+        }
+
+        console.log(
+            "Dashboard V5 chargé ✅"
+        );
+
     }
     catch (error) {
 
