@@ -149,21 +149,41 @@ body{
 
 .card{
 
-    background:var(--card);
+    background:
+    rgba(17,24,39,.92);
 
-    border-radius:var(--radius);
+    border:
+    1px solid rgba(255,255,255,.05);
 
-    padding:20px;
+    border-radius:
+    var(--radius-md);
 
-    box-shadow:var(--shadow);
+    padding:24px;
 
-    transition:.3s;
+    box-shadow:
+    var(--shadow-md);
+
+    backdrop-filter:
+    blur(10px);
+
+    transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+
 }
 
 .card:hover{
 
     transform:
-    translateY(-4px);
+    translateY(-6px);
+
+    border-color:
+    rgba(59,130,246,.25);
+
+    box-shadow:
+    var(--shadow-lg);
+
 }
 
 .card-main{
@@ -173,26 +193,43 @@ body{
     background:
     linear-gradient(
         135deg,
-        #183a64,
-        #284f86
+        #1d4ed8,
+        #2563eb
     );
+
+    border:
+    1px solid
+    rgba(255,255,255,.08);
+
 }
 
 .label{
 
-    color:var(--muted);
+    color:
+    var(--text-secondary);
 
-    font-size:14px;
+    font-size:
+    0.85rem;
 
-    margin-bottom:10px;
+    font-weight:
+    500;
+
+    text-transform:
+    uppercase;
+
+    letter-spacing:
+    .05em;
+
 }
 
 .value{
 
-    font-size:32px;
+    font-size:
+    clamp(1.8rem,2.5vw,2.6rem);
 
-    font-weight:700;
-}
+    font-weight:800;
+
+    letter-spacing:-0.
 
 .goal-mini{
 
