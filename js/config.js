@@ -28,16 +28,37 @@ const CONFIG = window.CONFIG;
 /* GESTION DU THEME                           */
 /* ========================================== */
 
-const themeToggle = document.getElementById('themeToggle');
-const body = document.body;
+document.addEventListener('DOMContentLoaded', () => {
 
-themeToggle.addEventListener('click', () => {
-  body.classList.toggle('light');
-  
-  // Changer l'icône du bouton selon le thème
-  if (body.classList.contains('light')) {
-    themeToggle.innerHTML = '☀️';
-  } else {
-    themeToggle.innerHTML = '🌙';
-  }
+    const themeToggle = document.getElementById('themeToggle');
+    if (!themeToggle) {
+        console.error('themeToggle introuvable');
+        return;
+    }
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light');
+        themeToggle.textContent = '☀️';
+    } else {
+        document.body.classList.remove('light');
+        themeToggle.textContent = '🌙';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light');
+        const isLight =
+            document.body.classList.contains('light');
+        localStorage.setItem(
+            'theme',
+            isLight ? 'light' : 'dark'
+        );
+        themeToggle.textContent =
+            isLight ? '☀️' : '🌙';
+        console.log(
+            'Thème changé :',
+            isLight ? 'clair' : 'sombre'
+        );
+    });
+
 });
