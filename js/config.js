@@ -46,22 +46,21 @@ if (!themeToggle) {
 
     console.log('Listener thème installé');
 
-    themeToggle.addEventListener('click', () => {
+themeToggle.addEventListener('click', () => {
 
     if (document.body.classList.contains('light')) {
-        document.body.classList.remove('light');
-    } else {
-        document.body.classList.add('light');
-    }
+    document.body.classList.remove('light');
+} else {
+    document.body.classList.add('light');
+}
 
-    const isLight = document.body.classList.contains('light');
+const isLight = document.body.classList.contains('light');
 
-    console.log('BODY =', document.body.className);
+console.log(
+    'BODY CLASS =',
+    document.body.className);
 
-    localStorage.setItem(
-        'theme',
-        isLight ? 'light' : 'dark'
-    );
+    localStorage.setItem( 'theme', isLight ? 'light' : 'dark'  );
 
     themeToggle.textContent =
         isLight ? '☀️' : '🌙';
