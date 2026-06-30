@@ -23,3 +23,21 @@ window.CONFIG = {
 
 /* Compatibilité maximale */
 const CONFIG = window.CONFIG;
+
+/* ========================================== */
+/* GESTION DU THEME                           */
+/* ========================================== */
+
+const themeToggle = document.getElementById('themeToggle');
+const body = document.body;
+
+themeToggle.addEventListener('click', () => {
+  body.classList.toggle('light');
+  
+  // Changer l'icône du bouton selon le thème
+  if (body.classList.contains('light')) {
+    themeToggle.innerHTML = '☀️';
+  } else {
+    themeToggle.innerHTML = '🌙';
+  }
+});
