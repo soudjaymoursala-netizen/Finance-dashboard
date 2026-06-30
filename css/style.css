@@ -487,18 +487,40 @@ body{
 
 .chart-card{
 
-    background:var(--card);
+    background:
+    rgba(17,24,39,.92);
 
-    padding:25px;
+    border:
+    1px solid rgba(255,255,255,.05);
 
-    border-radius:20px;
+    border-radius:
+    var(--radius-lg);
 
-    box-shadow:var(--shadow);
+    padding:28px;
+
+    box-shadow:
+    var(--shadow-md);
+
+    backdrop-filter:
+    blur(10px);
+
 }
 
 .chart-card h2{
 
-    margin-bottom:20px;
+    margin-bottom:24px;
+
+    font-size:
+    clamp(1.1rem,1.5vw,1.6rem);
+
+    font-weight:700;
+
+}
+.chart-card:hover{
+
+    border-color:
+    rgba(59,130,246,.15);
+
 }
 
 #patrimoineChart{
