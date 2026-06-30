@@ -169,12 +169,14 @@ h6 {
 
 /* FIRE Tracker */
 .fire-tracker {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  margin-bottom: var(--space-xl);
-  padding: var(--space-xl);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+.fire-tracker h2,
+.fire-tracker #fireProgress,
+.fire-tracker #fireDetails {
+  color: white;
 }
 
 .fire-header {
