@@ -1,39 +1,55 @@
 let patrimoineChart = null;
 let allocationChart = null;
+
 function updatePatrimoineChart(
     labels,
     valeurs
 ) {
+
     const chartElement =
         document.querySelector(
             "#patrimoineChart"
         );
+
     if (!chartElement) return;
+
     if (patrimoineChart) {
+
         patrimoineChart.destroy();
+
     }
-    
+
     const objectifData =
         labels.map(
             () => 250000
         );
 
     const options = {
+
         chart: {
+
             type: "area",
+
             height: 420,
+
             background: "transparent",
+
             toolbar: {
                 show: false
             },
-            
+
             animations: {
+
                 enabled: true,
+
                 easing: "easeinout",
+
                 speed: 1200
+
             }
+
         },
-        
+
         series: [
 
             {
@@ -49,69 +65,109 @@ function updatePatrimoineChart(
         ],
 
         colors: [
+
             "#22c55e",
             "#94a3b8"
 
         ],
 
         stroke: {
+
             curve: "smooth",
+
             width: [4, 3],
+
             dashArray: [0, 8]
+
         },
 
         fill: {
+
             type: [
                 "gradient",
                 "solid"
             ],
 
             gradient: {
+
                 shade: "dark",
+
                 shadeIntensity: 0.5,
+
                 opacityFrom: 0.45,
+
                 opacityTo: 0.03,
+
                 stops: [0, 100]
+
             }
+
         },
 
         markers: {
+
             size: 5,
+
             strokeWidth: 2,
+
             hover: {
+
                 size: 8
+
             }
+
         },
 
         dataLabels: {
+
             enabled: false
+
         },
 
         grid: {
+
             borderColor: "#334155",
+
             strokeDashArray: 4
+
         },
 
         legend: {
+
             position: "top",
+
             labels: {
+
                 colors: "#ffffff"
+
             }
+
         },
 
         xaxis: {
+
             categories: labels,
+
             labels: {
-               style: {
+
+                style: {
+
                     colors: "#94a3b8"
+
                 }
+
             }
+
         },
 
         yaxis: {
+
             labels: {
+
                 style: {
+
                     colors: "#94a3b8"
+
                 },
 
                 formatter: function (
@@ -125,12 +181,17 @@ function updatePatrimoineChart(
                             )
                         + " €"
                     );
+
                 }
+
             }
+
         },
 
         tooltip: {
+
             theme: "dark",
+
             y: {
 
                 formatter: function (
@@ -146,13 +207,17 @@ function updatePatrimoineChart(
                     );
 
                 }
+
             }
+
         },
 
         theme: {
 
             mode: "dark"
+
         }
+
     };
 
     patrimoineChart =
@@ -162,6 +227,7 @@ function updatePatrimoineChart(
         );
 
     patrimoineChart.render();
+
 }
 
 function updateAllocationChart(
@@ -176,7 +242,9 @@ function updateAllocationChart(
         );
 
     if (!chartElement) return;
+
     if (allocationChart) {
+
         allocationChart.destroy();
 
     }
@@ -189,12 +257,17 @@ function updateAllocationChart(
     const options = {
 
         chart: {
+
             type: "donut",
+
             height: 420,
+
             background: "transparent"
+
         },
 
         series: [
+
             cash,
             pea,
             cto
@@ -202,6 +275,7 @@ function updateAllocationChart(
         ],
 
         labels: [
+
             "Cash",
             "PEA",
             "CTO"
@@ -209,100 +283,146 @@ function updateAllocationChart(
         ],
 
         colors: [
-            "#22c55e",
-            "#3b82f6",
-            "#f59e0b"
+
+            "#4EC5CF",
+            "#5B6C84",
+            "#D9A441"
 
         ],
 
         legend: {
+
             position: "bottom",
+
             fontSize: "14px",
+
             labels: {
+
                 colors: "#ffffff"
+
             }
+
         },
+
         plotOptions: {
+
             pie: {
+
                 donut: {
+
                     size: "72%",
+
                     labels: {
-                       show: true,
+
+                        show: true,
+
                         name: {
+
                             show: true,
-                            color: "#94a3b8"
+
+                            color: "#5B6C84"
+
                         },
+
                         value: {
 
                             show: true,
-                            color: "#ffffff"
+
+                            color: "#4EC5CF",
+
+                            fontWeight: 700
+
                         },
 
                         total: {
+
                             show: true,
+
                             label:
                                 "Patrimoine",
 
                             color:
-                                "#ffffff",
+                                "#4EC5CF",
 
                             formatter:
                                 function () {
+
                                     return (
+
                                         Math.round(
                                             total
                                         )
                                         .toLocaleString(
                                             "fr-FR"
                                         )
+
                                         + " €"
+
                                     );
 
                                 }
+
                         }
+
                     }
+
                 }
+
             }
+
         },
 
         dataLabels: {
+
             enabled: true,
+
             formatter:
                 function (
                     value
                 ) {
 
                     return (
+
                         value.toFixed(
                             1
                         )
+
                         + "%"
+
                     );
 
                 }
+
         },
 
         tooltip: {
+
             theme: "dark",
 
             y: {
+
                 formatter:
                     function (
                         value
                     ) {
 
                         return (
+
                             Math.round(
                                 value
                             )
                             .toLocaleString(
                                 "fr-FR"
                             )
+
                             + " €"
+
                         );
 
                     }
+
             }
+
         },
 
         responsive: [
@@ -310,23 +430,34 @@ function updateAllocationChart(
             {
 
                 breakpoint: 768,
+
                 options: {
+
                     chart: {
+
                         height: 320
+
                     },
 
                     legend: {
-                       position:
+
+                        position:
                             "bottom"
+
                     }
+
                 }
+
             }
+
         ],
 
         theme: {
 
             mode: "dark"
+
         }
+
     };
 
     allocationChart =
@@ -336,4 +467,5 @@ function updateAllocationChart(
         );
 
     allocationChart.render();
+
 }
