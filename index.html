@@ -1,621 +1,184 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>Finance Dashboard V5</title>
-
-    <!-- Police Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <!-- Polices Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link
-        rel="stylesheet"
-        href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 
     <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
 </head>
-
 <body>
-
-<div class=
-
-        <!-- ===================================== -->
-        <!-- HEADER -->
-        <!-- ===================================== -->
-
+    <div class="container">
         <header class="header">
-
             <div>
-
                 <h1>💰 Finance Dashboard</h1>
-
-                <div
-                    id="lastUpdate"
-                    class="last-update">
-
+                <div id="lastUpdate" class="last-update">
                     Dernière synchronisation : --
-
                 </div>
-
             </div>
-
             <div class="header-actions">
-
-                <button
-                    id="themeToggle"
-                    class="theme-btn">
-
-                    🌙
-
-                </button>
-
-                <span class="status">
-
-                    LIVE
-
-                </span>
-
+                <button id="themeToggle" class="theme-btn">🌙</button>
+                <span class="status">LIVE</span>
             </div>
-
         </header>
 
-        <!-- ===================================== -->
-        <!-- ALERTES FUTURES -->
-        <!-- ===================================== -->
+        <main>
+            <section id="alerts"></section>
 
-        <section id="alerts">
-
-        </section>
-
-        <!-- ===================================== -->
-        <!-- KPI PRINCIPAUX -->
-        <!-- ===================================== -->
-
-        <section
-            id="kpi-main"
-            class="kpi-grid">
-
-            <div class="card card-main">
-
-                <div class="label">
-                    💎 Patrimoine Total
+            <section id="kpi-main" class="kpi-grid">
+                <div class="card card-main">
+                    <div class="label">💎 Patrimoine Total</div>
+                    <div class="value" id="networth">...</div>
+                    <div class="goal-mini" id="mainGoalProgress">🎯 Chargement...</div>
                 </div>
-
-                <div
-                    class="value"
-                    id="networth">
-
-                    ...
-
+                <div class="card">
+                    <div class="label">💵 Cash</div>
+                    <div class="value" id="cash">...</div>
                 </div>
-
-                <div
-                    class="goal-mini"
-                    id="mainGoalProgress">
-
-                    🎯 Chargement...
-
+                <div class="card">
+                    <div class="label">📈 PEA</div>
+                    <div class="value" id="pea">...</div>
                 </div>
-
-            </div>
-
-            <div class="card">
-
-                <div class="label">
-                    💵 Cash
+                <div class="card">
+                    <div class="label">🏦 CTO</div>
+                    <div class="value" id="cto">...</div>
                 </div>
-
-                <div
-                    class="value"
-                    id="cash">
-
-                    ...
-
+                <div class="card">
+                    <div class="label">📊 Investissements</div>
+                    <div class="value" id="investments">...</div>
                 </div>
-
-            </div>
-
-            <div class="card">
-
-                <div class="label">
-                    📈 PEA
+                <div class="card">
+                    <div class="label">🎯 Taux d'épargne</div>
+                    <div class="value" id="performance">...</div>
                 </div>
+            </section>
 
-                <div
-                    class="value"
-                    id="pea">
-
-                    ...
-
+            <section id="kpi-advanced" class="summary-grid">
+                <div class="card">
+                    <div class="label">💹 Plus-value totale</div>
+                    <div class="value" id="totalGain">...</div>
                 </div>
-
-            </div>
-
-            <div class="card">
-
-                <div class="label">
-                    🏦 CTO
+                <div class="card">
+                    <div class="label">📈 Performance globale</div>
+                    <div class="value" id="globalPerformance">...</div>
                 </div>
-
-                <div
-                    class="value"
-                    id="cto">
-
-                    ...
-
+                <div class="card">
+                    <div class="label">💰 Capital investi</div>
+                    <div class="value" id="capitalInvesti">...</div>
                 </div>
-
-            </div>
-
-            <div class="card">
-
-                <div class="label">
-                    📊 Investissements
+                <div class="card">
+                    <div class="label">⚖️ Ratio investi</div>
+                    <div class="value" id="ratioInvesti">...</div>
                 </div>
+            </section>
 
-                <div
-                    class="value"
-                    id="investments">
-
-                    ...
-
+            <section id="fire-tracker" class="fire-tracker">
+                <h2 class="fire-header">🎯 FIRE Tracker</h2>
+                <div id="fireProgress" class="fire-percentage">...</div>
+                <div id="fireDetails" class="fire-details">...</div>
+                <div class="fire-progress">
+                    <div id="fireBar" class="fire-progress-fill"></div>
                 </div>
+            </section>
 
-            </div>
+            <section id="statistics" class="summary-grid"></section>
 
-            <div class="card">
-
-                <div class="label">
-                    🎯 Taux d'épargne
+            <section id="projection-section" class="summary-grid">
+                <div class="card">
+                    <div class="label">🚀 Projection Objectif 250k</div>
+                    <div class="value" id="projectionDate">...</div>
                 </div>
-
-                <div
-                    class="value"
-                    id="performance">
-
-                    ...
-
+                <div class="card">
+                    <div class="label">💸 Reste à atteindre</div>
+                    <div class="value" id="summaryRemaining">...</div>
                 </div>
-
-            </div>
-
-        </section>
-    <!-- ===================================== -->
-        <!-- KPI AVANCES -->
-        <!-- ===================================== -->
-
-        <section
-            id="kpi-advanced"
-            class="summary-grid">
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    💹 Plus-value totale
+                <div class="card">
+                    <div class="label">💰 Patrimoine actuel</div>
+                    <div class="value" id="summaryNetworth">...</div>
                 </div>
-
-                <div
-                    class="summary-value"
-                    id="totalGain">
-
-                    ...
-
+                <div class="card">
+                    <div class="label">🎯 Progression 250k</div>
+                    <div class="value" id="summaryProgress">...</div>
                 </div>
+            </section>
 
-            </div>
+            <section id="future-kpi-container" class="summary-grid"></section>
 
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    📈 Performance globale
+            <section id="charts" class="chart-grid">
+                <div class="chart-card">
+                    <h2>📈 Évolution du patrimoine</h2>
+                    <div id="patrimoineChart"></div>
                 </div>
-
-                <div
-                    class="summary-value"
-                    id="globalPerformance">
-
-                    ...
-
+                <div class="chart-card">
+                    <h2>🥧 Allocation du patrimoine</h2>
+                    <div id="allocationChart"></div>
                 </div>
-
-            </div>
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    💰 Capital investi
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="capitalInvesti">
-
-                    ...
-
-                </div>
-
-            </div>
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    ⚖️ Ratio investi
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="ratioInvesti">
-
-                    ...
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- ===================================== -->
-        <!-- FIRE TRACKER -->
-        <!-- ===================================== -->
-
-        <section
-            id="fire-tracker"
-            class="fire-tracker">
-
-            <div class="fire-header">
-
-                🎯 FIRE Tracker
-
-            </div>
-
-            <div
-                id="fireProgress"
-                class="fire-percentage">
-
-                ...
-
-            </div>
-
-            <div
-                id="fireDetails"
-                class="fire-details">
-
-                ...
-
-            </div>
-
-            <div class="fire-progress">
-
-                <div
-                    id="fireBar"
-                    class="fire-progress-fill">
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- ===================================== -->
-        <!-- STATISTIQUES FUTURES -->
-        <!-- ===================================== -->
-
-        <section
-            id="statistics"
-            class="summary-grid">
-
-        </section>
-
-        <!-- ===================================== -->
-        <!-- PROJECTION OBJECTIF -->
-        <!-- ===================================== -->
-
-        <section
-            id="projection-section"
-            class="summary-grid">
-
-            <div class="summary-card projection-card">
-
-                <div class="summary-title">
-
-                    🚀 Projection Objectif 250k
-
-                </div>
-
-                <div
-                    id="projectionDate"
-                    class="summary-value">
-
-                    ...
-
-                </div>
-
-            </div>
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-
-                    💸 Reste à atteindre
-
-                </div>
-
-                <div
-                    id="summaryRemaining"
-                    class="summary-value">
-
-                    ...
-
-                </div>
-
-            </div>
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-
-                    💰 Patrimoine actuel
-
-                </div>
-
-                <div
-                    id="summaryNetworth"
-                    class="summary-value">
-
-                    ...
-
-                </div>
-
-            </div>
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-
-                    🎯 Progression 250k
-
-                </div>
-
-                <div
-                    id="summaryProgress"
-                    class="summary-value">
-
-                    ...
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- ===================================== -->
-        <!-- KPI FUTURES (V6 / V7) -->
-        <!-- ===================================== -->
-
-        <section
-            id="future-kpi-container"
-            class="summary-grid">
-
-        </section>
-    <!-- ===================================== -->
-        <!-- GRAPHIQUES -->
-        <!-- ===================================== -->
-
-        <section
-            id="charts"
-            class="chart-grid">
-
-            <div class="chart-card">
-
-                <h2>
-                    📈 Évolution du patrimoine
-                </h2>
-
-                <div id="patrimoineChart"></div>
-
-            </div>
-
-            <div class="chart-card">
-
-                <h2>
-                    🥧 Allocation du patrimoine
-                </h2>
-
-                <div id="allocationChart"></div>
-
-            </div>
-
-        </section>
-
-        <!-- ===================================== -->
-        <!-- OBJECTIFS FINANCIERS -->
-        <!-- ===================================== -->
-
-        <section
-            id="goals"
-            class="chart-card">
-
-            <h2>
-                🎯 Objectifs financiers
-            </h2>
-
-            <div id="goalsContainer">
-
-                <!-- Objectifs dynamiques -->
-
-                <div class="goal">
-
-                    <div class="goal-header">
-
-                        <span>
-                            🏠 Appartement
-                        </span>
-
-                        <span id="goal-appartement">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="progress-bar">
-
-                        <div
-                            id="bar-appartement"
-                            class="progress-fill">
-
+            </section>
+
+            <section id="goals" class="chart-card">
+                <h2>🎯 Objectifs financiers</h2>
+                <div id="goalsContainer">
+                    <div class="goal">
+                        <div class="goal-header">
+                            <span>🏠 Appartement</span>
+                            <span id="goal-appartement">0%</span>
                         </div>
-
-                    </div>
-
-                </div>
-
-                <div class="goal">
-
-                    <div class="goal-header">
-
-                        <span>
-                            🚗 Voiture
-                        </span>
-
-                        <span id="goal-voiture">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="progress-bar">
-
-                        <div
-                            id="bar-voiture"
-                            class="progress-fill">
-
+                        <div class="progress-bar">
+                            <div id="bar-appartement" class="progress-fill"></div>
                         </div>
-
                     </div>
-
-                </div>
-
-                <div class="goal">
-
-                    <div class="goal-header">
-
-                        <span>
-                            ✈️ Vacances
-                        </span>
-
-                        <span id="goal-vacances">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="progress-bar">
-
-                        <div
-                            id="bar-vacances"
-                            class="progress-fill">
-
+                    <div class="goal">
+                        <div class="goal-header">
+                            <span>🚗 Voiture</span>
+                            <span id="goal-voiture">0%</span>
                         </div>
-
-                    </div>
-
-                </div>
-
-                <div class="goal">
-
-                    <div class="goal-header">
-
-                        <span>
-                            🛟 Fonds d'urgence
-                        </span>
-
-                        <span id="goal-fonds_urgence">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="progress-bar">
-
-                        <div
-                            id="bar-fonds_urgence"
-                            class="progress-fill">
-
+                        <div class="progress-bar">
+                            <div id="bar-voiture" class="progress-fill"></div>
                         </div>
-
                     </div>
-
-                </div>
-
-                <div class="goal">
-
-                    <div class="goal-header">
-
-                        <span>
-                            🎯 Patrimoine 250k
-                        </span>
-
-                        <span id="goal-patrimoine_total">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="progress-bar">
-
-                        <div
-                            id="bar-patrimoine_total"
-                            class="progress-fill">
-
+                    <div class="goal">
+                        <div class="goal-header">
+                            <span>✈️ Vacances</span>
+                            <span id="goal-vacances">0%</span>
                         </div>
-
+                        <div class="progress-bar">
+                            <div id="bar-vacances" class="progress-fill"></div>
+                        </div>
                     </div>
-
+                    <div class="goal">
+                        <div class="goal-header">
+                            <span>🛟 Fonds d'urgence</span>
+                            <span id="goal-fonds_urgence">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="bar-fonds_urgence" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="goal">
+                        <div class="goal-header">
+                            <span>🎯 Patrimoine 250k</span>
+                            <span id="goal-patrimoine_total">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="bar-patrimoine_total" class="progress-fill"></div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
-        </section>
-
+            </section>
+        </main>
     </div>
 
-    <!-- ===================================== -->
-    <!-- JAVASCRIPT -->
-    <!-- ===================================== -->
-
+    <!-- JavaScript -->
     <script src="js/config.js"></script>
-
     <script src="js/charts.js"></script>
-
     <script src="js/errorHandler.js"></script>
-
     <script src="js/googleSheets.js"></script>
-
-<!--
-Utilisé uniquement pour les tests.
-Désactivé temporairement.
--->
-<!--
-<script src="cript>
--->
-
 </body>
-
 </html>
