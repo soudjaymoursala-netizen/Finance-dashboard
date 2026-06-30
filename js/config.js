@@ -48,22 +48,22 @@ if (!themeToggle) {
 
     themeToggle.addEventListener('click', () => {
 
-        document.body.classList.toggle('light');
+    if (document.body.classList.contains('light')) {
+        document.body.classList.remove('light');
+    } else {
+        document.body.classList.add('light');
+    }
 
-        const isLight = document.body.classList.contains('light');
+    const isLight = document.body.classList.contains('light');
 
-        localStorage.setItem(
-            'theme',
-            isLight ? 'light' : 'dark'
-        );
+    console.log('BODY =', document.body.className);
 
-        themeToggle.textContent =
-            isLight ? '☀️' : '🌙';
+    localStorage.setItem(
+        'theme',
+        isLight ? 'light' : 'dark'
+    );
 
-        console.log(
-            'Thème changé :',
-            isLight ? 'clair' : 'sombre'
-        );
-    });
+    themeToggle.textContent =
+        isLight ? '☀️' : '🌙';
 
-}
+});
