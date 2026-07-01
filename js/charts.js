@@ -44,7 +44,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
             { name: "Objectif " + Math.round(lastPatrimoine.objectif / 1000) + "k", data: objectifData }
         ],
 
-        colors: ["#22c55e", "#94a3b8"],
+        colors: ["#2DD4A7", "#8A94A6"],
 
         stroke: {
             curve: "smooth",
@@ -134,8 +134,8 @@ function updateAllocationChart(cash, pea, cto) {
 
         colors: [
             "#4EC5CF", // Cash
-            "#5B6C84", // PEA
-            "#D9A441"  // CTO
+            "#2DD4A7", // PEA
+            "#F0B429"  // CTO
         ],
 
         legend: {
@@ -153,7 +153,7 @@ function updateAllocationChart(cash, pea, cto) {
 
                         name: {
                             show: true,
-                            color: "#5B6C84"
+                            color: "#8A94A6"
                         },
 
                         value: {
@@ -216,7 +216,7 @@ function updatePeaCompositionChart(actions, etf) {
         chart: { type: "donut", height: 280, background: "transparent" },
         series: [actions, etf],
         labels: ["Actions", "ETF"],
-        colors: ["#D9A441", "#4EC5CF"],
+        colors: ["#F0B429", "#4EC5CF"],
         legend: { position: "bottom", fontSize: "13px", labels: { colors: "#ffffff" } },
         plotOptions: {
             pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "PEA", color: "#4EC5CF",
@@ -246,7 +246,7 @@ function updateCtoCompositionChart(actions, etf, crypto) {
         chart: { type: "donut", height: 280, background: "transparent" },
         series: [actions, etf, crypto],
         labels: ["Actions", "ETF", "Crypto"],
-        colors: ["#D9A441", "#4EC5CF", "#a855f7"],
+        colors: ["#F0B429", "#4EC5CF", "#9F7AEA"],
         legend: { position: "bottom", fontSize: "13px", labels: { colors: "#ffffff" } },
         plotOptions: {
             pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "CTO", color: "#4EC5CF",
@@ -278,7 +278,7 @@ function updateMonthlyBudgetChart(labels, revenus, depenses) {
             { name: "Revenus", data: revenus },
             { name: "Dépenses", data: depenses }
         ],
-        colors: ["#22c55e", "#ef4444"],
+        colors: ["#2DD4A7", "#F0576B"],
         plotOptions: { bar: { columnWidth: "55%", borderRadius: 4 } },
         dataLabels: { enabled: false },
         grid: { borderColor: "#334155", strokeDashArray: 4 },
@@ -293,10 +293,45 @@ function updateMonthlyBudgetChart(labels, revenus, depenses) {
     monthlyBudgetChart.render();
 }
 
+/* Sparkline dans la carte héros : tendance récente du patrimoine */
+let heroSparklineChart = null;
+
+function updateHeroSparkline(valeurs) {
+    const chartElement = document.querySelector("#heroSparkline");
+    if (!chartElement || !valeurs || !valeurs.length) return;
+    if (heroSparklineChart) heroSparklineChart.destroy();
+
+    const positive = valeurs[valeurs.length - 1] >= valeurs[0];
+
+    const options = {
+        chart: {
+            type: "area",
+            height: 60,
+            sparkline: { enabled: true },
+            animations: { enabled: true, speed: 800 }
+        },
+        series: [{ name: "Patrimoine", data: valeurs }],
+        colors: [positive ? "#2DD4A7" : "#F0576B"],
+        stroke: { curve: "smooth", width: 2.5 },
+        fill: {
+            type: "gradient",
+            gradient: { shadeIntensity: 0.6, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] }
+        },
+        tooltip: {
+            theme: getThemeMode(),
+            y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
+        }
+    };
+
+    heroSparklineChart = new ApexCharts(chartElement, options);
+    heroSparklineChart.render();
+}
+
 /* Refresh charts using cached data (appelable après un changement de thème) */
 function refreshCharts() {
   if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
     updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, lastPatrimoine.objectif);
+    updateHeroSparkline(lastPatrimoine.valeurs);
   }
   // même si les valeurs valent 0, on peut forcer la mise à jour
   updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto);

@@ -6,7 +6,7 @@
     <title>Finance Dashboard</title>
 
     <!-- Polices Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
@@ -25,63 +25,64 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button id="themeToggle" class="theme-btn">🌙</button>
-                <span class="status">LIVE</span>
+                <button id="themeToggle" class="theme-btn" aria-label="Changer de thème">🌙</button>
+                <span class="status">Live</span>
             </div>
         </header>
 
         <main>
             <section id="alerts" aria-live="polite"></section>
 
-            <section class="kpi-section">
-                <h2>KPI Principaux</h2>
-                <div class="kpi-grid">
-                    <div class="card kpi-card">
-                        <div class="label">💎 Patrimoine Total</div>
-                        <div class="value" id="networth">...</div>
-                        <div class="goal-mini" id="mainGoalProgress">🎯 Chargement...</div>
+            <section class="hero-section">
+                <h2>Vue d'ensemble</h2>
+                <div class="hero-card">
+                    <div class="hero-label">💎 Patrimoine Total</div>
+                    <div class="hero-value" id="networth">...</div>
+                    <div class="hero-sub" id="mainGoalProgress">🎯 Chargement...</div>
+                    <div id="heroSparkline" class="hero-sparkline"></div>
+                </div>
+                <div class="chip-row">
+                    <div class="chip">
+                        <span class="chip-label">💵 Cash</span>
+                        <span class="chip-value" id="cash">...</span>
                     </div>
-                    <div class="card kpi-card">
-                        <div class="label">💵 Cash</div>
-                        <div class="value" id="cash">...</div>
+                    <div class="chip">
+                        <span class="chip-label">📈 PEA</span>
+                        <span class="chip-value" id="pea">...</span>
                     </div>
-                    <div class="card kpi-card">
-                        <div class="label">📈 PEA</div>
-                        <div class="value" id="pea">...</div>
+                    <div class="chip">
+                        <span class="chip-label">🏦 CTO</span>
+                        <span class="chip-value" id="cto">...</span>
                     </div>
-                    <div class="card kpi-card">
-                        <div class="label">🏦 CTO</div>
-                        <div class="value" id="cto">...</div>
+                    <div class="chip">
+                        <span class="chip-label">📊 Investissements</span>
+                        <span class="chip-value" id="investments">...</span>
                     </div>
-                    <div class="card kpi-card">
-                        <div class="label">📊 Investissements</div>
-                        <div class="value" id="investments">...</div>
-                    </div>
-                    <div class="card kpi-card">
-                        <div class="label">🎯 Taux d'épargne</div>
-                        <div class="value" id="performance">...</div>
+                    <div class="chip">
+                        <span class="chip-label">🎯 Taux d'épargne</span>
+                        <span class="chip-value" id="performance">...</span>
                     </div>
                 </div>
             </section>
 
             <section class="kpi-advanced-section">
-                <h2>KPI Avancés</h2>
-                <div class="summary-grid">
-                    <div class="card summary-card">
-                        <div class="label">💹 Plus-value totale</div>
-                        <div class="value" id="totalGain">...</div>
+                <h2>KPI avancés</h2>
+                <div class="chip-row">
+                    <div class="chip">
+                        <span class="chip-label">💹 Plus-value totale</span>
+                        <span class="chip-value" id="totalGain">...</span>
                     </div>
-                    <div class="card summary-card">
-                        <div class="label">📈 Performance globale</div>
-                        <div class="value" id="globalPerformance">...</div>
+                    <div class="chip">
+                        <span class="chip-label">📈 Performance globale</span>
+                        <span class="chip-value" id="globalPerformance">...</span>
                     </div>
-                    <div class="card summary-card">
-                        <div class="label">💰 Capital investi</div>
-                        <div class="value" id="capitalInvesti">...</div>
+                    <div class="chip">
+                        <span class="chip-label">💰 Capital investi</span>
+                        <span class="chip-value" id="capitalInvesti">...</span>
                     </div>
-                    <div class="card summary-card">
-                        <div class="label">⚖️ Ratio investi</div>
-                        <div class="value" id="ratioInvesti">...</div>
+                    <div class="chip">
+                        <span class="chip-label">⚖️ Ratio investi</span>
+                        <span class="chip-value" id="ratioInvesti">...</span>
                     </div>
                 </div>
             </section>
@@ -97,36 +98,26 @@
                 </div>
             </section>
 
-            <section id="statistics" class="statistics-section">
-                <h2>Statistiques</h2>
-                <div class="summary-grid"></div>
-            </section>
-
             <section class="projection-section">
-                <h2>Projection Objectif</h2>
-                <div class="summary-grid">
-                    <div class="card summary-card">
-                        <div class="label">🚀 Projection Objectif 250k</div>
-                        <div class="value" id="projectionDate">...</div>
+                <h2>Projection objectif</h2>
+                <div class="chip-row">
+                    <div class="chip">
+                        <span class="chip-label">🚀 Projection</span>
+                        <span class="chip-value" id="projectionDate">...</span>
                     </div>
-                    <div class="card summary-card">
-                        <div class="label">💸 Reste à atteindre</div>
-                        <div class="value" id="summaryRemaining">...</div>
+                    <div class="chip">
+                        <span class="chip-label">💸 Reste à atteindre</span>
+                        <span class="chip-value" id="summaryRemaining">...</span>
                     </div>
-                    <div class="card summary-card">
-                        <div class="label">💰 Patrimoine actuel</div>
-                        <div class="value" id="summaryNetworth">...</div>
+                    <div class="chip">
+                        <span class="chip-label">💰 Patrimoine actuel</span>
+                        <span class="chip-value" id="summaryNetworth">...</span>
                     </div>
-                    <div class="card summary-card">
-                        <div class="label">🎯 Progression 250k</div>
-                        <div class="value" id="summaryProgress">...</div>
+                    <div class="chip">
+                        <span class="chip-label">🎯 Progression</span>
+                        <span class="chip-value" id="summaryProgress">...</span>
                     </div>
                 </div>
-            </section>
-
-            <section id="future-kpi-container" class="future-kpi-section">
-                <h2>KPI Futurs</h2>
-                <div class="summary-grid"></div>
             </section>
 
             <section class="charts-section">
@@ -168,13 +159,13 @@
 
             <section class="objectifs-annuels-section">
                 <h2>Objectifs annuels</h2>
-                <div class="kpi-grid" id="objectifsAnnuelsContainer"></div>
+                <div class="goals-grid" id="objectifsAnnuelsContainer"></div>
             </section>
 
             <section class="goals-section">
-                <h2>Objectifs financiers</h2>
-                <div id="goalsContainer">
-                    <div class="goal">
+                <h2>Objectifs d'épargne</h2>
+                <div id="goalsContainer" class="goals-grid">
+                    <div class="goal-card">
                         <div class="goal-header">
                             <span>🏠 Appartement</span>
                             <span id="goal-appartement">0%</span>
@@ -183,7 +174,7 @@
                             <div id="bar-appartement" class="progress-fill"></div>
                         </div>
                     </div>
-                    <div class="goal">
+                    <div class="goal-card">
                         <div class="goal-header">
                             <span>🚗 Voiture</span>
                             <span id="goal-voiture">0%</span>
@@ -192,7 +183,7 @@
                             <div id="bar-voiture" class="progress-fill"></div>
                         </div>
                     </div>
-                    <div class="goal">
+                    <div class="goal-card">
                         <div class="goal-header">
                             <span>✈️ Vacances</span>
                             <span id="goal-vacances">0%</span>
@@ -201,7 +192,7 @@
                             <div id="bar-vacances" class="progress-fill"></div>
                         </div>
                     </div>
-                    <div class="goal">
+                    <div class="goal-card">
                         <div class="goal-header">
                             <span>🛟 Fonds d'urgence</span>
                             <span id="goal-fonds_urgence">0%</span>
@@ -210,9 +201,9 @@
                             <div id="bar-fonds_urgence" class="progress-fill"></div>
                         </div>
                     </div>
-                    <div class="goal">
+                    <div class="goal-card">
                         <div class="goal-header">
-                            <span>🎯 Patrimoine 250k</span>
+                            <span>🎯 Patrimoine</span>
                             <span id="goal-patrimoine_total">0%</span>
                         </div>
                         <div class="progress-bar">

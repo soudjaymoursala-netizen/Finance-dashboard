@@ -289,6 +289,7 @@ async function chargerDashboard() {
                 valeurs.push(nettoyerNombre(cols[1].trim().replace(/^\"|\"$/g, "")));
             }
             if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
+            if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
             console.log("Graphiques OK ✅");
         } catch (e) {
             console.warn("Erreur parsing evolution chart:", e);
@@ -350,10 +351,14 @@ async function chargerDashboard() {
                 if (label) label.textContent = `${Math.round(o.actuel).toLocaleString("fr-FR")} € / ${Math.round(o.cible).toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
                 if (barre) {
                     barre.style.width = `${Math.min(pourcentage, 100)}%`;
-                    if (pourcentage < 25) barre.style.background = "#ef4444";
-                    else if (pourcentage < 50) barre.style.background = "#f59e0b";
-                    else if (pourcentage < 75) barre.style.background = "#3b82f6";
-                    else barre.style.background = "#22c55e";
+                    let couleurBarre;
+                    if (pourcentage < 25) couleurBarre = "#F0576B";
+                    else if (pourcentage < 50) couleurBarre = "#F5A623";
+                    else if (pourcentage < 75) couleurBarre = "#4EC5CF";
+                    else couleurBarre = "#2DD4A7";
+                    barre.style.background = couleurBarre;
+                    const parentCard = barre.closest(".goal-card");
+                    if (parentCard) parentCard.style.borderLeftColor = couleurBarre;
                 }
             });
 
@@ -375,13 +380,14 @@ async function chargerDashboard() {
                     // pour le reste, être proche/au-dessus de la cible est positif.
                     const enBonneVoie = lowerIsBetter ? o.actuel <= o.cible : pourcentage >= 75;
                     const surCible = lowerIsBetter ? o.actuel > o.cible : false;
-                    let couleur = "#3b82f6";
-                    if (surCible) couleur = "#ef4444";
-                    else if (enBonneVoie) couleur = "#22c55e";
-                    else if (pourcentage < 50 && !lowerIsBetter) couleur = "#f59e0b";
+                    let couleur = "#4EC5CF";
+                    if (surCible) couleur = "#F0576B";
+                    else if (enBonneVoie) couleur = "#2DD4A7";
+                    else if (pourcentage < 50 && !lowerIsBetter) couleur = "#F5A623";
 
                     const card = document.createElement("div");
-                    card.className = "card objectif-annuel-card";
+                    card.className = "objectif-annuel-card";
+                    card.style.borderLeftColor = couleur;
                     card.innerHTML = `
                         <div class="goal-header">
                             <span>${label}</span>
