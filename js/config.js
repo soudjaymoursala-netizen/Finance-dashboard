@@ -1,11 +1,12 @@
 const CONFIG = {
-  // URLs des Google Sheets
-  SHEETS: {
-    BUDGET: "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_BUDGET/export?format=csv&gid=519498006",
-    EVOLUTION: "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_BUDGET/export?format=csv&gid=810332816",
-    OBJECTIF: "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_BUDGET/export?format=csv&gid=1700667008",
-    PEA: "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_PEA/export?format=csv&gid=1971681206",
-    CTO: "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_CTO/export?format=csv&gid=1361663202"
+  // URLs des Google Sheets — chargées depuis config.local.js (non versionné)
+  // Voir config.local.example.js pour le modèle à copier.
+  SHEETS: (window.LOCAL_CONFIG && window.LOCAL_CONFIG.SHEETS) || {
+    BUDGET: "",
+    EVOLUTION: "",
+    OBJECTIF: "",
+    PEA: "",
+    CTO: ""
   },
 
   // Paramètres des graphiques
