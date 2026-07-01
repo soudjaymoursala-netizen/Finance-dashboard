@@ -51,59 +51,72 @@ function formatPourcentage(valeur) {
 
 /* ================================================== */
 /* LECTURE CSV KPI                                    */
+/* Amélioré : détection automatique du séparateur ("," ou ";")
+   et parsing tolérant des guillemets                      */
 /* ================================================== */
 
 function lireCSVKPI(csv) {
 
-    const lignes =
-        csv
-            .replace(/\r/g, "")
-            .trim()
-            .split("\n");
+    try {
 
-    const resultat = {};
-
-    for (
-        let i = 1;
-        i < lignes.length;
-        i++
-    ) {
-
-        const ligne =
-            lignes[i];
-
-        const indexVirgule =
-            ligne.indexOf(",");
-
-        if (
-            indexVirgule === -1
-        ) {
-            continue;
+        if (!csv) {
+            showError("CSV introuvable ou vide lors du parsing des KPI.");
+            return {};
         }
 
-        const cle =
-            ligne
-                .substring(
-                    0,
-                    indexVirgule
-                )
-                .trim();
+        const text = csv.replace(/\r/g, "").trim();
+        if (!text) {
+            showError("CSV vide après nettoyage (retours chariot retirés).");
+            return {};
+        }
 
-        const valeur =
-            ligne
-                .substring(
-                    indexVirgule + 1
-                )
-                .trim();
+        const lignes = text.split("\n");
+        if (lignes.length < 2) {
+            // pas de lignes de données
+            return {};
+        }
 
-        resultat[cle] =
-            nettoyerNombre(
-                valeur
-            );
+        // Detect separator using a sample of data lines
+        const sample = lignes.slice(1, Math.min(6, lignes.length)).join("\n");
+        const commas = (sample.match(/,/g) || []).length;
+        const semis = (sample.match(/;/g) || []).length;
+        const sep = (semis > commas) ? ";" : ",";
 
+        const resultat = {};
+
+        // split respecting quotes: sep not inside quotes
+        const splitRe = new RegExp(sep + "(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
+        for (let i = 1; i < lignes.length; i++) {
+
+            let ligne = lignes[i];
+            if (!ligne || !ligne.trim()) continue;
+
+            const colonnes = ligne.split(splitRe);
+
+            if (colonnes.length < 2) continue;
+
+            const cle = colonnes[0].trim().replace(/^\"|\"$/g, "");
+
+            // join the rest in case the value contains the separator
+            const valeurRaw = colonnes.slice(1).join(sep).trim().replace(/^\"|\"$/g, "");
+
+            resultat[cle] = nettoyerNombre(valeurRaw);
+
+        }
+
+        if (Object.keys(resultat).length === 0) {
+            showError("Parser CSV : aucune clé reconnue dans le CSV des KPI. Vérifie le format (séparateur ';' vs ',').");
+            console.log("CSV preview:", text.slice(0, 1000));
+        }
+
+        return resultat;
+
+    } catch (e) {
+        console.error("Erreur lors du parsing CSV:", e);
+        showError("Erreur lors du parsing du CSV des KPI. Voir la console pour plus de détails.");
+        return {};
     }
-
-    return resultat;
 
 }
 
@@ -1135,6 +1148,7 @@ const [
             "Erreur Dashboard :",
             error
         );
+        showError("Erreur lors du chargement du dashboard. Voir la console pour plus d'infos.");
 
     }
 
