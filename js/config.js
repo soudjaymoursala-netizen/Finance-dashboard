@@ -132,10 +132,5 @@
       // noop
     }
   } else {
-    console.log("CONFIG OK — endpoints:", {
-      BUDGET: window.CONFIG.URL_BUDGET,
-      CTO: window.CONFIG.URL_CTO,
-      PEA: window.CONFIG.URL_PEA,
-    });
   }
 })();

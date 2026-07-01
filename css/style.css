@@ -736,6 +736,14 @@ main > section > h2 {
   flex-shrink: 0;
 }
 
+/* Focus clavier visible, indispensable pour les elements role="button"
+   sur des div/h3 (pas de style de focus natif comme sur un <button>) */
+[role="button"]:focus-visible,
+.theme-btn:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
 /* ==================================================
    Responsive
    ================================================== */

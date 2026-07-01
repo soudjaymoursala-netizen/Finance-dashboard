@@ -103,7 +103,6 @@ function lireCSVKPI(csv) {
 
         if (Object.keys(resultat).length === 0) {
             showError("Parser CSV : aucune clé reconnue dans le CSV des KPI. Vérifie le format (séparateur ',' vs ';').");
-            console.log("CSV preview:", text.slice(0, 1000));
         }
 
         return resultat;
@@ -184,7 +183,6 @@ const DATA = {
 
 async function chargerDashboard() {
     try {
-        console.log("CONFIG =", window.CONFIG);
         if (!window.CONFIG) throw new Error("window.CONFIG introuvable");
 
         // helper to fetch and handle errors
@@ -215,9 +213,6 @@ async function chargerDashboard() {
         DATA.cto = lireCSVKPI(ctoTxt);
         DATA.pea = lireCSVKPI(peaTxt);
 
-        console.log("Budget", DATA.budget);
-        console.log("PEA", DATA.pea);
-        console.log("CTO", DATA.cto);
 
         const tauxChange = DATA.cto.eur_chf || 1;
         DATA.ctoValeurEUR = (DATA.cto.cto_valeur_chf || 0) * tauxChange;
@@ -267,10 +262,14 @@ async function chargerDashboard() {
                     '<div class="fire-stat"><span class="fire-stat-label">💸 Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
                     '<div class="fire-stat"><span class="fire-stat-label">🏦 Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
                     '<div class="fire-stat"><span class="fire-stat-label">🚀 Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
-        if (DOM.fireBar) DOM.fireBar.style.width = Math.min(DATA.progression250k, 100) + "%";
+        if (DOM.fireBar) {
+            const pct = Math.max(0, Math.min(DATA.progression250k, 100));
+            DOM.fireBar.style.width = pct + "%";
+            const fireProgressWrapper = DOM.fireBar.parentElement;
+            if (fireProgressWrapper) fireProgressWrapper.setAttribute("aria-valuenow", Math.round(pct));
+        }
         if (DOM.lastUpdate) DOM.lastUpdate.textContent = "Dernière synchronisation : " + new Date().toLocaleString("fr-FR");
 
-        console.log("Calculs financiers OK ✅");
 
         // Allocation chart
         if (typeof updateAllocationChart === "function") {
@@ -330,7 +329,6 @@ async function chargerDashboard() {
             } catch (e) {
                 console.warn("Tendance héros non calculable:", e);
             }
-            console.log("Graphiques OK ✅");
         } catch (e) {
             console.warn("Erreur parsing evolution chart:", e);
         }
@@ -372,7 +370,12 @@ async function chargerDashboard() {
                     '<div class="fire-stat"><span class="fire-stat-label">💸 Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
                     '<div class="fire-stat"><span class="fire-stat-label">🏦 Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
                     '<div class="fire-stat"><span class="fire-stat-label">🚀 Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
-                if (DOM.fireBar) DOM.fireBar.style.width = Math.min(DATA.progression250k, 100) + "%";
+                if (DOM.fireBar) {
+            const pct = Math.max(0, Math.min(DATA.progression250k, 100));
+            DOM.fireBar.style.width = pct + "%";
+            const fireProgressWrapper = DOM.fireBar.parentElement;
+            if (fireProgressWrapper) fireProgressWrapper.setAttribute("aria-valuenow", Math.round(pct));
+        }
                 // redessine le graphique patrimoine avec la cible reelle (il avait ete
                 // dessine plus haut avec la valeur par defaut, avant que l'objectif
                 // dynamique ne soit connu)
@@ -385,7 +388,7 @@ async function chargerDashboard() {
             ["appartement", "voiture", "vacances", "fonds_urgence", "patrimoine_total"].forEach((objectif) => {
                 const o = OBJECTIFS[objectif];
                 if (!o || o.cible <= 0) return;
-                const pourcentage = (o.actuel / o.cible) * 100;
+                const pourcentage = Math.max(0, (o.actuel / o.cible) * 100);
                 const label = document.getElementById("goal-" + objectif);
                 const barre = document.getElementById("bar-" + objectif);
                 if (label) label.textContent = `${Math.round(o.actuel).toLocaleString("fr-FR")} € / ${Math.round(o.cible).toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
@@ -399,6 +402,8 @@ async function chargerDashboard() {
                     barre.style.background = couleurBarre;
                     const parentCard = barre.closest(".goal-card");
                     if (parentCard) parentCard.style.borderLeftColor = couleurBarre;
+                    const progressWrapper = barre.closest(".progress-bar");
+                    if (progressWrapper) progressWrapper.setAttribute("aria-valuenow", Math.round(Math.min(pourcentage, 100)));
                 }
             });
 
@@ -415,7 +420,7 @@ async function chargerDashboard() {
                 ANNUELS.forEach(({ key, label, lowerIsBetter }) => {
                     const o = OBJECTIFS[key];
                     if (!o || o.cible <= 0) return;
-                    const pourcentage = (o.actuel / o.cible) * 100;
+                    const pourcentage = Math.max(0, (o.actuel / o.cible) * 100);
                     // "en bonne voie" : pour les dépenses, être sous la cible est positif ;
                     // pour le reste, être proche/au-dessus de la cible est positif.
                     const enBonneVoie = lowerIsBetter ? o.actuel <= o.cible : pourcentage >= 75;
@@ -433,7 +438,7 @@ async function chargerDashboard() {
                             <span>${label}</span>
                             <span style="color:${couleur}">${Math.round(o.actuel).toLocaleString("fr-FR")} € / ${Math.round(o.cible).toLocaleString("fr-FR")} €</span>
                         </div>
-                        <div class="progress-bar">
+                        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(Math.min(pourcentage, 100))}" aria-label="${label}">
                             <div class="progress-fill" style="width:${Math.min(pourcentage, 100)}%;background:${couleur}"></div>
                         </div>
                         <div class="objectif-annuel-pct" style="color:${couleur}">${pourcentage.toFixed(0)}%${lowerIsBetter ? (surCible ? " — dépassement" : " du budget utilisé") : " atteint"}</div>
@@ -442,7 +447,6 @@ async function chargerDashboard() {
                 });
             }
 
-            console.log("Objectifs OK ✅", OBJECTIFS);
         } catch (e) {
             console.warn("Erreur parsing objectifs:", e);
         }
@@ -460,7 +464,6 @@ async function chargerDashboard() {
             if (peaPositions) peaPositions.textContent = (DATA.pea.nombre_position || 0) + " position" + ((DATA.pea.nombre_position || 0) > 1 ? "s" : "");
             const ctoPositions = document.getElementById("ctoPositions");
             if (ctoPositions) ctoPositions.textContent = (DATA.cto.nombre_position || 0) + " position" + ((DATA.cto.nombre_position || 0) > 1 ? "s" : "") + " · 1 EUR = " + (DATA.cto.eur_chf || 0).toFixed(2) + " CHF";
-            console.log("Composition portefeuille OK ✅");
         } catch (e) {
             console.warn("Erreur composition portefeuille:", e);
         }
@@ -520,7 +523,6 @@ async function chargerDashboard() {
             });
         }
 
-        console.log("Dashboard V5 chargé ✅");
     } catch (error) {
         console.error("Erreur Dashboard :", error);
         showError("Erreur lors du chargement du dashboard. Voir la console pour plus d'infos.");

@@ -1,4 +1,7 @@
-/* UI for runtime configuration when URLs are missing */
+/* Panneau de configuration de secours : ne s'affiche que si une URL de
+   source de donnees venait a manquer (normalement jamais, grace au
+   fallback DEFAULT_PROXY_BASE_URL dans config.js). Sert de filet de
+   securite pour reconfigurer sans toucher au code. */
 (function () {
   function createPanel() {
     const existing = document.getElementById('runtime-config-panel');
@@ -7,20 +10,20 @@
     const panel = document.createElement('div');
     panel.id = 'runtime-config-panel';
     panel.innerHTML = `
-      <button id="runtime-config-toggle" aria-label="Config">⚙️</button>
+      <button id="runtime-config-toggle" aria-label="Configuration avancée">⚙️</button>
       <div id="runtime-config" class="runtime-config-hidden">
-        <h3>Config rapide (test)</h3>
-        <p>Colle ici les URLs d'export CSV (ou laisse vide si tu utilises un Worker).</p>
-        <label>URL_BUDGET<br><input id="rc-url-budget" type="text"/></label>
-        <label>URL_CTO<br><input id="rc-url-cto" type="text"/></label>
-        <label>URL_PEA<br><input id="rc-url-pea" type="text"/></label>
-        <label>URL_EVOLUTION<br><input id="rc-url-evolution" type="text"/></label>
-        <label>URL_OBJECTIF<br><input id="rc-url-objectif" type="text"/></label>
-        <div style="margin-top:.5rem">
-          <button id="rc-save">Save & Reload</button>
-          <button id="rc-clear">Clear</button>
+        <h3>⚠️ Configuration avancée</h3>
+        <p>Une ou plusieurs sources de données sont introuvables. Renseignez ici les URLs manuellement (ou laissez vide si vous utilisez le Worker proxy habituel).</p>
+        <label>Budget<br><input id="rc-url-budget" type="text" placeholder="https://..."/></label>
+        <label>CTO<br><input id="rc-url-cto" type="text" placeholder="https://..."/></label>
+        <label>PEA<br><input id="rc-url-pea" type="text" placeholder="https://..."/></label>
+        <label>Évolution<br><input id="rc-url-evolution" type="text" placeholder="https://..."/></label>
+        <label>Objectif<br><input id="rc-url-objectif" type="text" placeholder="https://..."/></label>
+        <div class="rc-actions">
+          <button id="rc-save">Enregistrer et recharger</button>
+          <button id="rc-clear" class="rc-secondary">Réinitialiser</button>
         </div>
-        <small>Ces valeurs sont stockées localement dans ton navigateur (localStorage).</small>
+        <small>Ces valeurs sont stockées uniquement dans ce navigateur (localStorage), jamais envoyées ailleurs.</small>
       </div>
     `;
 
@@ -28,11 +31,17 @@
 
     const style = document.createElement('style');
     style.textContent = `
-      #runtime-config-panel{position:fixed;right:12px;bottom:12px;z-index:9999;font-family:Arial,Helvetica,sans-serif}
-      #runtime-config-toggle{background:#1f2937;color:white;border:none;border-radius:6px;padding:8px;cursor:pointer}
-      #runtime-config{background:rgba(0,0,0,0.8);color:white;padding:12px;border-radius:8px;margin-top:8px;min-width:320px}
-      #runtime-config label{display:block;margin:6px 0}
-      #runtime-config input{width:100%;padding:6px;border-radius:4px;border:1px solid #333;background:#0f172a;color:#fff}
+      #runtime-config-panel{position:fixed;right:16px;bottom:16px;z-index:9999;font-family:'Inter',sans-serif}
+      #runtime-config-toggle{background:#141B2E;color:#F1F5F9;border:1px solid rgba(255,255,255,0.1);border-radius:9999px;width:2.75rem;height:2.75rem;cursor:pointer;font-size:1.1rem;box-shadow:0 8px 24px rgba(0,0,0,0.35)}
+      #runtime-config{background:linear-gradient(150deg,#141B2E,#1C2740);color:#F1F5F9;padding:1.25rem;border-radius:14px;border:1px solid rgba(255,255,255,0.08);margin-top:0.5rem;min-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.35)}
+      #runtime-config h3{font-family:'Sora',sans-serif;font-size:0.95rem;margin:0 0 0.5rem}
+      #runtime-config p{font-size:0.8rem;color:#8A94A6;margin:0 0 0.75rem}
+      #runtime-config label{display:block;margin:0.5rem 0;font-size:0.75rem;font-weight:600;color:#8A94A6;text-transform:uppercase;letter-spacing:0.04em}
+      #runtime-config input{width:100%;padding:0.5rem 0.65rem;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:#0B1120;color:#F1F5F9;font-family:'Inter',sans-serif;margin-top:0.25rem}
+      #runtime-config small{display:block;margin-top:0.75rem;font-size:0.7rem;color:#8A94A6}
+      .rc-actions{display:flex;gap:0.5rem;margin-top:0.75rem}
+      #rc-save{flex:1;background:#2DD4A7;color:#0B1120;border:none;border-radius:8px;padding:0.55rem;font-weight:700;cursor:pointer}
+      .rc-secondary{background:transparent;color:#8A94A6;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.55rem 0.8rem;cursor:pointer}
       .runtime-config-hidden{display:none}
     `;
     document.head.appendChild(style);

@@ -33,7 +33,10 @@ window.onerror = function (message, source, line, column, error) {
   }
   console.groupEnd();
 
-  addAlert(`Erreur JS: ${message} (${source}:${line})`, "error");
+  // Message convivial pour l'utilisateur final : le detail technique
+  // (message brut, fichier, ligne) reste dans la console pour le
+  // developpement, mais n'a rien a faire dans l'interface d'un client.
+  addAlert("Une erreur inattendue est survenue. Essayez de recharger la page.", "error");
   return false;
 };
 
@@ -45,8 +48,7 @@ window.addEventListener("unhandledrejection", function (event) {
   }
   console.groupEnd();
 
-  const reason = event.reason && event.reason.message ? event.reason.message : String(event.reason);
-  addAlert(`Promise reject: ${reason}`, "error");
+  addAlert("Un problème est survenu lors du chargement des données. Réessayez dans quelques instants.", "error");
 });
 
 function showError(message) {
