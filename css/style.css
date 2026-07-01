@@ -198,6 +198,35 @@ h1, h2, h3 {
   height: 300px;
 }
 
+/* Composition du portefeuille */
+.composition-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.chart-small {
+  height: 280px;
+}
+
+.composition-meta {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary-color);
+  margin-top: 0.5rem;
+}
+
+/* Objectifs annuels */
+.objectif-annuel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.objectif-annuel-pct {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: right;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {

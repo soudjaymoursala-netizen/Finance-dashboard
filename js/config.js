@@ -52,6 +52,7 @@
       PEA: buildSheetUrl("PEA", "VITE_URL_PEA"),
       EVOLUTION: buildSheetUrl("EVOLUTION", "VITE_URL_EVOLUTION"),
       OBJECTIF: buildSheetUrl("OBJECTIF", "VITE_URL_OBJECTIF"),
+      BUDGET_MENSUEL: buildSheetUrl("BUDGET_MENSUEL", "VITE_URL_BUDGET_MENSUEL"),
     },
     CHARTS: {
       PATRIMOINE: {
@@ -100,15 +101,20 @@
     URL_OBJECTIF: CONFIG.SHEETS.OBJECTIF,
     URL_PEA: CONFIG.SHEETS.PEA,
     URL_CTO: CONFIG.SHEETS.CTO,
+    URL_BUDGET_MENSUEL: CONFIG.SHEETS.BUDGET_MENSUEL,
     CHARTS: CONFIG.CHARTS,
     GOALS: CONFIG.GOALS,
     FIRE: CONFIG.FIRE,
     utils: CONFIG.utils,
   };
 
+  // URL_BUDGET_MENSUEL est optionnelle (feature pas encore configuree cote
+  // Cloudflare) : on l'exclut volontairement de la verification "missing"
+  // pour ne pas afficher une alerte tant que ce n'est pas branche.
+
   // Aide au debug et message utilisateur si config manquante
   const missing = Object.entries(window.CONFIG)
-    .filter(([k, v]) => k.startsWith("URL_") && (!v || v === ""))
+    .filter(([k, v]) => k.startsWith("URL_") && k !== "URL_BUDGET_MENSUEL" && (!v || v === ""))
     .map(([k]) => k);
 
   if (missing.length) {

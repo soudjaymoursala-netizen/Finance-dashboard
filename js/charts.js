@@ -1,22 +1,31 @@
 let patrimoineChart = null;
 let allocationChart = null;
+let peaCompositionChart = null;
+let ctoCompositionChart = null;
+let monthlyBudgetChart = null;
 
-let lastPatrimoine = { labels: [], valeurs: [] };
+let lastPatrimoine = { labels: [], valeurs: [], objectif: 250000 };
 let lastAllocation = { cash: 0, pea: 0, cto: 0 };
+let lastPeaComposition = { actions: 0, etf: 0 };
+let lastCtoComposition = { actions: 0, etf: 0, crypto: 0 };
+let lastMonthlyBudget = { labels: [], revenus: [], depenses: [] };
 
 function getThemeMode() {
   return document && document.body && document.body.classList.contains("light") ? "light" : "dark";
 }
 
-function updatePatrimoineChart(labels, valeurs) {
+function updatePatrimoineChart(labels, valeurs, objectifCible) {
 
     lastPatrimoine.labels = labels || [];
     lastPatrimoine.valeurs = valeurs || [];
+    if (typeof objectifCible === "number" && objectifCible > 0) {
+        lastPatrimoine.objectif = objectifCible;
+    }
 
     const chartElement = document.querySelector("#patrimoineChart");
     if (!chartElement) return;
     if (patrimoineChart) patrimoineChart.destroy();
-    const objectifData = labels.map(() => 250000);
+    const objectifData = labels.map(() => lastPatrimoine.objectif);
     const options = {
         chart: {
             type: "area",
@@ -32,7 +41,7 @@ function updatePatrimoineChart(labels, valeurs) {
 
         series: [
             { name: "Patrimoine", data: valeurs },
-            { name: "Objectif 250k", data: objectifData }
+            { name: "Objectif " + Math.round(lastPatrimoine.objectif / 1000) + "k", data: objectifData }
         ],
 
         colors: ["#22c55e", "#94a3b8"],
@@ -193,13 +202,109 @@ function updateAllocationChart(cash, pea, cto) {
     allocationChart.render();
 }
 
+/* Composition PEA : Actions vs ETF */
+function updatePeaCompositionChart(actions, etf) {
+
+    lastPeaComposition.actions = actions || 0;
+    lastPeaComposition.etf = etf || 0;
+
+    const chartElement = document.querySelector("#peaCompositionChart");
+    if (!chartElement) return;
+    if (peaCompositionChart) peaCompositionChart.destroy();
+
+    const options = {
+        chart: { type: "donut", height: 280, background: "transparent" },
+        series: [actions, etf],
+        labels: ["Actions", "ETF"],
+        colors: ["#D9A441", "#4EC5CF"],
+        legend: { position: "bottom", fontSize: "13px", labels: { colors: "#ffffff" } },
+        plotOptions: {
+            pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "PEA", color: "#4EC5CF",
+                formatter: () => Math.round(actions + etf).toLocaleString("fr-FR") + " €" } } } }
+        },
+        dataLabels: { enabled: true, formatter: v => v.toFixed(0) + "%" },
+        tooltip: { theme: getThemeMode(), y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
+        theme: { mode: getThemeMode() }
+    };
+
+    peaCompositionChart = new ApexCharts(chartElement, options);
+    peaCompositionChart.render();
+}
+
+/* Composition CTO : Actions vs ETF vs Crypto */
+function updateCtoCompositionChart(actions, etf, crypto) {
+
+    lastCtoComposition.actions = actions || 0;
+    lastCtoComposition.etf = etf || 0;
+    lastCtoComposition.crypto = crypto || 0;
+
+    const chartElement = document.querySelector("#ctoCompositionChart");
+    if (!chartElement) return;
+    if (ctoCompositionChart) ctoCompositionChart.destroy();
+
+    const options = {
+        chart: { type: "donut", height: 280, background: "transparent" },
+        series: [actions, etf, crypto],
+        labels: ["Actions", "ETF", "Crypto"],
+        colors: ["#D9A441", "#4EC5CF", "#a855f7"],
+        legend: { position: "bottom", fontSize: "13px", labels: { colors: "#ffffff" } },
+        plotOptions: {
+            pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "CTO", color: "#4EC5CF",
+                formatter: () => Math.round(actions + etf + crypto).toLocaleString("fr-FR") + " CHF" } } } }
+        },
+        dataLabels: { enabled: true, formatter: v => v.toFixed(0) + "%" },
+        tooltip: { theme: getThemeMode(), y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " CHF" } },
+        theme: { mode: getThemeMode() }
+    };
+
+    ctoCompositionChart = new ApexCharts(chartElement, options);
+    ctoCompositionChart.render();
+}
+
+/* Suivi mensuel : Revenus vs Dépenses (optionnel, API_BUDGET_MENSUEL) */
+function updateMonthlyBudgetChart(labels, revenus, depenses) {
+
+    lastMonthlyBudget.labels = labels || [];
+    lastMonthlyBudget.revenus = revenus || [];
+    lastMonthlyBudget.depenses = depenses || [];
+
+    const chartElement = document.querySelector("#monthlyBudgetChart");
+    if (!chartElement) return;
+    if (monthlyBudgetChart) monthlyBudgetChart.destroy();
+
+    const options = {
+        chart: { type: "bar", height: 320, background: "transparent", toolbar: { show: false } },
+        series: [
+            { name: "Revenus", data: revenus },
+            { name: "Dépenses", data: depenses }
+        ],
+        colors: ["#22c55e", "#ef4444"],
+        plotOptions: { bar: { columnWidth: "55%", borderRadius: 4 } },
+        dataLabels: { enabled: false },
+        grid: { borderColor: "#334155", strokeDashArray: 4 },
+        legend: { position: "top", labels: { colors: "#ffffff" } },
+        xaxis: { categories: labels, labels: { style: { colors: "#94a3b8" } } },
+        yaxis: { labels: { style: { colors: "#94a3b8" }, formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
+        tooltip: { theme: getThemeMode(), y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
+        theme: { mode: getThemeMode() }
+    };
+
+    monthlyBudgetChart = new ApexCharts(chartElement, options);
+    monthlyBudgetChart.render();
+}
+
 /* Refresh charts using cached data (appelable après un changement de thème) */
 function refreshCharts() {
   if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
-    updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs);
+    updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, lastPatrimoine.objectif);
   }
   // même si les valeurs valent 0, on peut forcer la mise à jour
   updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto);
+  updatePeaCompositionChart(lastPeaComposition.actions, lastPeaComposition.etf);
+  updateCtoCompositionChart(lastCtoComposition.actions, lastCtoComposition.etf, lastCtoComposition.crypto);
+  if (lastMonthlyBudget.labels && lastMonthlyBudget.labels.length) {
+    updateMonthlyBudgetChart(lastMonthlyBudget.labels, lastMonthlyBudget.revenus, lastMonthlyBudget.depenses);
+  }
 }
 
 /* rendre refreshCharts accessible globalement depuis les autres scripts */

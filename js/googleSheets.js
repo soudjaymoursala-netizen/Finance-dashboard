@@ -288,13 +288,19 @@ async function chargerDashboard() {
                 labels.push(cols[0].trim());
                 valeurs.push(nettoyerNombre(cols[1].trim().replace(/^\"|\"$/g, "")));
             }
-            if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs);
+            if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
             console.log("Graphiques OK ✅");
         } catch (e) {
             console.warn("Erreur parsing evolution chart:", e);
         }
 
-        // Objectifs parsing (robust)
+        // Objectifs parsing (robust + dynamique)
+        // API_OBJECTIF contient 2 familles de lignes :
+        //  - objectifs d'épargne (appartement, voiture, vacances, fonds_urgence, patrimoine_total)
+        //    -> déjà affichés via des barres dédiées (id="goal-xxx" / "bar-xxx")
+        //  - métriques annuelles (revenue_annuel, depense_annuel, epargne_annuel, investis_annuel)
+        //    -> affichées dynamiquement dans la nouvelle section "Objectifs Annuels"
+        const OBJECTIFS = {};
         try {
             const sample = objectifTxt || "";
             const sep = detectSeparator(sample);
@@ -303,14 +309,45 @@ async function chargerDashboard() {
                 if (!lines[i]) continue;
                 const cols = splitCsvLine(lines[i], sep);
                 if (cols.length < 3) continue;
-                const objectif = cols[0].trim();
+                const nom = cols[0].trim().replace(/^\"|\"$/g, "");
                 const cible = nettoyerNombre(cols[1].trim().replace(/^\"|\"$/g, ""));
                 const actuel = nettoyerNombre(cols[2].trim().replace(/^\"|\"$/g, ""));
-                if (cible <= 0) continue;
-                const pourcentage = (actuel / cible) * 100;
+                if (!nom) continue;
+                OBJECTIFS[nom] = { cible, actuel };
+            }
+
+            // Objectif patrimoine 250k : piloté dynamiquement par le Sheet
+            // (au lieu d'une valeur figée dans le code)
+            if (OBJECTIFS.patrimoine_total && OBJECTIFS.patrimoine_total.cible > 0) {
+                DATA.objectif250k = OBJECTIFS.patrimoine_total.cible;
+                DATA.restant250k = Math.max(0, DATA.objectif250k - DATA.patrimoine);
+                DATA.progression250k = DATA.patrimoine > 0 ? (DATA.patrimoine / DATA.objectif250k) * 100 : 0;
+                DATA.anneesRestantes = DATA.epargneAnnuelle > 0 ? DATA.restant250k / DATA.epargneAnnuelle : 0;
+                DATA.projectionAnnee = new Date().getFullYear() + Math.ceil(DATA.anneesRestantes);
+                // re-synchroniser l'affichage deja fait plus haut avec la cible dynamique
+                if (DOM.summaryProgress) DOM.summaryProgress.textContent = formatPourcentage(DATA.progression250k);
+                if (DOM.summaryRemaining) DOM.summaryRemaining.textContent = formatEUR(DATA.restant250k);
+                if (DOM.projectionDate) DOM.projectionDate.innerHTML = DATA.projectionAnnee + "<br><small>" + DATA.anneesRestantes.toFixed(1) + " ans</small>";
+                if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
+                if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
+                if (DOM.fireDetails) DOM.fireDetails.innerHTML = "Patrimoine : " + formatEUR(DATA.patrimoine) + "<br>Objectif : " + formatEUR(DATA.objectif250k) + "<br>Progression : " + DATA.progression250k.toFixed(1) + " %<br>Reste : " + formatEUR(DATA.restant250k) + "<br>Épargne annuelle : " + formatEUR(DATA.epargneAnnuelle) + "<br>Projection : " + DATA.projectionAnnee + " (~" + DATA.anneesRestantes.toFixed(1) + " ans)";
+                if (DOM.fireBar) DOM.fireBar.style.width = Math.min(DATA.progression250k, 100) + "%";
+                // redessine le graphique patrimoine avec la cible reelle (il avait ete
+                // dessine plus haut avec la valeur par defaut, avant que l'objectif
+                // dynamique ne soit connu)
+                if (typeof updatePatrimoineChart === "function") {
+                    updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, DATA.objectif250k);
+                }
+            }
+
+            // Barres des objectifs d'épargne (comportement existant, conservé)
+            ["appartement", "voiture", "vacances", "fonds_urgence", "patrimoine_total"].forEach((objectif) => {
+                const o = OBJECTIFS[objectif];
+                if (!o || o.cible <= 0) return;
+                const pourcentage = (o.actuel / o.cible) * 100;
                 const label = document.getElementById("goal-" + objectif);
                 const barre = document.getElementById("bar-" + objectif);
-                if (label) label.textContent = `${Math.round(actuel).toLocaleString("fr-FR")} € / ${Math.round(cible).toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
+                if (label) label.textContent = `${Math.round(o.actuel).toLocaleString("fr-FR")} € / ${Math.round(o.cible).toLocaleString("fr-FR")} € (${pourcentage.toFixed(1)}%)`;
                 if (barre) {
                     barre.style.width = `${Math.min(pourcentage, 100)}%`;
                     if (pourcentage < 25) barre.style.background = "#ef4444";
@@ -318,10 +355,106 @@ async function chargerDashboard() {
                     else if (pourcentage < 75) barre.style.background = "#3b82f6";
                     else barre.style.background = "#22c55e";
                 }
+            });
+
+            // Métriques annuelles (nouveau) : rendu dynamique dans #objectifsAnnuelsContainer
+            const ANNUELS = [
+                { key: "revenue_annuel", label: "💰 Revenus", lowerIsBetter: false },
+                { key: "depense_annuel", label: "💸 Dépenses", lowerIsBetter: true },
+                { key: "epargne_annuel", label: "🏦 Épargne", lowerIsBetter: false },
+                { key: "investis_annuel", label: "📈 Investissements", lowerIsBetter: false },
+            ];
+            const container = document.getElementById("objectifsAnnuelsContainer");
+            if (container) {
+                container.innerHTML = "";
+                ANNUELS.forEach(({ key, label, lowerIsBetter }) => {
+                    const o = OBJECTIFS[key];
+                    if (!o || o.cible <= 0) return;
+                    const pourcentage = (o.actuel / o.cible) * 100;
+                    // "en bonne voie" : pour les dépenses, être sous la cible est positif ;
+                    // pour le reste, être proche/au-dessus de la cible est positif.
+                    const enBonneVoie = lowerIsBetter ? o.actuel <= o.cible : pourcentage >= 75;
+                    const surCible = lowerIsBetter ? o.actuel > o.cible : false;
+                    let couleur = "#3b82f6";
+                    if (surCible) couleur = "#ef4444";
+                    else if (enBonneVoie) couleur = "#22c55e";
+                    else if (pourcentage < 50 && !lowerIsBetter) couleur = "#f59e0b";
+
+                    const card = document.createElement("div");
+                    card.className = "card objectif-annuel-card";
+                    card.innerHTML = `
+                        <div class="goal-header">
+                            <span>${label}</span>
+                            <span style="color:${couleur}">${Math.round(o.actuel).toLocaleString("fr-FR")} € / ${Math.round(o.cible).toLocaleString("fr-FR")} €</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:${Math.min(pourcentage, 100)}%;background:${couleur}"></div>
+                        </div>
+                        <div class="objectif-annuel-pct" style="color:${couleur}">${pourcentage.toFixed(0)}%${lowerIsBetter ? (surCible ? " — dépassement" : " du budget utilisé") : " atteint"}</div>
+                    `;
+                    container.appendChild(card);
+                });
             }
-            console.log("Objectifs OK ✅");
+
+            console.log("Objectifs OK ✅", OBJECTIFS);
         } catch (e) {
             console.warn("Erreur parsing objectifs:", e);
+        }
+
+        // Composition du portefeuille (nouveau) : PEA (Actions/ETF) + CTO (Actions/ETF/Crypto)
+        // Ces données étaient déjà récupérées (DATA.pea / DATA.cto) mais jamais affichées.
+        try {
+            if (typeof updatePeaCompositionChart === "function") {
+                updatePeaCompositionChart(DATA.pea.pea_action || 0, DATA.pea.pea_etf || 0);
+            }
+            if (typeof updateCtoCompositionChart === "function") {
+                updateCtoCompositionChart(DATA.cto.cto_action || 0, DATA.cto.cto_etf || 0, DATA.cto.cto_crypto || 0);
+            }
+            const peaPositions = document.getElementById("peaPositions");
+            if (peaPositions) peaPositions.textContent = (DATA.pea.nombre_position || 0) + " position" + ((DATA.pea.nombre_position || 0) > 1 ? "s" : "");
+            const ctoPositions = document.getElementById("ctoPositions");
+            if (ctoPositions) ctoPositions.textContent = (DATA.cto.nombre_position || 0) + " position" + ((DATA.cto.nombre_position || 0) > 1 ? "s" : "") + " · 1 EUR = " + (DATA.cto.eur_chf || 0).toFixed(2) + " CHF";
+            console.log("Composition portefeuille OK ✅");
+        } catch (e) {
+            console.warn("Erreur composition portefeuille:", e);
+        }
+
+        // Suivi mensuel (nouveau, optionnel) : n'affiche la section que si
+        // API_BUDGET_MENSUEL est configuré côté Cloudflare (sinon la section reste masquée,
+        // aucune alerte affichée pour ne pas gêner tant que ce n'est pas branché).
+        try {
+            const monthlySection = document.getElementById("monthlyBudgetSection");
+            if (window.CONFIG.URL_BUDGET_MENSUEL) {
+                let monthlyTxt = "";
+                try {
+                    const r = await fetch(window.CONFIG.URL_BUDGET_MENSUEL);
+                    if (r.ok) monthlyTxt = await r.text();
+                } catch (fetchErr) {
+                    // silencieux : feature optionnelle, pas encore configuree
+                }
+                if (monthlyTxt) {
+                    const sep = detectSeparator(monthlyTxt);
+                    const lines = monthlyTxt.replace(/\r/g, "").trim().split("\n");
+                    const labels = [], revenus = [], depenses = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        if (!lines[i]) continue;
+                        const cols = splitCsvLine(lines[i], sep);
+                        if (cols.length < 3) continue;
+                        const rev = nettoyerNombre(cols[1]);
+                        const dep = nettoyerNombre(cols[2]);
+                        if (rev === 0 && dep === 0) continue; // ligne future non renseignée
+                        labels.push(cols[0].trim());
+                        revenus.push(rev);
+                        depenses.push(dep);
+                    }
+                    if (labels.length && typeof updateMonthlyBudgetChart === "function") {
+                        updateMonthlyBudgetChart(labels, revenus, depenses);
+                        if (monthlySection) monthlySection.style.display = "";
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("Suivi mensuel non disponible:", e);
         }
 
         // theme handling unchanged
