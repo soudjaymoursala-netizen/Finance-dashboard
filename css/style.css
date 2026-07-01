@@ -224,7 +224,7 @@ main > section > h2 {
    ================================================== */
 .chip-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
   gap: 0.75rem;
 }
 
@@ -374,7 +374,7 @@ main > section > h2 {
    ================================================== */
 .goals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1rem;
 }
 
@@ -392,8 +392,10 @@ main > section > h2 {
 
 .goal-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 0.4rem;
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -556,6 +558,24 @@ main > section > h2 {
   .card:hover, .chip:hover, .goal-card:hover, .objectif-annuel-card:hover {
     transform: none;
   }
+}
+
+/* ==================================================
+   ANTI-DÉBORDEMENT — les éléments flex/grid refusent par
+   défaut de rétrécir sous la largeur de leur contenu, ce qui
+   pousse le texte hors des cartes au lieu de passer à la ligne
+   ================================================== */
+.card, .chip, .goal-card, .objectif-annuel-card,
+.chip-label, .chip-value,
+.goal-header, .goal-header > span,
+.hero-top-row, .hero-label, .hero-value,
+.card .label, .card .value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.icon-badge {
+  flex-shrink: 0;
 }
 
 /* ==================================================
