@@ -1,28 +1,34 @@
 (function () {
   const env = window.__ENV || {}; // optional env injection (Netlify, GH Pages injecteur, etc.)
 
-  // Fallback par défaut : notre déploiement GitHub Pages est un site 100%
-  // statique (pas de build Vite/Netlify), donc window.PROXY_BASE_URL et
-  // env.* ne sont jamais injectés ici. On garde un défaut en dur pour que
-  // le dashboard fonctionne sans configuration supplémentaire, tout en
-  // restant surchargeable (ex: window.PROXY_BASE_URL = "..." avant ce script,
-  // ou un futur build Vite/Netlify avec les vraies env vars).
-  const DEFAULT_PROXY_BASE_URL =
-    "https://autumn-poetry-ca2cfinance-dashboard-proxy.soudjaymoursala.workers.dev";
-
   const PROXY_BASE_URL =
     window.PROXY_BASE_URL ||
     env.PROXY_BASE_URL ||
     env.VITE_PROXY_BASE_URL ||
-    DEFAULT_PROXY_BASE_URL;
+    "";
+
+  function getFromLocalStorage(key) {
+    try {
+      const v = localStorage.getItem(key);
+      return v && v.trim() ? v.trim() : null;
+    } catch (e) {
+      return null;
+    }
+  }
 
   function buildSheetUrl(key, viteKey) {
+    // priority: injected env > window global > localStorage VITE_* > localStorage URL_* > proxy
     if (env[viteKey]) {
       return env[viteKey];
     }
     if (env["URL_" + key]) {
       return env["URL_" + key];
     }
+    if (window["URL_" + key]) {
+      return window["URL_" + key];
+    }
+    const fromLS = getFromLocalStorage(viteKey) || getFromLocalStorage("URL_" + key);
+    if (fromLS) return fromLS;
     if (PROXY_BASE_URL) {
       return PROXY_BASE_URL.replace(/\/$/, "") + "/api/" + key;
     }
@@ -78,6 +84,7 @@
     },
   };
 
+  // Expose global window.CONFIG compatible avec googleSheets.js (flat keys)
   window.CONFIG = {
     URL_BUDGET: CONFIG.SHEETS.BUDGET,
     URL_EVOLUTION: CONFIG.SHEETS.EVOLUTION,
@@ -90,12 +97,13 @@
     utils: CONFIG.utils,
   };
 
+  // Aide au debug et message utilisateur si config manquante
   const missing = Object.entries(window.CONFIG)
     .filter(([k, v]) => k.startsWith("URL_") && (!v || v === ""))
     .map(([k]) => k);
 
   if (missing.length) {
-    const msg = `Configuration manquante : ${missing.join(", ")}. Vérifie js/config.js, .env ou PROXY_BASE_URL.`;
+    const msg = `Configuration manquante : ${missing.join(", ")}. Tu peux coller des URLs CSV via le panneau de configuration (icône ⚙️) ou définir PROXY_BASE_URL.`;
     console.warn(msg);
     try {
       const alerts = document.getElementById("alerts");

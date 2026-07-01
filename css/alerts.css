@@ -1,0 +1,7 @@
+/* Alerts styling + runtime config tweaks */
+.alert{padding:10px;border-radius:6px;margin-bottom:8px}
+.alert-error{background:#2b021f;color:#ffd1dc;border:1px solid #5a0b2a}
+.alert-success{background:#042814;color:#b6ffd1;border:1px solid #0b5a2a}
+
+/* make sure runtime config panel inputs are readable in light/dark */
+#runtime-config input{background:#0b1220}
