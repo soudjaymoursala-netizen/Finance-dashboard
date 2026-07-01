@@ -1,22 +1,44 @@
 /* Sections repliables : clic (ou Entrée/Espace au clavier) sur une carte
-   principale -> affiche/masque les sous-cartes de detail associees.
-   Plusieurs sections peuvent rester ouvertes simultanement (pas de
-   comportement accordeon exclusif). Accessible clavier + lecteurs
-   d'ecran (role="button", aria-expanded synchronise). */
+   principale -> affiche/masque les sous-cartes de détail associées.
+   Plusieurs sections peuvent rester ouvertes simultanément (pas de
+   comportement accordéon exclusif). Accessible clavier + lecteurs
+   d'écran (role="button", aria-expanded synchronisé). L'ouverture ET
+   la fermeture sont animées symétriquement (pas de disparition brutale
+   en display:none instantané). */
 (function () {
     function toggle(triggerEl, targetEl, chevronEl, onOpen) {
-        const isOpen = targetEl.classList.toggle("open");
-        if (chevronEl) chevronEl.classList.toggle("open", isOpen);
-        triggerEl.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        const isCurrentlyOpen = targetEl.classList.contains("open");
 
-        if (isOpen && typeof onOpen === "function") {
-            // Laisser le temps au navigateur d'appliquer le nouvel
-            // affichage avant de forcer un recalcul de dimensions
-            // (utile pour les graphiques ApexCharts qui auraient ete
-            // rendus pendant que leur conteneur etait masque).
-            requestAnimationFrame(function () {
-                setTimeout(onOpen, 50);
-            });
+        if (!isCurrentlyOpen) {
+            // OUVERTURE
+            targetEl.classList.remove("closing");
+            targetEl.classList.add("open");
+            if (chevronEl) chevronEl.classList.add("open");
+            triggerEl.setAttribute("aria-expanded", "true");
+
+            if (typeof onOpen === "function") {
+                // Laisser le temps au navigateur d'appliquer le nouvel
+                // affichage avant de forcer un recalcul de dimensions
+                // (utile pour les graphiques ApexCharts qui auraient ete
+                // rendus pendant que leur conteneur etait masque).
+                requestAnimationFrame(function () {
+                    setTimeout(onOpen, 50);
+                });
+            }
+        } else {
+            // FERMETURE : on joue une animation de sortie avant de
+            // repasser reellement a display:none (sinon le contenu
+            // disparaissait instantanement, contrairement a l'ouverture).
+            targetEl.classList.remove("open");
+            targetEl.classList.add("closing");
+            if (chevronEl) chevronEl.classList.remove("open");
+            triggerEl.setAttribute("aria-expanded", "false");
+
+            const handleAnimationEnd = function () {
+                targetEl.classList.remove("closing");
+                targetEl.removeEventListener("animationend", handleAnimationEnd);
+            };
+            targetEl.addEventListener("animationend", handleAnimationEnd);
         }
     }
 

@@ -119,18 +119,35 @@ function lireCSVKPI(csv) {
 
 function animerValeur(element, valeurFinale, suffixe = "") {
     if (!element) return;
-    const duree = 1000;
-    const pas = 30;
-    const increment = valeurFinale / (duree / pas);
-    let valeur = 0;
-    const timer = setInterval(() => {
-        valeur += increment;
-        if (valeur >= valeurFinale) {
-            valeur = valeurFinale;
-            clearInterval(timer);
-        }
+
+    // Annule une animation precedente sur ce meme element si elle est
+    // encore en cours (evite un chevauchement/flicker en cas de rappel
+    // rapide sur le meme element).
+    if (element._animFrame) cancelAnimationFrame(element._animFrame);
+
+    const duree = 900;
+    const debut = performance.now();
+
+    // ease-out cubic : demarre vite, decelere en douceur vers la valeur
+    // finale - beaucoup plus naturel qu'une progression lineaire.
+    function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
+    function step(maintenant) {
+        const ecoule = maintenant - debut;
+        const t = Math.min(ecoule / duree, 1);
+        const valeur = valeurFinale * easeOutCubic(t);
         element.textContent = Math.round(valeur).toLocaleString("fr-FR") + suffixe;
-    }, pas);
+
+        if (t < 1) {
+            element._animFrame = requestAnimationFrame(step);
+        } else {
+            element._animFrame = null;
+        }
+    }
+
+    element._animFrame = requestAnimationFrame(step);
 }
 
 /* ================================================== */
@@ -522,6 +539,11 @@ async function chargerDashboard() {
                 if (window.refreshCharts) window.refreshCharts();
             });
         }
+
+        // Chargement termine : on retire la pulsation de tous les
+        // placeholders restants (au cas ou une donnee precise n'aurait
+        // pas ete ecrite individuellement plus haut).
+        document.querySelectorAll(".skeleton").forEach((el) => el.classList.remove("skeleton"));
 
     } catch (error) {
         console.error("Erreur Dashboard :", error);
