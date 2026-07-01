@@ -2,7 +2,7 @@
    Delegation d'evenement sur document -> fonctionne aussi pour les
    cartes generees dynamiquement (objectifs annuels). */
 (function () {
-    const SELECTOR = ".card, .chip, .goal-card, .objectif-annuel-card";
+    const SELECTOR = ".card, .chip, .goal-card, .objectif-annuel-card, .hero-card, .fire-tracker, .toggle-card";
 
     function createRipple(event) {
         const target = event.target.closest(SELECTOR);

@@ -590,6 +590,85 @@ main > section > h2 {
 }
 
 /* ==================================================
+   SECTIONS REPLIABLES — cartes principales cliquables
+   révélant des sous-cartes de détail
+   ================================================== */
+.hero-card.expandable, .fire-tracker.expandable {
+  cursor: pointer;
+}
+
+.toggle-chevron {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary-color);
+  transition: transform 250ms ease;
+  z-index: 1;
+}
+
+.toggle-chevron.open {
+  transform: rotate(180deg);
+}
+
+.chart-card h3.expandable-title {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-card h3.expandable-title .toggle-chevron {
+  position: static;
+  margin-left: 0.5rem;
+}
+
+.collapsible-content {
+  display: none;
+}
+
+.collapsible-content.open {
+  display: grid;
+  animation: fadeInUp 400ms ease both;
+}
+
+.collapsible-block {
+  display: none;
+}
+
+.collapsible-block.open {
+  display: block;
+  animation: fadeInUp 400ms ease both;
+}
+
+.toggle-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 1rem;
+  transition: transform 150ms ease;
+}
+
+.toggle-card:hover {
+  transform: translateY(-2px);
+}
+
+.toggle-card-label {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary-color);
+}
+
+/* ==================================================
    RIPPLE — onde tactile au clic/tap sur les cartes
    ================================================== */
 .card, .chip, .goal-card, .objectif-annuel-card {
