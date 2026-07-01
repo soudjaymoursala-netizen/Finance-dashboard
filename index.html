@@ -36,30 +36,33 @@
             <section class="hero-section">
                 <h2>Vue d'ensemble</h2>
                 <div class="hero-card">
-                    <div class="hero-label">💎 Patrimoine Total</div>
+                    <div class="hero-top-row">
+                        <div class="hero-label"><span class="icon-badge hero-icon">💎</span>Patrimoine Total</div>
+                        <span id="heroTrend" class="hero-trend" style="display:none"></span>
+                    </div>
                     <div class="hero-value" id="networth">...</div>
                     <div class="hero-sub" id="mainGoalProgress">🎯 Chargement...</div>
                     <div id="heroSparkline" class="hero-sparkline"></div>
                 </div>
                 <div class="chip-row">
                     <div class="chip">
-                        <span class="chip-label">💵 Cash</span>
+                        <span class="chip-label"><span class="icon-badge blue">💵</span>Cash</span>
                         <span class="chip-value" id="cash">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">📈 PEA</span>
+                        <span class="chip-label"><span class="icon-badge emerald">📈</span>PEA</span>
                         <span class="chip-value" id="pea">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">🏦 CTO</span>
+                        <span class="chip-label"><span class="icon-badge gold">🏦</span>CTO</span>
                         <span class="chip-value" id="cto">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">📊 Investissements</span>
+                        <span class="chip-label"><span class="icon-badge violet">📊</span>Investissements</span>
                         <span class="chip-value" id="investments">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">🎯 Taux d'épargne</span>
+                        <span class="chip-label"><span class="icon-badge emerald">🎯</span>Taux d'épargne</span>
                         <span class="chip-value" id="performance">...</span>
                     </div>
                 </div>
@@ -69,19 +72,19 @@
                 <h2>KPI avancés</h2>
                 <div class="chip-row">
                     <div class="chip">
-                        <span class="chip-label">💹 Plus-value totale</span>
+                        <span class="chip-label"><span class="icon-badge emerald">💹</span>Plus-value totale</span>
                         <span class="chip-value" id="totalGain">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">📈 Performance globale</span>
+                        <span class="chip-label"><span class="icon-badge blue">📈</span>Performance globale</span>
                         <span class="chip-value" id="globalPerformance">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">💰 Capital investi</span>
+                        <span class="chip-label"><span class="icon-badge gold">💰</span>Capital investi</span>
                         <span class="chip-value" id="capitalInvesti">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">⚖️ Ratio investi</span>
+                        <span class="chip-label"><span class="icon-badge violet">⚖️</span>Ratio investi</span>
                         <span class="chip-value" id="ratioInvesti">...</span>
                     </div>
                 </div>
@@ -102,19 +105,19 @@
                 <h2>Projection objectif</h2>
                 <div class="chip-row">
                     <div class="chip">
-                        <span class="chip-label">🚀 Projection</span>
+                        <span class="chip-label"><span class="icon-badge blue">🚀</span>Projection</span>
                         <span class="chip-value" id="projectionDate">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">💸 Reste à atteindre</span>
+                        <span class="chip-label"><span class="icon-badge warn">💸</span>Reste à atteindre</span>
                         <span class="chip-value" id="summaryRemaining">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">💰 Patrimoine actuel</span>
+                        <span class="chip-label"><span class="icon-badge emerald">💰</span>Patrimoine actuel</span>
                         <span class="chip-value" id="summaryNetworth">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label">🎯 Progression</span>
+                        <span class="chip-label"><span class="icon-badge emerald">🎯</span>Progression</span>
                         <span class="chip-value" id="summaryProgress">...</span>
                     </div>
                 </div>
@@ -124,11 +127,11 @@
                 <h2>Graphiques</h2>
                 <div class="chart-grid">
                     <div class="card chart-card">
-                        <h3>📈 Évolution du patrimoine</h3>
+                        <h3><span class="icon-badge emerald">📈</span>Évolution du patrimoine</h3>
                         <div id="patrimoineChart" class="chart"></div>
                     </div>
                     <div class="card chart-card">
-                        <h3>🥧 Allocation du patrimoine</h3>
+                        <h3><span class="icon-badge violet">🥧</span>Allocation du patrimoine</h3>
                         <div id="allocationChart" class="chart"></div>
                     </div>
                 </div>
@@ -138,12 +141,12 @@
                 <h2>Composition du portefeuille</h2>
                 <div class="chart-grid composition-grid">
                     <div class="card chart-card">
-                        <h3>📈 PEA — Trade Republic</h3>
+                        <h3><span class="icon-badge emerald">📈</span>PEA — Trade Republic</h3>
                         <div id="peaCompositionChart" class="chart chart-small"></div>
                         <div class="composition-meta" id="peaPositions">...</div>
                     </div>
                     <div class="card chart-card">
-                        <h3>🏦 CTO — YUH</h3>
+                        <h3><span class="icon-badge gold">🏦</span>CTO — YUH</h3>
                         <div id="ctoCompositionChart" class="chart chart-small"></div>
                         <div class="composition-meta" id="ctoPositions">...</div>
                     </div>
@@ -167,7 +170,7 @@
                 <div id="goalsContainer" class="goals-grid">
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span>🏠 Appartement</span>
+                            <span><span class="icon-badge gold">🏠</span>Appartement</span>
                             <span id="goal-appartement">0%</span>
                         </div>
                         <div class="progress-bar">
@@ -176,7 +179,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span>🚗 Voiture</span>
+                            <span><span class="icon-badge blue">🚗</span>Voiture</span>
                             <span id="goal-voiture">0%</span>
                         </div>
                         <div class="progress-bar">
@@ -185,7 +188,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span>✈️ Vacances</span>
+                            <span><span class="icon-badge violet">✈️</span>Vacances</span>
                             <span id="goal-vacances">0%</span>
                         </div>
                         <div class="progress-bar">
@@ -194,7 +197,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span>🛟 Fonds d'urgence</span>
+                            <span><span class="icon-badge warn">🛟</span>Fonds d'urgence</span>
                             <span id="goal-fonds_urgence">0%</span>
                         </div>
                         <div class="progress-bar">
@@ -203,7 +206,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span>🎯 Patrimoine</span>
+                            <span><span class="icon-badge emerald">🎯</span>Patrimoine</span>
                             <span id="goal-patrimoine_total">0%</span>
                         </div>
                         <div class="progress-bar">

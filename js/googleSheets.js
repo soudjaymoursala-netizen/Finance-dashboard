@@ -290,6 +290,24 @@ async function chargerDashboard() {
             }
             if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
+
+            // Badge de tendance : variation entre les 2 derniers points connus
+            try {
+                const pointsValides = valeurs.filter((v) => v && v > 0);
+                if (pointsValides.length >= 2) {
+                    const dernier = pointsValides[pointsValides.length - 1];
+                    const precedent = pointsValides[pointsValides.length - 2];
+                    const deltaPct = precedent > 0 ? ((dernier - precedent) / precedent) * 100 : 0;
+                    const trendEl = document.getElementById("heroTrend");
+                    if (trendEl && Math.abs(deltaPct) > 0.05) {
+                        trendEl.style.display = "";
+                        trendEl.className = "hero-trend " + (deltaPct >= 0 ? "up" : "down");
+                        trendEl.textContent = (deltaPct >= 0 ? "▲ +" : "▼ ") + deltaPct.toFixed(1) + "%";
+                    }
+                }
+            } catch (e) {
+                console.warn("Tendance héros non calculable:", e);
+            }
             console.log("Graphiques OK ✅");
         } catch (e) {
             console.warn("Erreur parsing evolution chart:", e);

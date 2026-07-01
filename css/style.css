@@ -252,7 +252,6 @@ main > section > h2 {
   color: var(--text-secondary-color);
   display: flex;
   align-items: center;
-  gap: 0.35rem;
 }
 
 .chip-value {
@@ -441,6 +440,122 @@ main > section > h2 {
    ================================================== */
 .alert {
   border-radius: var(--radius-sm);
+}
+
+/* ==================================================
+   ICON BADGES — remplace les emojis flottants
+   ================================================== */
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 9px;
+  font-size: 1rem;
+  margin-right: 0.55rem;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.icon-badge.emerald { background: rgba(45, 212, 167, 0.14); }
+.icon-badge.gold    { background: rgba(240, 180, 41, 0.14); }
+.icon-badge.violet  { background: rgba(159, 122, 234, 0.14); }
+.icon-badge.blue    { background: rgba(78, 197, 207, 0.14); }
+.icon-badge.warn    { background: rgba(245, 166, 35, 0.14); }
+
+.hero-label .icon-badge { width: 2.4rem; height: 2.4rem; font-size: 1.25rem; border-radius: 11px; }
+.icon-badge.hero-icon { background: rgba(45, 212, 167, 0.16); }
+
+/* ==================================================
+   PROFONDEUR — glow au survol, bordure "verre"
+   ================================================== */
+.card, .chip, .goal-card, .objectif-annuel-card, .hero-card, .fire-tracker {
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.03);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.card:hover, .chip:hover, .goal-card:hover, .objectif-annuel-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(45, 212, 167, 0.35);
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(45, 212, 167, 0.12), 0 12px 28px rgba(45, 212, 167, 0.08);
+}
+
+.hero-card {
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 60px rgba(45, 212, 167, 0.06);
+}
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  bottom: -30%;
+  left: -8%;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(240,180,41,0.10), transparent 70%);
+  pointer-events: none;
+}
+
+/* ==================================================
+   HERO — tendance
+   ================================================== */
+.hero-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero-trend {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.hero-trend.up {
+  color: var(--accent-color);
+  background: rgba(45, 212, 167, 0.14);
+}
+
+.hero-trend.down {
+  color: var(--negative-color);
+  background: rgba(240, 87, 107, 0.14);
+}
+
+/* ==================================================
+   ANIMATIONS D'ENTRÉE
+   ================================================== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-card, .chip, .card, .goal-card, .objectif-annuel-card, .fire-tracker {
+  animation: fadeInUp 500ms ease both;
+}
+
+.chip-row .chip:nth-child(1) { animation-delay: 40ms; }
+.chip-row .chip:nth-child(2) { animation-delay: 80ms; }
+.chip-row .chip:nth-child(3) { animation-delay: 120ms; }
+.chip-row .chip:nth-child(4) { animation-delay: 160ms; }
+.chip-row .chip:nth-child(5) { animation-delay: 200ms; }
+
+.goals-grid > *:nth-child(1) { animation-delay: 40ms; }
+.goals-grid > *:nth-child(2) { animation-delay: 80ms; }
+.goals-grid > *:nth-child(3) { animation-delay: 120ms; }
+.goals-grid > *:nth-child(4) { animation-delay: 160ms; }
+.goals-grid > *:nth-child(5) { animation-delay: 200ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-card, .chip, .card, .goal-card, .objectif-annuel-card, .fire-tracker {
+    animation: none;
+  }
+  .card:hover, .chip:hover, .goal-card:hover, .objectif-annuel-card:hover {
+    transform: none;
+  }
 }
 
 /* ==================================================
