@@ -1079,6 +1079,10 @@ const [
                 themeButton.textContent =
                     "☀️";
 
+                if (window.refreshCharts) {
+                    window.refreshCharts();
+                }
+
             }
 
             themeButton.addEventListener(
@@ -1110,6 +1114,10 @@ const [
                         : "dark"
 
                     );
+
+                    if (window.refreshCharts) {
+                        window.refreshCharts();
+                    }
 
                 }
             );
