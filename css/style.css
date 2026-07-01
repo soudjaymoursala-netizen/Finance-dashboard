@@ -590,6 +590,35 @@ main > section > h2 {
 }
 
 /* ==================================================
+   RIPPLE — onde tactile au clic/tap sur les cartes
+   ================================================== */
+.card, .chip, .goal-card, .objectif-annuel-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(45, 212, 167, 0.28);
+  transform: scale(0);
+  opacity: 1;
+  pointer-events: none;
+  animation: rippleAnim 600ms ease-out forwards;
+}
+
+@keyframes rippleAnim {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ripple { display: none; }
+}
+
+/* ==================================================
    ANTI-DÉBORDEMENT — les éléments flex/grid refusent par
    défaut de rétrécir sous la largeur de leur contenu, ce qui
    pousse le texte hors des cartes au lieu de passer à la ligne
