@@ -1,7 +1,17 @@
 let patrimoineChart = null;
 let allocationChart = null;
 
+let lastPatrimoine = { labels: [], valeurs: [] };
+let lastAllocation = { cash: 0, pea: 0, cto: 0 };
+
+function getThemeMode() {
+  return document && document.body && document.body.classList.contains("light") ? "light" : "dark";
+}
+
 function updatePatrimoineChart(labels, valeurs) {
+
+    lastPatrimoine.labels = labels || [];
+    lastPatrimoine.valeurs = valeurs || [];
 
     const chartElement = document.querySelector("#patrimoineChart");
     if (!chartElement) return;
@@ -78,14 +88,14 @@ function updatePatrimoineChart(labels, valeurs) {
         },
 
         tooltip: {
-            theme: "dark",
+            theme: getThemeMode(),
             y: {
                 formatter: value =>
                     Math.round(value).toLocaleString("fr-FR") + " €"
             }
         },
 
-        theme: { mode: "dark" }
+        theme: { mode: getThemeMode() }
     };
 
     patrimoineChart = new ApexCharts(chartElement, options);
@@ -93,6 +103,10 @@ function updatePatrimoineChart(labels, valeurs) {
 }
 
 function updateAllocationChart(cash, pea, cto) {
+
+    lastAllocation.cash = cash || 0;
+    lastAllocation.pea = pea || 0;
+    lastAllocation.cto = cto || 0;
 
     const chartElement = document.querySelector("#allocationChart");
     if (!chartElement) return;
@@ -157,7 +171,7 @@ function updateAllocationChart(cash, pea, cto) {
         },
 
         tooltip: {
-            theme: "dark",
+            theme: getThemeMode(),
             y: {
                 formatter: value =>
                     Math.round(value).toLocaleString("fr-FR") + " €"
@@ -172,9 +186,21 @@ function updateAllocationChart(cash, pea, cto) {
             }
         }],
 
-        theme: { mode: "dark" }
+        theme: { mode: getThemeMode() }
     };
 
     allocationChart = new ApexCharts(chartElement, options);
     allocationChart.render();
 }
+
+/* Refresh charts using cached data (appelable après un changement de thème) */
+function refreshCharts() {
+  if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
+    updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs);
+  }
+  // même si les valeurs valent 0, on peut forcer la mise à jour
+  updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto);
+}
+
+/* rendre refreshCharts accessible globalement depuis les autres scripts */
+window.refreshCharts = refreshCharts;
