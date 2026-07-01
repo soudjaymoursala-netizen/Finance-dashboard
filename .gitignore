@@ -30,4 +30,3 @@ build/
 # Sensitive data
 credentials.json
 secrets/
-js/config.local.js

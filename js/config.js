@@ -1,12 +1,17 @@
 const CONFIG = {
-  // URLs des Google Sheets — chargées depuis config.local.js (non versionné)
-  // Voir config.local.example.js pour le modèle à copier.
-  SHEETS: (window.LOCAL_CONFIG && window.LOCAL_CONFIG.SHEETS) || {
-    BUDGET: "",
-    EVOLUTION: "",
-    OBJECTIF: "",
-    PEA: "",
-    CTO: ""
+  // Adresse du Worker Cloudflare qui proxifie les Google Sheets.
+  // Pas une donnée sensible : elle est publique par nature (le site
+  // GitHub Pages l'est aussi), protégée seulement par la vérification
+  // d'origine (ALLOWED_ORIGIN) côté Worker.
+  // -> Remplacez par votre URL après déploiement (voir cloudflare-worker/worker.js)
+  PROXY_BASE_URL: "https://finance-dashboard-proxy.VOTRE-SOUS-DOMAINE.workers.dev",
+
+  SHEETS: {
+    get BUDGET() { return CONFIG.PROXY_BASE_URL + "/api/BUDGET"; },
+    get EVOLUTION() { return CONFIG.PROXY_BASE_URL + "/api/EVOLUTION"; },
+    get OBJECTIF() { return CONFIG.PROXY_BASE_URL + "/api/OBJECTIF"; },
+    get PEA() { return CONFIG.PROXY_BASE_URL + "/api/PEA"; },
+    get CTO() { return CONFIG.PROXY_BASE_URL + "/api/CTO"; }
   },
 
   // Paramètres des graphiques
