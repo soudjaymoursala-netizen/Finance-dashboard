@@ -4,7 +4,7 @@ const CONFIG = {
   // GitHub Pages l'est aussi), protégée seulement par la vérification
   // d'origine (ALLOWED_ORIGIN) côté Worker.
   // -> Remplacez par votre URL après déploiement (voir cloudflare-worker/worker.js)
-  PROXY_BASE_URL: "https://finance-dashboard-proxy.VOTRE-SOUS-DOMAINE.workers.dev",
+  PROXY_BASE_URL: "https://autumn-poetry-ca2cfinance-dashboard-proxy.soudjaymoursala.workers.dev",
 
   SHEETS: {
     get BUDGET() { return CONFIG.PROXY_BASE_URL + "/api/BUDGET"; },
