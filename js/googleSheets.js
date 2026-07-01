@@ -271,7 +271,7 @@ async function chargerDashboard() {
         if (DOM.projectionDate) DOM.projectionDate.innerHTML = DATA.projectionAnnee + "<br><small>" + DATA.anneesRestantes.toFixed(1) + " ans</small>";
         if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
         if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers 250k";
-        if (DOM.fireDetails) DOM.fireDetails.innerHTML = "Patrimoine : " + formatEUR(DATA.patrimoine) + "<br>Objectif : " + formatEUR(DATA.objectif250k) + "<br>Progression : " + DATA.progression250k.toFixed(1) + " %<br>Reste : " + formatEUR(DATA.restant250k) + "<br>Épargne annuelle : " + formatEUR(DATA.epargneAnnuelle) + "<br>Projection : " + DATA.projectionAnnee + " (~" + DATA.anneesRestantes.toFixed(1) + " ans)";
+        if (DOM.fireDetails) DOM.fireDetails.innerHTML = "🏦 Épargne annuelle : <strong>" + formatEUR(DATA.epargneAnnuelle) + "</strong> · 🚀 Projection : <strong>" + DATA.projectionAnnee + "</strong> (~" + DATA.anneesRestantes.toFixed(1) + " ans)";
         if (DOM.fireBar) DOM.fireBar.style.width = Math.min(DATA.progression250k, 100) + "%";
         if (DOM.lastUpdate) DOM.lastUpdate.textContent = "Dernière synchronisation : " + new Date().toLocaleString("fr-FR");
 
@@ -376,7 +376,7 @@ async function chargerDashboard() {
                 if (DOM.projectionDate) DOM.projectionDate.innerHTML = DATA.projectionAnnee + "<br><small>" + DATA.anneesRestantes.toFixed(1) + " ans</small>";
                 if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
                 if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
-                if (DOM.fireDetails) DOM.fireDetails.innerHTML = "Patrimoine : " + formatEUR(DATA.patrimoine) + "<br>Objectif : " + formatEUR(DATA.objectif250k) + "<br>Progression : " + DATA.progression250k.toFixed(1) + " %<br>Reste : " + formatEUR(DATA.restant250k) + "<br>Épargne annuelle : " + formatEUR(DATA.epargneAnnuelle) + "<br>Projection : " + DATA.projectionAnnee + " (~" + DATA.anneesRestantes.toFixed(1) + " ans)";
+                if (DOM.fireDetails) DOM.fireDetails.innerHTML = "🏦 Épargne annuelle : <strong>" + formatEUR(DATA.epargneAnnuelle) + "</strong> · 🚀 Projection : <strong>" + DATA.projectionAnnee + "</strong> (~" + DATA.anneesRestantes.toFixed(1) + " ans)";
                 if (DOM.fireBar) DOM.fireBar.style.width = Math.min(DATA.progression250k, 100) + "%";
                 // redessine le graphique patrimoine avec la cible reelle (il avait ete
                 // dessine plus haut avec la valeur par defaut, avant que l'objectif

@@ -38,11 +38,15 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
     const chartElement = document.querySelector("#patrimoineChart");
     if (!chartElement) return;
     if (patrimoineChart) patrimoineChart.destroy();
-    const objectifData = labels.map(() => lastPatrimoine.objectif);
+    // La ligne "Objectif" (250k) a ete retiree du trace : elle forcait
+    // l'axe vertical a couvrir 50k-250k, ecrasant la vraie courbe (70k-95k)
+    // dans le tiers bas du graphique. L'objectif reste visible ailleurs
+    // (FIRE Tracker, carte objectif Patrimoine) ; ici l'axe s'auto-adapte
+    // aux vraies valeurs pour mieux voir la progression mois par mois.
     const options = {
         chart: {
             type: "area",
-            height: 420,
+            height: 380,
             background: "transparent",
             toolbar: { show: false },
             animations: {
@@ -53,21 +57,18 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
         },
 
         series: [
-            { name: "Patrimoine", data: valeurs },
-            { name: "Objectif " + Math.round(lastPatrimoine.objectif / 1000) + "k", data: objectifData }
+            { name: "Patrimoine", data: valeurs }
         ],
 
-        colors: ["#2DD4A7", "#5B6472"],
+        colors: ["#2DD4A7"],
 
         stroke: {
             curve: "smooth",
-            width: [4, 2],
-            dashArray: [0, 6]
+            width: 4
         },
 
         fill: {
-            type: ["gradient", "solid"],
-            opacity: [1, 0],
+            type: "gradient",
             gradient: {
                 shade: "dark",
                 shadeIntensity: 0.5,
@@ -78,7 +79,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
         },
 
         markers: {
-            size: [5, 0],
+            size: 5,
             strokeWidth: 2,
             hover: { size: 8 }
         },
@@ -88,11 +89,6 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
         grid: {
             borderColor: "#334155",
             strokeDashArray: 4
-        },
-
-        legend: {
-            position: "top",
-            labels: { colors: getChartTextColor() }
         },
 
         xaxis: {
