@@ -52,3 +52,19 @@ const CONFIG = {
     }
   }
 };
+
+// Expose a global window.CONFIG compatible with googleSheets.js
+// googleSheets.js expects flat keys like window.CONFIG.URL_BUDGET, etc.
+window.CONFIG = {
+  URL_BUDGET: CONFIG.SHEETS.BUDGET,
+  URL_EVOLUTION: CONFIG.SHEETS.EVOLUTION,
+  URL_OBJECTIF: CONFIG.SHEETS.OBJECTIF,
+  URL_PEA: CONFIG.SHEETS.PEA,
+  URL_CTO: CONFIG.SHEETS.CTO,
+
+  // also provide convenience access to other config parts if needed
+  CHARTS: CONFIG.CHARTS,
+  GOALS: CONFIG.GOALS,
+  FIRE: CONFIG.FIRE,
+  utils: CONFIG.utils
+};
