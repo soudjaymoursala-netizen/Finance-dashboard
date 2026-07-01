@@ -14,6 +14,13 @@ function getThemeMode() {
   return document && document.body && document.body.classList.contains("light") ? "light" : "dark";
 }
 
+/* Couleur de texte pour les légendes/labels ApexCharts, adaptée au thème
+   (les couleurs de graphiques sont des hex litteraux, pas des variables CSS,
+   donc il faut les recalculer manuellement selon le mode actif) */
+function getChartTextColor() {
+  return getThemeMode() === "light" ? "#0F172A" : "#F1F5F9";
+}
+
 function updatePatrimoineChart(labels, valeurs, objectifCible) {
 
     lastPatrimoine.labels = labels || [];
@@ -78,7 +85,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
 
         legend: {
             position: "top",
-            labels: { colors: "#ffffff" }
+            labels: { colors: getChartTextColor() }
         },
 
         xaxis: {
@@ -141,7 +148,7 @@ function updateAllocationChart(cash, pea, cto) {
         legend: {
             position: "bottom",
             fontSize: "14px",
-            labels: { colors: "#ffffff" }
+            labels: { colors: getChartTextColor() }
         },
 
         plotOptions: {
@@ -217,7 +224,7 @@ function updatePeaCompositionChart(actions, etf) {
         series: [actions, etf],
         labels: ["Actions", "ETF"],
         colors: ["#F0B429", "#4EC5CF"],
-        legend: { position: "bottom", fontSize: "13px", labels: { colors: "#ffffff" } },
+        legend: { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
         plotOptions: {
             pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "PEA", color: "#4EC5CF",
                 formatter: () => Math.round(actions + etf).toLocaleString("fr-FR") + " €" } } } }
@@ -247,7 +254,7 @@ function updateCtoCompositionChart(actions, etf, crypto) {
         series: [actions, etf, crypto],
         labels: ["Actions", "ETF", "Crypto"],
         colors: ["#F0B429", "#4EC5CF", "#9F7AEA"],
-        legend: { position: "bottom", fontSize: "13px", labels: { colors: "#ffffff" } },
+        legend: { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
         plotOptions: {
             pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "CTO", color: "#4EC5CF",
                 formatter: () => Math.round(actions + etf + crypto).toLocaleString("fr-FR") + " CHF" } } } }
@@ -282,7 +289,7 @@ function updateMonthlyBudgetChart(labels, revenus, depenses) {
         plotOptions: { bar: { columnWidth: "55%", borderRadius: 4 } },
         dataLabels: { enabled: false },
         grid: { borderColor: "#334155", strokeDashArray: 4 },
-        legend: { position: "top", labels: { colors: "#ffffff" } },
+        legend: { position: "top", labels: { colors: getChartTextColor() } },
         xaxis: { categories: labels, labels: { style: { colors: "#94a3b8" } } },
         yaxis: { labels: { style: { colors: "#94a3b8" }, formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
         tooltip: { theme: getThemeMode(), y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
