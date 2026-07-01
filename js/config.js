@@ -1,11 +1,20 @@
 (function () {
   const env = window.__ENV || {}; // optional env injection (Netlify, GH Pages injecteur, etc.)
 
+  // Fallback par défaut : notre déploiement GitHub Pages est un site 100%
+  // statique (pas de build Vite/Netlify), donc window.PROXY_BASE_URL et
+  // env.* ne sont jamais injectés ici. On garde un défaut en dur pour que
+  // le dashboard fonctionne sans configuration supplémentaire, tout en
+  // restant surchargeable (ex: window.PROXY_BASE_URL = "..." avant ce script,
+  // ou un futur build Vite/Netlify avec les vraies env vars).
+  const DEFAULT_PROXY_BASE_URL =
+    "https://autumn-poetry-ca2cfinance-dashboard-proxy.soudjaymoursala.workers.dev";
+
   const PROXY_BASE_URL =
     window.PROXY_BASE_URL ||
     env.PROXY_BASE_URL ||
     env.VITE_PROXY_BASE_URL ||
-    "";
+    DEFAULT_PROXY_BASE_URL;
 
   function buildSheetUrl(key, viteKey) {
     if (env[viteKey]) {
