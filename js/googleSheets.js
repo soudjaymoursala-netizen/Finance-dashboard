@@ -237,9 +237,17 @@ async function chargerDashboard() {
         DATA.performanceGlobale = DATA.capitalInvesti > 0 ? (DATA.plusValueTotale / DATA.capitalInvesti) * 100 : 0;
         DATA.ratioInvesti = DATA.patrimoine > 0 ? ((DATA.budget.investissements_total || 0) / DATA.patrimoine) * 100 : 0;
 
+        // Épargne annuelle utilisée pour la projection FIRE : on utilise la
+        // croissance réelle du patrimoine (patrimoine_annuel = cash épargné
+        // + montant investi cette année) plutôt que revenus - dépenses, qui
+        // ignore la performance des investissements et sous-estime le
+        // rythme réel d'épargne. Cette mesure correspond à ce que
+        // taux_epargne_annuel utilise déjà dans le Sheet lui-même.
         const revenusAnnuels = DATA.budget.revenus_annuel || 0;
         const depensesAnnuelles = DATA.budget.depenses_annuel || 0;
-        DATA.epargneAnnuelle = Math.max(0, revenusAnnuels - depensesAnnuelles);
+        DATA.epargneAnnuelle = DATA.budget.patrimoine_annuel > 0
+            ? DATA.budget.patrimoine_annuel
+            : Math.max(0, revenusAnnuels - depensesAnnuelles); // repli si patrimoine_annuel absent
         DATA.anneesRestantes = DATA.epargneAnnuelle > 0 ? DATA.restant250k / DATA.epargneAnnuelle : 0;
         DATA.projectionAnnee = new Date().getFullYear() + Math.ceil(DATA.anneesRestantes);
 
