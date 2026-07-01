@@ -52,7 +52,7 @@
       PEA: buildSheetUrl("PEA", "VITE_URL_PEA"),
       EVOLUTION: buildSheetUrl("EVOLUTION", "VITE_URL_EVOLUTION"),
       OBJECTIF: buildSheetUrl("OBJECTIF", "VITE_URL_OBJECTIF"),
-      BUDGET_MENSUEL: buildSheetUrl("BUDGET_MENSUEL", "VITE_URL_BUDGET_MENSUEL"),
+      BUDGET_MENSUEL: buildSheetUrl("MENSUEL", "VITE_URL_BUDGET_MENSUEL"),
     },
     CHARTS: {
       PATRIMOINE: {
