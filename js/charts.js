@@ -8,6 +8,18 @@ function getThemeMode() {
   return document && document.body && document.body.classList.contains("light") ? "light" : "dark";
 }
 
+function movingAverage(series, window = 3) {
+  if (!series || series.length === 0) return [];
+  const result = [];
+  for (let i = 0; i < series.length; i++) {
+    const start = Math.max(0, i - window + 1);
+    const slice = series.slice(start, i + 1);
+    const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
+    result.push(avg);
+  }
+  return result;
+}
+
 function updatePatrimoineChart(labels, valeurs) {
 
     lastPatrimoine.labels = labels || [];
@@ -16,7 +28,10 @@ function updatePatrimoineChart(labels, valeurs) {
     const chartElement = document.querySelector("#patrimoineChart");
     if (!chartElement) return;
     if (patrimoineChart) patrimoineChart.destroy();
+
     const objectifData = labels.map(() => 250000);
+    const movingAvgData = movingAverage(valeurs, 3);
+
     const options = {
         chart: {
             type: "area",
@@ -32,19 +47,20 @@ function updatePatrimoineChart(labels, valeurs) {
 
         series: [
             { name: "Patrimoine", data: valeurs },
+            { name: "Moyenne 3M", data: movingAvgData },
             { name: "Objectif 250k", data: objectifData }
         ],
 
-        colors: ["#22c55e", "#94a3b8"],
+        colors: ["#22c55e", "#3b82f6", "#94a3b8"],
 
         stroke: {
             curve: "smooth",
-            width: [4, 3],
-            dashArray: [0, 8]
+            width: [4, 2, 3],
+            dashArray: [0, 0, 8]
         },
 
         fill: {
-            type: ["gradient", "solid"],
+            type: ["gradient", "solid", "solid"],
             gradient: {
                 shade: "dark",
                 shadeIntensity: 0.5,
@@ -69,19 +85,19 @@ function updatePatrimoineChart(labels, valeurs) {
 
         legend: {
             position: "top",
-            labels: { colors: "#ffffff" }
+            labels: { colors: getThemeMode() === "light" ? "#1f2937" : "#ffffff" }
         },
 
         xaxis: {
             categories: labels,
             labels: {
-                style: { colors: "#94a3b8" }
+                style: { colors: getThemeMode() === "light" ? "#4b5563" : "#94a3b8" }
             }
         },
 
         yaxis: {
             labels: {
-                style: { colors: "#94a3b8" },
+                style: { colors: getThemeMode() === "light" ? "#4b5563" : "#94a3b8" },
                 formatter: value =>
                     Math.round(value).toLocaleString("fr-FR") + " €"
             }
@@ -132,7 +148,7 @@ function updateAllocationChart(cash, pea, cto) {
         legend: {
             position: "bottom",
             fontSize: "14px",
-            labels: { colors: "#ffffff" }
+            labels: { colors: getThemeMode() === "light" ? "#1f2937" : "#ffffff" }
         },
 
         plotOptions: {
@@ -144,7 +160,7 @@ function updateAllocationChart(cash, pea, cto) {
 
                         name: {
                             show: true,
-                            color: "#5B6C84"
+                            color: getThemeMode() === "light" ? "#4b5563" : "#5B6C84"
                         },
 
                         value: {
@@ -198,7 +214,6 @@ function refreshCharts() {
   if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
     updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs);
   }
-  // même si les valeurs valent 0, on peut forcer la mise à jour
   updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto);
 }
 
