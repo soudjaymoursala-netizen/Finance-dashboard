@@ -229,7 +229,7 @@ main > section > h2 {
 }
 
 .chip {
-  background: var(--secondary-color);
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.9rem 1.1rem;
@@ -264,7 +264,7 @@ main > section > h2 {
    CARTES génériques
    ================================================== */
 .card {
-  background: var(--secondary-color);
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 1.5rem;
@@ -379,7 +379,7 @@ main > section > h2 {
 }
 
 .goal-card, .objectif-annuel-card {
-  background: var(--secondary-color);
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
   border: 1px solid var(--border-color);
   border-left: 4px solid var(--accent-color);
   border-radius: var(--radius-sm);
@@ -458,10 +458,10 @@ main > section > h2 {
   flex-shrink: 0;
 }
 
-.icon-badge.emerald { background: rgba(45, 212, 167, 0.14); }
-.icon-badge.gold    { background: rgba(240, 180, 41, 0.14); }
-.icon-badge.violet  { background: rgba(159, 122, 234, 0.14); }
-.icon-badge.blue    { background: rgba(78, 197, 207, 0.14); }
+.icon-badge.emerald { background: rgba(23, 140, 110, 0.16); }
+.icon-badge.gold    { background: rgba(185, 133, 39, 0.16); }
+.icon-badge.violet  { background: rgba(108, 92, 224, 0.16); }
+.icon-badge.blue    { background: rgba(29, 143, 166, 0.16); }
 .icon-badge.warn    { background: rgba(245, 166, 35, 0.14); }
 
 .hero-label .icon-badge { width: 2.4rem; height: 2.4rem; font-size: 1.25rem; border-radius: 11px; }

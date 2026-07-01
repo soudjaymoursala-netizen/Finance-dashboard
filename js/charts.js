@@ -21,6 +21,12 @@ function getChartTextColor() {
   return getThemeMode() === "light" ? "#0F172A" : "#F1F5F9";
 }
 
+/* Couleur de contour des segments de donut : doit se fondre avec le fond
+   de carte pour un rendu plus net (au lieu du blanc par defaut d'ApexCharts) */
+function getChartStrokeColor() {
+  return getThemeMode() === "light" ? "#FFFFFF" : "#141B2E";
+}
+
 function updatePatrimoineChart(labels, valeurs, objectifCible) {
 
     lastPatrimoine.labels = labels || [];
@@ -140,10 +146,17 @@ function updateAllocationChart(cash, pea, cto) {
         labels: ["Cash", "PEA", "CTO"],
 
         colors: [
-            "#4EC5CF", // Cash
-            "#2DD4A7", // PEA
-            "#F0B429"  // CTO
+            "#1D8FA6", // Cash — teal profond
+            "#178C6E", // PEA — émeraude profond
+            "#B98527"  // CTO — bronze/or profond
         ],
+
+        stroke: { colors: [getChartStrokeColor()], width: 2 },
+
+        fill: {
+            type: "gradient",
+            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.35, opacityFrom: 1, opacityTo: 0.88 }
+        },
 
         legend: {
             position: "bottom",
@@ -154,7 +167,7 @@ function updateAllocationChart(cash, pea, cto) {
         plotOptions: {
             pie: {
                 donut: {
-                    size: "72%",
+                    size: "60%",
                     labels: {
                         show: true,
 
@@ -165,14 +178,14 @@ function updateAllocationChart(cash, pea, cto) {
 
                         value: {
                             show: true,
-                            color: "#4EC5CF",
+                            color: "#1D8FA6",
                             fontWeight: 700
                         },
 
                         total: {
                             show: true,
                             label: "Patrimoine",
-                            color: "#4EC5CF",
+                            color: "#1D8FA6",
                             formatter: () =>
                                 Math.round(total).toLocaleString("fr-FR") + " €"
                         }
@@ -223,10 +236,15 @@ function updatePeaCompositionChart(actions, etf) {
         chart: { type: "donut", height: 280, background: "transparent" },
         series: [actions, etf],
         labels: ["Actions", "ETF"],
-        colors: ["#F0B429", "#4EC5CF"],
+        colors: ["#B98527", "#1D8FA6"],
+        stroke: { colors: [getChartStrokeColor()], width: 2 },
+        fill: {
+            type: "gradient",
+            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.35, opacityFrom: 1, opacityTo: 0.88 }
+        },
         legend: { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
         plotOptions: {
-            pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "PEA", color: "#4EC5CF",
+            pie: { donut: { size: "58%", labels: { show: true, total: { show: true, label: "PEA", color: "#1D8FA6",
                 formatter: () => Math.round(actions + etf).toLocaleString("fr-FR") + " €" } } } }
         },
         dataLabels: { enabled: true, formatter: v => v.toFixed(0) + "%" },
@@ -253,10 +271,15 @@ function updateCtoCompositionChart(actions, etf, crypto) {
         chart: { type: "donut", height: 280, background: "transparent" },
         series: [actions, etf, crypto],
         labels: ["Actions", "ETF", "Crypto"],
-        colors: ["#F0B429", "#4EC5CF", "#9F7AEA"],
+        colors: ["#B98527", "#1D8FA6", "#6C5CE0"],
+        stroke: { colors: [getChartStrokeColor()], width: 2 },
+        fill: {
+            type: "gradient",
+            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.35, opacityFrom: 1, opacityTo: 0.88 }
+        },
         legend: { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
         plotOptions: {
-            pie: { donut: { size: "68%", labels: { show: true, total: { show: true, label: "CTO", color: "#4EC5CF",
+            pie: { donut: { size: "58%", labels: { show: true, total: { show: true, label: "CTO", color: "#1D8FA6",
                 formatter: () => Math.round(actions + etf + crypto).toLocaleString("fr-FR") + " CHF" } } } }
         },
         dataLabels: { enabled: true, formatter: v => v.toFixed(0) + "%" },
