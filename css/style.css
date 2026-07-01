@@ -9,11 +9,24 @@
   --negative-color: #fc8181;
 }
 
+/* Mode clair (appliqué en ajoutant la classe .light sur body) */
+body.light {
+  --primary-color: #f8fafc;
+  --secondary-color: #ffffff;
+  --accent-color: #0ea5a3;
+  --text-color: #0f172a;
+  --text-secondary-color: #475569;
+  --positive-color: #16a34a;
+  --negative-color: #dc2626;
+}
+
 /* Typographie */
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
   color: var(--text-color);
+  background: var(--primary-color);
+  transition: background-color 250ms ease, color 250ms ease;
 }
 
 h1, h2, h3 {
