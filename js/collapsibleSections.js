@@ -28,12 +28,6 @@
     );
 
     bindToggle(
-        document.getElementById("fireCard"),
-        document.getElementById("projectionChipRow"),
-        document.getElementById("fireChevron")
-    );
-
-    bindToggle(
         document.getElementById("kpiAvancesToggle"),
         document.getElementById("kpiAvancesChipRow"),
         document.getElementById("kpiAvancesChevron")

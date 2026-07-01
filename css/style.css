@@ -351,15 +351,35 @@ main > section > h2 {
 }
 
 .fire-details {
-  font-size: 0.9rem;
-  color: var(--text-secondary-color);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.75rem;
   margin-bottom: 1.75rem;
   position: relative;
 }
 
-.fire-details strong {
-  color: var(--text-color);
+.fire-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+}
+
+.fire-stat-label {
+  font-size: 0.7rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary-color);
+  margin-bottom: 0.2rem;
+}
+
+.fire-stat-value {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-color);
 }
 
 .fire-progress {

@@ -299,6 +299,19 @@ function updateMonthlyBudgetChart(labels, revenus, depenses) {
     if (!chartElement) return;
     if (monthlyBudgetChart) monthlyBudgetChart.destroy();
 
+    // Detection de valeur exceptionnelle (ex: gros achat/depot ponctuel un
+    // mois donne) : si la plus grande valeur ecrase largement toutes les
+    // autres, on plafonne l'axe pour garder les autres mois lisibles.
+    // La vraie valeur reste consultable au survol (tooltip non affecte
+    // par le plafond visuel).
+    const toutesValeurs = [...(revenus || []), ...(depenses || [])]
+        .filter(v => v > 0)
+        .sort((a, b) => b - a);
+    let yaxisMax;
+    if (toutesValeurs.length >= 2 && toutesValeurs[0] > toutesValeurs[1] * 2.5) {
+        yaxisMax = Math.ceil((toutesValeurs[1] * 1.35) / 1000) * 1000;
+    }
+
     const options = {
         chart: { type: "bar", height: 320, background: "transparent", toolbar: { show: false } },
         series: [
@@ -311,8 +324,14 @@ function updateMonthlyBudgetChart(labels, revenus, depenses) {
         grid: { borderColor: "#334155", strokeDashArray: 4 },
         legend: { position: "top", labels: { colors: getChartTextColor() } },
         xaxis: { categories: labels, labels: { style: { colors: "#94a3b8" } } },
-        yaxis: { labels: { style: { colors: "#94a3b8" }, formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
-        tooltip: { theme: getThemeMode(), y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
+        yaxis: {
+            max: yaxisMax,
+            labels: { style: { colors: "#94a3b8" }, formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
+        },
+        tooltip: {
+            theme: getThemeMode(),
+            y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
+        },
         theme: { mode: getThemeMode() }
     };
 

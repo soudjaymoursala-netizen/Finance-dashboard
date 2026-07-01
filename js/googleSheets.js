@@ -148,13 +148,9 @@ const DOM = {
     globalPerformance: document.getElementById("globalPerformance"),
     capitalInvesti: document.getElementById("capitalInvesti"),
     ratioInvesti: document.getElementById("ratioInvesti"),
-    summaryNetworth: document.getElementById("summaryNetworth"),
-    summaryProgress: document.getElementById("summaryProgress"),
-    summaryRemaining: document.getElementById("summaryRemaining"),
     fireProgress: document.getElementById("fireProgress"),
     fireDetails: document.getElementById("fireDetails"),
     fireBar: document.getElementById("fireBar"),
-    projectionDate: document.getElementById("projectionDate"),
     mainGoalProgress: document.getElementById("mainGoalProgress"),
     lastUpdate: document.getElementById("lastUpdate"),
 };
@@ -259,19 +255,18 @@ async function chargerDashboard() {
         animerValeur(DOM.cto, DATA.ctoValeurEUR, " €");
         if (DOM.performance) DOM.performance.textContent = ((DATA.budget.taux_epargne_annuel || 0) * 100).toFixed(0) + " %";
 
-        if (DOM.summaryNetworth) DOM.summaryNetworth.textContent = formatEUR(DATA.patrimoine);
-        if (DOM.summaryProgress) DOM.summaryProgress.textContent = formatPourcentage(DATA.progression250k);
-        if (DOM.summaryRemaining) DOM.summaryRemaining.textContent = formatEUR(DATA.restant250k);
 
-        if (DOM.totalGain) DOM.totalGain.textContent = DATA.plusValueTotale.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+        if (DOM.totalGain) DOM.totalGain.textContent = formatEUR(DATA.plusValueTotale);
         if (DOM.globalPerformance) DOM.globalPerformance.textContent = formatPourcentage(DATA.performanceGlobale);
         if (DOM.capitalInvesti) DOM.capitalInvesti.textContent = formatEUR(DATA.capitalInvesti);
         if (DOM.ratioInvesti) DOM.ratioInvesti.textContent = formatPourcentage(DATA.ratioInvesti);
 
-        if (DOM.projectionDate) DOM.projectionDate.innerHTML = DATA.projectionAnnee + "<br><small>" + DATA.anneesRestantes.toFixed(1) + " ans</small>";
         if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
         if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers 250k";
-        if (DOM.fireDetails) DOM.fireDetails.innerHTML = "🏦 Épargne annuelle : <strong>" + formatEUR(DATA.epargneAnnuelle) + "</strong> · 🚀 Projection : <strong>" + DATA.projectionAnnee + "</strong> (~" + DATA.anneesRestantes.toFixed(1) + " ans)";
+        if (DOM.fireDetails) DOM.fireDetails.innerHTML =
+                    '<div class="fire-stat"><span class="fire-stat-label">💸 Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">🏦 Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">🚀 Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
         if (DOM.fireBar) DOM.fireBar.style.width = Math.min(DATA.progression250k, 100) + "%";
         if (DOM.lastUpdate) DOM.lastUpdate.textContent = "Dernière synchronisation : " + new Date().toLocaleString("fr-FR");
 
@@ -371,12 +366,12 @@ async function chargerDashboard() {
                 DATA.anneesRestantes = DATA.epargneAnnuelle > 0 ? DATA.restant250k / DATA.epargneAnnuelle : 0;
                 DATA.projectionAnnee = new Date().getFullYear() + Math.ceil(DATA.anneesRestantes);
                 // re-synchroniser l'affichage deja fait plus haut avec la cible dynamique
-                if (DOM.summaryProgress) DOM.summaryProgress.textContent = formatPourcentage(DATA.progression250k);
-                if (DOM.summaryRemaining) DOM.summaryRemaining.textContent = formatEUR(DATA.restant250k);
-                if (DOM.projectionDate) DOM.projectionDate.innerHTML = DATA.projectionAnnee + "<br><small>" + DATA.anneesRestantes.toFixed(1) + " ans</small>";
                 if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
                 if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
-                if (DOM.fireDetails) DOM.fireDetails.innerHTML = "🏦 Épargne annuelle : <strong>" + formatEUR(DATA.epargneAnnuelle) + "</strong> · 🚀 Projection : <strong>" + DATA.projectionAnnee + "</strong> (~" + DATA.anneesRestantes.toFixed(1) + " ans)";
+                if (DOM.fireDetails) DOM.fireDetails.innerHTML =
+                    '<div class="fire-stat"><span class="fire-stat-label">💸 Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">🏦 Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">🚀 Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
                 if (DOM.fireBar) DOM.fireBar.style.width = Math.min(DATA.progression250k, 100) + "%";
                 // redessine le graphique patrimoine avec la cible reelle (il avait ete
                 // dessine plus haut avec la valeur par defaut, avant que l'objectif
