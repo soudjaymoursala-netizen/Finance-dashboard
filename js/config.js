@@ -1,76 +1,109 @@
-const CONFIG = {
-  // Adresse du Worker Cloudflare qui proxifie les Google Sheets.
-  // Pas une donnée sensible : elle est publique par nature (le site
-  // GitHub Pages l'est aussi), protégée seulement par la vérification
-  // d'origine (ALLOWED_ORIGIN) côté Worker.
-  // -> Remplacez par votre URL après déploiement (voir cloudflare-worker/worker.js)
-  PROXY_BASE_URL: "https://autumn-poetry-ca2cfinance-dashboard-proxy.soudjaymoursala.workers.dev",
+(function () {
+  const env = window.__ENV || {}; // optional env injection (Netlify, GH Pages injecteur, etc.)
 
-  SHEETS: {
-    get BUDGET() { return CONFIG.PROXY_BASE_URL + "/api/BUDGET"; },
-    get EVOLUTION() { return CONFIG.PROXY_BASE_URL + "/api/EVOLUTION"; },
-    get OBJECTIF() { return CONFIG.PROXY_BASE_URL + "/api/OBJECTIF"; },
-    get PEA() { return CONFIG.PROXY_BASE_URL + "/api/PEA"; },
-    get CTO() { return CONFIG.PROXY_BASE_URL + "/api/CTO"; }
-  },
+  const PROXY_BASE_URL =
+    window.PROXY_BASE_URL ||
+    env.PROXY_BASE_URL ||
+    env.VITE_PROXY_BASE_URL ||
+    "";
 
-  // Paramètres des graphiques
-  CHARTS: {
-    PATRIMOINE: {
-      title: "Évolution du patrimoine",
-      xAxisFormat: "MMM YY",
-      yAxisFormat: "€"
-    },
-    ALLOCATION: {
-      title: "Allocation du patrimoine",
-      seriesNames: ["Cash", "PEA", "CTO"]
+  function buildSheetUrl(key, viteKey) {
+    if (env[viteKey]) {
+      return env[viteKey];
     }
-  },
-
-  // Objectifs financiers
-  GOALS: [
-    { name: "Appartement", emoji: "🏠", target: 50000 },
-    { name: "Voiture", emoji: "🚗", target: 10000 },
-    { name: "Vacances", emoji: "✈️", target: 3000 },
-    { name: "Fonds d'urgence", emoji: "🛟", target: 24000 },
-    { name: "Patrimoine 250k", emoji: "🎯", target: 250000 }
-  ],
-
-  // Paramètres du FIRE Tracker
-  FIRE: {
-    target: 250000,
-    aer: 0.04,
-    wer: 0.03
-  },
-
-  // Fonctions utilitaires
-  utils: {
-    formatCurrency(value) {
-      return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(value);
-    },
-
-    formatPercent(value) {
-      return `${(value * 100).toFixed(1)}%`;
-    },
-
-    formatDate(date) {
-      return new Intl.DateTimeFormat("fr-FR", { year: "numeric", month: "long" }).format(new Date(date));
+    if (env["URL_" + key]) {
+      return env["URL_" + key];
     }
+    if (PROXY_BASE_URL) {
+      return PROXY_BASE_URL.replace(/\/$/, "") + "/api/" + key;
+    }
+    return "";
   }
-};
 
-// Expose a global window.CONFIG compatible with googleSheets.js
-// googleSheets.js expects flat keys like window.CONFIG.URL_BUDGET, etc.
-window.CONFIG = {
-  URL_BUDGET: CONFIG.SHEETS.BUDGET,
-  URL_EVOLUTION: CONFIG.SHEETS.EVOLUTION,
-  URL_OBJECTIF: CONFIG.SHEETS.OBJECTIF,
-  URL_PEA: CONFIG.SHEETS.PEA,
-  URL_CTO: CONFIG.SHEETS.CTO,
+  const CONFIG = {
+    PROXY_BASE_URL,
+    SHEETS: {
+      BUDGET: buildSheetUrl("BUDGET", "VITE_URL_BUDGET"),
+      CTO: buildSheetUrl("CTO", "VITE_URL_CTO"),
+      PEA: buildSheetUrl("PEA", "VITE_URL_PEA"),
+      EVOLUTION: buildSheetUrl("EVOLUTION", "VITE_URL_EVOLUTION"),
+      OBJECTIF: buildSheetUrl("OBJECTIF", "VITE_URL_OBJECTIF"),
+    },
+    CHARTS: {
+      PATRIMOINE: {
+        title: "Évolution du patrimoine",
+        xAxisFormat: "MMM YY",
+        yAxisFormat: "€",
+      },
+      ALLOCATION: {
+        title: "Allocation du patrimoine",
+        seriesNames: ["Cash", "PEA", "CTO"],
+      },
+    },
+    GOALS: [
+      { name: "Appartement", emoji: "🏠", target: 50000 },
+      { name: "Voiture", emoji: "🚗", target: 10000 },
+      { name: "Vacances", emoji: "✈️", target: 3000 },
+      { name: "Fonds d'urgence", emoji: "🛟", target: 24000 },
+      { name: "Patrimoine 250k", emoji: "🎯", target: 250000 },
+    ],
+    FIRE: {
+      target: 250000,
+      aer: 0.04,
+      wer: 0.03,
+    },
+    utils: {
+      formatCurrency(value) {
+        return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
+          value
+        );
+      },
+      formatPercent(value) {
+        return `${(value * 100).toFixed(1)}%`;
+      },
+      formatDate(date) {
+        return new Intl.DateTimeFormat("fr-FR", { year: "numeric", month: "long" }).format(
+          new Date(date)
+        );
+      },
+    },
+  };
 
-  // also provide convenience access to other config parts if needed
-  CHARTS: CONFIG.CHARTS,
-  GOALS: CONFIG.GOALS,
-  FIRE: CONFIG.FIRE,
-  utils: CONFIG.utils
-};
+  window.CONFIG = {
+    URL_BUDGET: CONFIG.SHEETS.BUDGET,
+    URL_EVOLUTION: CONFIG.SHEETS.EVOLUTION,
+    URL_OBJECTIF: CONFIG.SHEETS.OBJECTIF,
+    URL_PEA: CONFIG.SHEETS.PEA,
+    URL_CTO: CONFIG.SHEETS.CTO,
+    CHARTS: CONFIG.CHARTS,
+    GOALS: CONFIG.GOALS,
+    FIRE: CONFIG.FIRE,
+    utils: CONFIG.utils,
+  };
+
+  const missing = Object.entries(window.CONFIG)
+    .filter(([k, v]) => k.startsWith("URL_") && (!v || v === ""))
+    .map(([k]) => k);
+
+  if (missing.length) {
+    const msg = `Configuration manquante : ${missing.join(", ")}. Vérifie js/config.js, .env ou PROXY_BASE_URL.`;
+    console.warn(msg);
+    try {
+      const alerts = document.getElementById("alerts");
+      if (alerts) {
+        const el = document.createElement("div");
+        el.className = "alert alert-error";
+        el.textContent = msg;
+        alerts.appendChild(el);
+      }
+    } catch (e) {
+      // noop
+    }
+  } else {
+    console.log("CONFIG OK — endpoints:", {
+      BUDGET: window.CONFIG.URL_BUDGET,
+      CTO: window.CONFIG.URL_CTO,
+      PEA: window.CONFIG.URL_PEA,
+    });
+  }
+})();
