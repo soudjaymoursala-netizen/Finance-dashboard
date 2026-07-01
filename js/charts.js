@@ -178,4 +178,3 @@ function updateAllocationChart(cash, pea, cto) {
     allocationChart = new ApexCharts(chartElement, options);
     allocationChart.render();
 }
-``
