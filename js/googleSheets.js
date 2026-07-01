@@ -279,15 +279,34 @@ async function chargerDashboard() {
             const sample = evolutionTxt || "";
             const sep = detectSeparator(sample);
             const lines = (evolutionTxt || "").replace(/\r/g, "").trim().split("\n");
-            const labels = [];
-            const valeurs = [];
+            const labelsRaw = [];
+            const valeursRaw = [];
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
                 const cols = splitCsvLine(lines[i], sep);
                 if (cols.length < 2) continue;
-                labels.push(cols[0].trim());
-                valeurs.push(nettoyerNombre(cols[1].trim().replace(/^\"|\"$/g, "")));
+                labelsRaw.push(cols[0].trim());
+                valeursRaw.push(nettoyerNombre(cols[1].trim().replace(/^\"|\"$/g, "")));
             }
+
+            // Certains Sheets reportent automatiquement la derniere valeur
+            // connue sur les mois futurs non-encore-atteints (formule de
+            // report). Ca cree un plateau artificiel en fin de courbe qui
+            // donne l'impression que le patrimoine a arrete de croitre.
+            // On coupe la queue de valeurs strictement identiques et
+            // consecutives en fin de serie (on garde le premier point de
+            // ce plateau, qui correspond au dernier mois reellement suivi).
+            let coupureIndex = valeursRaw.length;
+            if (valeursRaw.length > 2) {
+                const derniereValeur = valeursRaw[valeursRaw.length - 1];
+                let j = valeursRaw.length - 1;
+                while (j > 0 && valeursRaw[j - 1] === derniereValeur) j--;
+                // j pointe maintenant sur le premier point du plateau final
+                if (valeursRaw.length - j >= 2) coupureIndex = j + 1;
+            }
+            const labels = labelsRaw.slice(0, coupureIndex);
+            const valeurs = valeursRaw.slice(0, coupureIndex);
+
             if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
 
