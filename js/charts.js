@@ -57,16 +57,17 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
             { name: "Objectif " + Math.round(lastPatrimoine.objectif / 1000) + "k", data: objectifData }
         ],
 
-        colors: ["#2DD4A7", "#8A94A6"],
+        colors: ["#2DD4A7", "#5B6472"],
 
         stroke: {
             curve: "smooth",
-            width: [4, 3],
-            dashArray: [0, 8]
+            width: [4, 2],
+            dashArray: [0, 6]
         },
 
         fill: {
             type: ["gradient", "solid"],
+            opacity: [1, 0],
             gradient: {
                 shade: "dark",
                 shadeIntensity: 0.5,
@@ -77,7 +78,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
         },
 
         markers: {
-            size: 5,
+            size: [5, 0],
             strokeWidth: 2,
             hover: { size: 8 }
         },
