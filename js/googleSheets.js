@@ -395,10 +395,10 @@ async function chargerDashboard() {
                 if (barre) {
                     barre.style.width = `${Math.min(pourcentage, 100)}%`;
                     let couleurBarre;
-                    if (pourcentage < 25) couleurBarre = "#F0576B";
-                    else if (pourcentage < 50) couleurBarre = "#F5A623";
-                    else if (pourcentage < 75) couleurBarre = "#4EC5CF";
-                    else couleurBarre = "#2DD4A7";
+                    if (pourcentage < 25) couleurBarre = getStatusColor("negative");
+                    else if (pourcentage < 50) couleurBarre = getStatusColor("warning");
+                    else if (pourcentage < 75) couleurBarre = getStatusColor("info");
+                    else couleurBarre = getStatusColor("positive");
                     barre.style.background = couleurBarre;
                     const parentCard = barre.closest(".goal-card");
                     if (parentCard) parentCard.style.borderLeftColor = couleurBarre;
@@ -425,10 +425,10 @@ async function chargerDashboard() {
                     // pour le reste, être proche/au-dessus de la cible est positif.
                     const enBonneVoie = lowerIsBetter ? o.actuel <= o.cible : pourcentage >= 75;
                     const surCible = lowerIsBetter ? o.actuel > o.cible : false;
-                    let couleur = "#4EC5CF";
-                    if (surCible) couleur = "#F0576B";
-                    else if (enBonneVoie) couleur = "#2DD4A7";
-                    else if (pourcentage < 50 && !lowerIsBetter) couleur = "#F5A623";
+                    let couleur = getStatusColor("info");
+                    if (surCible) couleur = getStatusColor("negative");
+                    else if (enBonneVoie) couleur = getStatusColor("positive");
+                    else if (pourcentage < 50 && !lowerIsBetter) couleur = getStatusColor("warning");
 
                     const card = document.createElement("div");
                     card.className = "objectif-annuel-card";

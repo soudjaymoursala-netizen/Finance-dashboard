@@ -21,6 +21,22 @@ function getChartTextColor() {
   return getThemeMode() === "light" ? "#0F172A" : "#F1F5F9";
 }
 
+/* Couleurs de statut (positif/attention/info/negatif) adaptees au theme.
+   Les teintes "mode sombre" (vives) tombaient a 1.9-3.3:1 de contraste
+   sur fond blanc en mode clair (echec WCAG AA, seuil 4.5:1 pour du
+   petit texte) - variantes assombries validees pour le mode clair. */
+function getStatusColor(status) {
+  const light = getThemeMode() === "light";
+  const map = {
+    positive: light ? "#0A8563" : "#2DD4A7",
+    warning:  light ? "#9C5F00" : "#F5A623",
+    info:     light ? "#0E7C8F" : "#4EC5CF",
+    negative: light ? "#D6304A" : "#F0576B"
+  };
+  return map[status] || map.info;
+}
+window.getStatusColor = getStatusColor;
+
 /* Couleur de contour des segments de donut : doit se fondre avec le fond
    de carte pour un rendu plus net (au lieu du blanc par defaut d'ApexCharts) */
 function getChartStrokeColor() {
