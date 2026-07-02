@@ -621,7 +621,12 @@ main > section > h2 {
   font-size: 0.7rem;
 }
 
-.chip.expandable {
+.card .label .toggle-chevron {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.chip.expandable, .card.account-card.expandable {
   cursor: pointer;
 }
 

@@ -168,9 +168,9 @@ function animerValeur(element, valeurFinale, suffixe = "") {
 /* ================================================== */
 const DOM = {
     networth: document.getElementById("networth"),
-    cash: document.getElementById("cash"),
-    pea: document.getElementById("pea"),
-    cto: document.getElementById("cto"),
+    cash: document.getElementById("cashMain"),
+    pea: document.getElementById("peaMain"),
+    cto: document.getElementById("ctoMain"),
     investments: document.getElementById("investments"),
     performance: document.getElementById("performance"),
     totalGain: document.getElementById("totalGain"),
@@ -524,10 +524,12 @@ async function chargerDashboard() {
             if (typeof updateCtoCompositionChart === "function") {
                 updateCtoCompositionChart(DATA.cto.cto_action || 0, DATA.cto.cto_etf || 0, DATA.cto.cto_crypto || 0);
             }
-            const peaPositions = document.getElementById("peaPositions");
-            if (peaPositions) peaPositions.textContent = (DATA.pea.nombre_position || 0) + " position" + ((DATA.pea.nombre_position || 0) > 1 ? "s" : "");
-            const ctoPositions = document.getElementById("ctoPositions");
-            if (ctoPositions) ctoPositions.textContent = (DATA.cto.nombre_position || 0) + " position" + ((DATA.cto.nombre_position || 0) > 1 ? "s" : "") + " · 1 EUR = " + (DATA.cto.eur_chf || 0).toFixed(2) + " CHF";
+            // Nombre de positions desormais couvert par les sous-cartes
+            // "Positions" (peaDetailPositions / ctoDetailPositions),
+            // donc plus besoin de ce texte separe redondant. Le taux
+            // EUR/CHF (info non dupliquee ailleurs) devient sa propre
+            // sous-carte dans le detail CTO.
+            setTxt("ctoDetailEurChf", "1 € = " + (DATA.cto.eur_chf || 0).toFixed(2) + " CHF");
         } catch (e) {
             console.warn("Erreur composition portefeuille:", e);
         }

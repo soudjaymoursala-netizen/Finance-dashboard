@@ -73,29 +73,26 @@
     );
 
     bindToggle(
-        document.getElementById("allocationToggle"),
-        document.getElementById("compositionSection"),
-        document.getElementById("allocationChevron"),
+        document.getElementById("cashAccountCard"),
+        document.getElementById("cashDetailSection"),
+        document.getElementById("cashChevron")
+    );
+
+    bindToggle(
+        document.getElementById("peaAccountCard"),
+        document.getElementById("peaDetailSection"),
+        document.getElementById("peaChevron"),
         function () {
             window.dispatchEvent(new Event("resize"));
         }
     );
 
     bindToggle(
-        document.getElementById("cashToggle"),
-        document.getElementById("cashDetailSection"),
-        document.getElementById("cashChevron")
-    );
-
-    bindToggle(
-        document.getElementById("peaToggle"),
-        document.getElementById("peaDetailSection"),
-        document.getElementById("peaChevron")
-    );
-
-    bindToggle(
-        document.getElementById("ctoToggle"),
+        document.getElementById("ctoAccountCard"),
         document.getElementById("ctoDetailSection"),
-        document.getElementById("ctoChevron")
+        document.getElementById("ctoChevron"),
+        function () {
+            window.dispatchEvent(new Event("resize"));
+        }
     );
 })();
