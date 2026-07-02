@@ -340,7 +340,7 @@ async function chargerDashboard() {
                     if (trendEl && Math.abs(deltaPct) > 0.05) {
                         trendEl.style.display = "";
                         trendEl.className = "hero-trend " + (deltaPct >= 0 ? "up" : "down");
-                        trendEl.textContent = (deltaPct >= 0 ? "▲ +" : "▼ ") + deltaPct.toFixed(1) + "%";
+                        trendEl.textContent = (deltaPct >= 0 ? "▲ +" : "▼ ") + deltaPct.toFixed(1) + "% ce mois";
                         trendEl.title = "Variation par rapport au mois précédent";
                     }
                 }
