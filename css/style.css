@@ -598,6 +598,13 @@ main > section > h2 {
   justify-content: space-between;
 }
 
+.hero-top-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .hero-trend {
   font-size: 0.85rem;
   font-weight: 700;

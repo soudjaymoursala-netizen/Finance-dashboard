@@ -274,7 +274,7 @@ async function chargerDashboard() {
         if (DOM.ratioInvesti) DOM.ratioInvesti.textContent = formatPourcentage(DATA.ratioInvesti);
 
         if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
-        if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers 250k";
+        if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
         if (DOM.fireDetails) DOM.fireDetails.innerHTML =
                     '<div class="fire-stat"><span class="fire-stat-label">💸 Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
                     '<div class="fire-stat"><span class="fire-stat-label">🏦 Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
@@ -341,6 +341,7 @@ async function chargerDashboard() {
                         trendEl.style.display = "";
                         trendEl.className = "hero-trend " + (deltaPct >= 0 ? "up" : "down");
                         trendEl.textContent = (deltaPct >= 0 ? "▲ +" : "▼ ") + deltaPct.toFixed(1) + "%";
+                        trendEl.title = "Variation par rapport au mois précédent";
                     }
                 }
             } catch (e) {

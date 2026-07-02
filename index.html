@@ -40,10 +40,12 @@
             <section class="hero-section">
                 <h2>Vue d'ensemble</h2>
                 <div class="hero-card expandable" id="heroCard" role="button" tabindex="0" aria-expanded="false" aria-controls="heroChipRow">
-                    <span class="toggle-chevron" id="heroChevron">▾</span>
                     <div class="hero-top-row">
                         <div class="hero-label"><span class="icon-badge hero-icon">💎</span>Patrimoine Total</div>
-                        <span id="heroTrend" class="hero-trend" style="display:none"></span>
+                        <div class="hero-top-right">
+                            <span id="heroTrend" class="hero-trend" style="display:none"></span>
+                            <span class="toggle-chevron" id="heroChevron" style="position:static">▾</span>
+                        </div>
                     </div>
                     <div class="hero-value skeleton" id="networth">...</div>
                     <div class="hero-sub" id="mainGoalProgress">🎯 Chargement...</div>
