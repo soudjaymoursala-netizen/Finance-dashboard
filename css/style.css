@@ -616,6 +616,15 @@ main > section > h2 {
   border: 1px solid var(--border-color);
 }
 
+.chip-label .toggle-chevron {
+  margin-left: 0.35rem;
+  font-size: 0.7rem;
+}
+
+.chip.expandable {
+  cursor: pointer;
+}
+
 .hero-trend {
   font-size: 0.85rem;
   font-weight: 700;

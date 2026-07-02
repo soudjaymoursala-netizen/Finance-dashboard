@@ -80,4 +80,22 @@
             window.dispatchEvent(new Event("resize"));
         }
     );
+
+    bindToggle(
+        document.getElementById("cashToggle"),
+        document.getElementById("cashDetailSection"),
+        document.getElementById("cashChevron")
+    );
+
+    bindToggle(
+        document.getElementById("peaToggle"),
+        document.getElementById("peaDetailSection"),
+        document.getElementById("peaChevron")
+    );
+
+    bindToggle(
+        document.getElementById("ctoToggle"),
+        document.getElementById("ctoDetailSection"),
+        document.getElementById("ctoChevron")
+    );
 })();

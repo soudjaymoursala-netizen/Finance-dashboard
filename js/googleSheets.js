@@ -41,6 +41,19 @@ function formatEUR(valeur) {
 
 }
 
+function formatCHF(valeur) {
+
+    return Number(
+        valeur || 0
+    ).toLocaleString(
+        "fr-FR",
+        {
+            maximumFractionDigits: 0
+        }
+    ) + " CHF";
+
+}
+
 function formatPourcentage(valeur) {
 
     return Number(
@@ -266,6 +279,39 @@ async function chargerDashboard() {
         animerValeur(DOM.pea, DATA.pea.pea_valeur || 0, " €");
         animerValeur(DOM.cto, DATA.ctoValeurEUR, " €");
         if (DOM.performance) DOM.performance.textContent = ((DATA.budget.taux_epargne_annuel || 0) * 100).toFixed(0) + " %";
+
+        // Sous-cartes de detail Cash / PEA / CTO (reveleés au clic sur
+        // le chip correspondant). Ecriture defensive (|| 0) : les 4
+        // champs epargne_livret_* ne sont pas encore forcement presents
+        // dans API_BUDGET tant que l'utilisateur ne les a pas ajoutes -
+        // dans ce cas la sous-carte affiche simplement 0 € sans erreur.
+        const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+
+        setTxt("cashLivretA", formatEUR(DATA.budget.epargne_livret_a || 0));
+        setTxt("cashLdds", formatEUR(DATA.budget.epargne_livret_ldds || 0));
+        setTxt("cashNickel", formatEUR(DATA.budget.epargne_nickel || 0));
+        setTxt("cashYuh", formatEUR(DATA.budget.epargne_livret_yuh || 0));
+
+        setTxt("peaDetailValeur", formatEUR(DATA.pea.pea_valeur || 0));
+        setTxt("peaDetailInvesti", formatEUR(DATA.pea.pea_investi || 0));
+        setTxt("peaDetailPlusvalue", formatEUR(DATA.pea.pea_plusvalue || 0));
+        setTxt("peaDetailPerformance", formatPourcentage((DATA.pea.pea_performance || 0) * 100));
+        setTxt("peaDetailAction", formatEUR(DATA.pea.pea_action || 0));
+        setTxt("peaDetailEtf", formatEUR(DATA.pea.pea_etf || 0));
+        setTxt("peaDetailPartAction", formatPourcentage((DATA.pea.part_action || 0) * 100));
+        setTxt("peaDetailPartEtf", formatPourcentage((DATA.pea.part_etf || 0) * 100));
+        setTxt("peaDetailPositions", Math.round(DATA.pea.nombre_position || 0).toString());
+
+        setTxt("ctoDetailInvesti", formatCHF(DATA.cto.cto_investi_chf || 0));
+        setTxt("ctoDetailPlusvalue", formatCHF(DATA.cto.cto_plusvalue_chf || 0));
+        setTxt("ctoDetailPerformance", formatPourcentage((DATA.cto.cto_performance || 0) * 100));
+        setTxt("ctoDetailAction", formatCHF(DATA.cto.cto_action || 0));
+        setTxt("ctoDetailEtf", formatCHF(DATA.cto.cto_etf || 0));
+        setTxt("ctoDetailCrypto", formatCHF(DATA.cto.cto_crypto || 0));
+        setTxt("ctoDetailPartAction", formatPourcentage((DATA.cto.part_action || 0) * 100));
+        setTxt("ctoDetailPartEtf", formatPourcentage((DATA.cto.part_etf || 0) * 100));
+        setTxt("ctoDetailPartCrypto", formatPourcentage((DATA.cto.part_crypto || 0) * 100));
+        setTxt("ctoDetailPositions", Math.round(DATA.cto.nombre_position || 0).toString());
 
 
         if (DOM.totalGain) DOM.totalGain.textContent = formatEUR(DATA.plusValueTotale);
