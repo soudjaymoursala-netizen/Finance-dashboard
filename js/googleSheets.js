@@ -172,6 +172,7 @@ const DOM = {
     pea: document.getElementById("peaMain"),
     cto: document.getElementById("ctoMain"),
     investments: document.getElementById("investments"),
+    heroCash: document.getElementById("heroCash"),
     performance: document.getElementById("performance"),
     totalGain: document.getElementById("totalGain"),
     globalPerformance: document.getElementById("globalPerformance"),
@@ -276,6 +277,7 @@ async function chargerDashboard() {
         animerValeur(DOM.networth, DATA.patrimoine, " €");
         animerValeur(DOM.cash, DATA.budget.cash_dispo_total || 0, " €");
         animerValeur(DOM.investments, DATA.budget.investissements_total || 0, " €");
+        animerValeur(DOM.heroCash, DATA.budget.cash_dispo_total || 0, " €");
         animerValeur(DOM.pea, DATA.pea.pea_valeur || 0, " €");
         animerValeur(DOM.cto, DATA.ctoValeurEUR, " €");
         if (DOM.performance) DOM.performance.textContent = ((DATA.budget.taux_epargne_annuel || 0) * 100).toFixed(0) + " %";
