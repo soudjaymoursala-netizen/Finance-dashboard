@@ -287,7 +287,7 @@ async function chargerDashboard() {
         // dans ce cas la sous-carte affiche simplement 0 € sans erreur.
         const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
 
-        setTxt("cashLivretA", formatEUR(DATA.budget.epargne_livret_a || 0));
+        setTxt("cashLivretA", formatEUR(DATA.budget.epargne_livret_A || 0));
         setTxt("cashLdds", formatEUR(DATA.budget.epargne_livret_ldds || 0));
         setTxt("cashNickel", formatEUR(DATA.budget.epargne_nickel || 0));
         setTxt("cashYuh", formatEUR(DATA.budget.epargne_livret_yuh || 0));
