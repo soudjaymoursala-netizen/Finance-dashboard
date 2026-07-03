@@ -177,7 +177,7 @@ const DOM = {
     totalGain: document.getElementById("totalGain"),
     globalPerformance: document.getElementById("globalPerformance"),
     capitalInvesti: document.getElementById("capitalInvesti"),
-    ratioInvesti: document.getElementById("ratioInvesti"),
+    valeurInvestie: document.getElementById("valeurInvestie"),
     fireProgress: document.getElementById("fireProgress"),
     fireDetails: document.getElementById("fireDetails"),
     fireBar: document.getElementById("fireBar"),
@@ -199,7 +199,7 @@ const DATA = {
     plusValueTotale: 0,
     capitalInvesti: 0,
     performanceGlobale: 0,
-    ratioInvesti: 0,
+    valeurInvestie: 0,
     epargneAnnuelle: 0,
     anneesRestantes: 0,
     projectionAnnee: 0,
@@ -257,7 +257,7 @@ async function chargerDashboard() {
         DATA.plusValueTotale = (DATA.pea.pea_plusvalue || 0) + DATA.ctoPlusValueEUR;
         DATA.capitalInvesti = (DATA.pea.pea_investi || 0) + DATA.ctoInvestiEUR;
         DATA.performanceGlobale = DATA.capitalInvesti > 0 ? (DATA.plusValueTotale / DATA.capitalInvesti) * 100 : 0;
-        DATA.ratioInvesti = DATA.patrimoine > 0 ? ((DATA.budget.investissements_total || 0) / DATA.patrimoine) * 100 : 0;
+        DATA.valeurInvestie = (DATA.pea.pea_valeur || 0) + (DATA.ctoValeurEUR || 0);
 
         // Épargne annuelle utilisée pour la projection FIRE : on utilise la
         // croissance réelle du patrimoine (patrimoine_annuel = cash épargné
@@ -319,7 +319,7 @@ async function chargerDashboard() {
         if (DOM.totalGain) DOM.totalGain.textContent = formatEUR(DATA.plusValueTotale);
         if (DOM.globalPerformance) DOM.globalPerformance.textContent = formatPourcentage(DATA.performanceGlobale);
         if (DOM.capitalInvesti) DOM.capitalInvesti.textContent = formatEUR(DATA.capitalInvesti);
-        if (DOM.ratioInvesti) DOM.ratioInvesti.textContent = formatPourcentage(DATA.ratioInvesti);
+        if (DOM.valeurInvestie) DOM.valeurInvestie.textContent = formatEUR(DATA.valeurInvestie);
 
         if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
         if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";

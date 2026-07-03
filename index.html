@@ -148,28 +148,28 @@
             </section>
 
             <section class="kpi-advanced-section">
-                <h2>KPI avancés</h2>
+                <h2>Portefeuille consolidé</h2>
                 <div class="toggle-card" id="kpiAvancesToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="kpiAvancesChipRow">
-                    <span class="icon-badge violet">📊</span>
-                    <span class="toggle-card-label">Plus-value, performance, capital investi, ratio investi</span>
+                    <span class="icon-badge violet">💼</span>
+                    <span class="toggle-card-label">Vue combinée PEA + CTO : valeur totale, gains, performance</span>
                     <span class="toggle-chevron" id="kpiAvancesChevron" style="position:static">▾</span>
                 </div>
                 <div class="chip-row collapsible-content" id="kpiAvancesChipRow">
+                    <div class="chip">
+                        <span class="chip-label"><span class="icon-badge violet">💼</span>Valeur investie</span>
+                        <span class="chip-value skeleton" id="valeurInvestie">...</span>
+                    </div>
+                    <div class="chip">
+                        <span class="chip-label"><span class="icon-badge gold">💰</span>Capital engagé</span>
+                        <span class="chip-value skeleton" id="capitalInvesti">...</span>
+                    </div>
                     <div class="chip">
                         <span class="chip-label"><span class="icon-badge emerald">💹</span>Plus-value totale</span>
                         <span class="chip-value skeleton" id="totalGain">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label"><span class="icon-badge blue">📈</span>Performance globale</span>
+                        <span class="chip-label"><span class="icon-badge blue">📈</span>Performance</span>
                         <span class="chip-value skeleton" id="globalPerformance">...</span>
-                    </div>
-                    <div class="chip">
-                        <span class="chip-label"><span class="icon-badge gold">💰</span>Capital investi</span>
-                        <span class="chip-value skeleton" id="capitalInvesti">...</span>
-                    </div>
-                    <div class="chip">
-                        <span class="chip-label"><span class="icon-badge violet">⚖️</span>Ratio investi</span>
-                        <span class="chip-value skeleton" id="ratioInvesti">...</span>
                     </div>
                 </div>
             </section>
