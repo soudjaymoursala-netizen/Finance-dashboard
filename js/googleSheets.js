@@ -279,7 +279,7 @@ async function chargerDashboard() {
         animerValeur(DOM.investments, DATA.budget.investissements_total || 0, " €");
         animerValeur(DOM.heroCash, DATA.budget.cash_dispo_total || 0, " €");
         animerValeur(DOM.pea, DATA.pea.pea_valeur || 0, " €");
-        animerValeur(DOM.cto, DATA.ctoValeurEUR, " €");
+        animerValeur(DOM.cto, DATA.cto.cto_valeur_chf || 0, " CHF");
         if (DOM.performance) DOM.performance.textContent = ((DATA.budget.taux_epargne_annuel || 0) * 100).toFixed(0) + " %";
 
         // Sous-cartes de detail Cash / PEA / CTO (reveleés au clic sur
