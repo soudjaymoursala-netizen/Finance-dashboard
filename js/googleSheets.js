@@ -267,6 +267,7 @@ async function chargerDashboard() {
             // Silencieux : on continue avec le taux du Sheet
             console.warn("Taux BCE non disponible, fallback sur taux Sheet :", tauxChange);
         }
+        DATA.tauxChange = tauxChange; // taux BCE temps réel (ou fallback Sheet)
         DATA.ctoValeurEUR = (DATA.cto.cto_valeur_chf || 0) * tauxChange;
         DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) * tauxChange;
         DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) * tauxChange;
@@ -572,7 +573,10 @@ async function chargerDashboard() {
             // donc plus besoin de ce texte separe redondant. Le taux
             // EUR/CHF (info non dupliquee ailleurs) devient sa propre
             // sous-carte dans le detail CTO.
-            setTxt("ctoDetailEurChf", "1 € = " + (DATA.cto.eur_chf || 0).toFixed(2) + " CHF");
+            // Afficher le taux BCE temps réel (stocké dans DATA.tauxChange = CHF→EUR)
+            // On réinverse pour afficher EUR→CHF (convention lisible)
+            const tauxEurChfAffichage = DATA.tauxChange > 0 ? (1 / DATA.tauxChange) : (DATA.cto.eur_chf || 0);
+            setTxt("ctoDetailEurChf", "1 € = " + tauxEurChfAffichage.toFixed(4) + " CHF (BCE)");
         } catch (e) {
             console.warn("Erreur composition portefeuille:", e);
         }
