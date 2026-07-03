@@ -69,75 +69,80 @@
 
             <section class="comptes-section">
                 <h2>Comptes</h2>
-                <div class="goals-grid">
-                    <div class="card account-card expandable" id="cashAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="cashDetailSection">
-                        <div class="label"><span class="icon-badge blue">💵</span>Cash disponible<span class="toggle-chevron" id="cashChevron" style="position:static">▾</span></div>
-                        <div class="value skeleton" id="cashMain">...</div>
+                <div class="comptes-grid">
+                    <div class="compte-group">
+                        <div class="card account-card expandable" id="cashAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="cashDetailSection">
+                            <div class="label"><span class="icon-badge blue">💵</span>Cash disponible<span class="toggle-chevron" id="cashChevron" style="position:static">▾</span></div>
+                            <div class="value skeleton" id="cashMain">...</div>
+                        </div>
+                        <div class="collapsible-block compte-detail" id="cashDetailSection">
+                            <div class="goals-grid">
+                                <div class="goal-card">
+                                    <div class="goal-header"><span><span class="icon-badge blue">🏦</span>Livret A</span></div>
+                                    <div class="fire-stat-value" id="cashLivretA">...</div>
+                                </div>
+                                <div class="goal-card">
+                                    <div class="goal-header"><span><span class="icon-badge blue">🏦</span>LDDS</span></div>
+                                    <div class="fire-stat-value" id="cashLdds">...</div>
+                                </div>
+                                <div class="goal-card">
+                                    <div class="goal-header"><span><span class="icon-badge blue">💳</span>Nickel</span></div>
+                                    <div class="fire-stat-value" id="cashNickel">...</div>
+                                </div>
+                                <div class="goal-card">
+                                    <div class="goal-header"><span><span class="icon-badge blue">🏦</span>Livret YUH</span></div>
+                                    <div class="fire-stat-value" id="cashYuh">...</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card account-card expandable" id="peaAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="peaDetailSection">
-                        <div class="label"><span class="icon-badge emerald">📈</span>PEA — Trade Republic<span class="toggle-chevron" id="peaChevron" style="position:static">▾</span></div>
-                        <div class="value skeleton" id="peaMain">...</div>
-                    </div>
-                    <div class="card account-card expandable" id="ctoAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="ctoDetailSection">
-                        <div class="label"><span class="icon-badge gold">🏦</span>CTO — YUH<span class="toggle-chevron" id="ctoChevron" style="position:static">▾</span></div>
-                        <div class="value skeleton" id="ctoMain">...</div>
-                    </div>
-                </div>
 
-                <div class="collapsible-block" id="cashDetailSection">
-                    <div class="goals-grid">
-                        <div class="goal-card">
-                            <div class="goal-header"><span><span class="icon-badge blue">🏦</span>Livret A</span></div>
-                            <div class="fire-stat-value" id="cashLivretA">...</div>
+                    <div class="compte-group">
+                        <div class="card account-card expandable" id="peaAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="peaDetailSection">
+                            <div class="label"><span class="icon-badge emerald">📈</span>PEA — Trade Republic<span class="toggle-chevron" id="peaChevron" style="position:static">▾</span></div>
+                            <div class="value skeleton" id="peaMain">...</div>
                         </div>
-                        <div class="goal-card">
-                            <div class="goal-header"><span><span class="icon-badge blue">🏦</span>LDDS</span></div>
-                            <div class="fire-stat-value" id="cashLdds">...</div>
-                        </div>
-                        <div class="goal-card">
-                            <div class="goal-header"><span><span class="icon-badge blue">💳</span>Nickel</span></div>
-                            <div class="fire-stat-value" id="cashNickel">...</div>
-                        </div>
-                        <div class="goal-card">
-                            <div class="goal-header"><span><span class="icon-badge blue">🏦</span>Livret YUH</span></div>
-                            <div class="fire-stat-value" id="cashYuh">...</div>
+                        <div class="collapsible-block compte-detail" id="peaDetailSection">
+                            <div class="card chart-card">
+                                <div id="peaCompositionChart" class="chart chart-small"></div>
+                            </div>
+                            <div class="goals-grid">
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💎</span>Valeur totale</span></div><div class="fire-stat-value" id="peaDetailValeur">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💰</span>Investi</span></div><div class="fire-stat-value" id="peaDetailInvesti">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💹</span>Plus-value</span></div><div class="fire-stat-value" id="peaDetailPlusvalue">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">📈</span>Performance</span></div><div class="fire-stat-value" id="peaDetailPerformance">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📊</span>Actions</span></div><div class="fire-stat-value" id="peaDetailAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">📦</span>ETF</span></div><div class="fire-stat-value" id="peaDetailEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">⚖️</span>Part actions</span></div><div class="fire-stat-value" id="peaDetailPartAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">⚖️</span>Part ETF</span></div><div class="fire-stat-value" id="peaDetailPartEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">🔢</span>Positions</span></div><div class="fire-stat-value" id="peaDetailPositions">...</div></div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="collapsible-block" id="peaDetailSection">
-                    <div class="card chart-card">
-                        <div id="peaCompositionChart" class="chart chart-small"></div>
-                    </div>
-                    <div class="goals-grid">
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💎</span>Valeur totale</span></div><div class="fire-stat-value" id="peaDetailValeur">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💰</span>Investi</span></div><div class="fire-stat-value" id="peaDetailInvesti">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💹</span>Plus-value</span></div><div class="fire-stat-value" id="peaDetailPlusvalue">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">📈</span>Performance</span></div><div class="fire-stat-value" id="peaDetailPerformance">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📊</span>Actions</span></div><div class="fire-stat-value" id="peaDetailAction">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">📦</span>ETF</span></div><div class="fire-stat-value" id="peaDetailEtf">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">⚖️</span>Part actions</span></div><div class="fire-stat-value" id="peaDetailPartAction">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">⚖️</span>Part ETF</span></div><div class="fire-stat-value" id="peaDetailPartEtf">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">🔢</span>Positions</span></div><div class="fire-stat-value" id="peaDetailPositions">...</div></div>
-                    </div>
-                </div>
-
-                <div class="collapsible-block" id="ctoDetailSection">
-                    <div class="card chart-card">
-                        <div id="ctoCompositionChart" class="chart chart-small"></div>
-                    </div>
-                    <div class="goals-grid">
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💰</span>Investi</span></div><div class="fire-stat-value" id="ctoDetailInvesti">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💹</span>Plus-value</span></div><div class="fire-stat-value" id="ctoDetailPlusvalue">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📈</span>Performance</span></div><div class="fire-stat-value" id="ctoDetailPerformance">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📊</span>Actions</span></div><div class="fire-stat-value" id="ctoDetailAction">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">📦</span>ETF</span></div><div class="fire-stat-value" id="ctoDetailEtf">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">🪙</span>Crypto</span></div><div class="fire-stat-value" id="ctoDetailCrypto">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">⚖️</span>Part actions</span></div><div class="fire-stat-value" id="ctoDetailPartAction">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">⚖️</span>Part ETF</span></div><div class="fire-stat-value" id="ctoDetailPartEtf">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">⚖️</span>Part crypto</span></div><div class="fire-stat-value" id="ctoDetailPartCrypto">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">🔢</span>Positions</span></div><div class="fire-stat-value" id="ctoDetailPositions">...</div></div>
-                        <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">💱</span>Taux EUR/CHF</span></div><div class="fire-stat-value" id="ctoDetailEurChf">...</div></div>
+                    <div class="compte-group">
+                        <div class="card account-card expandable" id="ctoAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="ctoDetailSection">
+                            <div class="label"><span class="icon-badge gold">🏦</span>CTO — YUH<span class="toggle-chevron" id="ctoChevron" style="position:static">▾</span></div>
+                            <div class="value skeleton" id="ctoMain">...</div>
+                        </div>
+                        <div class="collapsible-block compte-detail" id="ctoDetailSection">
+                            <div class="card chart-card">
+                                <div id="ctoCompositionChart" class="chart chart-small"></div>
+                            </div>
+                            <div class="goals-grid">
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💰</span>Investi</span></div><div class="fire-stat-value" id="ctoDetailInvesti">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💹</span>Plus-value</span></div><div class="fire-stat-value" id="ctoDetailPlusvalue">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📈</span>Performance</span></div><div class="fire-stat-value" id="ctoDetailPerformance">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📊</span>Actions</span></div><div class="fire-stat-value" id="ctoDetailAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">📦</span>ETF</span></div><div class="fire-stat-value" id="ctoDetailEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">🪙</span>Crypto</span></div><div class="fire-stat-value" id="ctoDetailCrypto">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">⚖️</span>Part actions</span></div><div class="fire-stat-value" id="ctoDetailPartAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">⚖️</span>Part ETF</span></div><div class="fire-stat-value" id="ctoDetailPartEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">⚖️</span>Part crypto</span></div><div class="fire-stat-value" id="ctoDetailPartCrypto">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">🔢</span>Positions</span></div><div class="fire-stat-value" id="ctoDetailPositions">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">💱</span>Taux EUR/CHF</span></div><div class="fire-stat-value" id="ctoDetailEurChf">...</div></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

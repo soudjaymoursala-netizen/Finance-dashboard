@@ -1,15 +1,44 @@
 /* Sections repliables : clic (ou Entrée/Espace au clavier) sur une carte
    principale -> affiche/masque les sous-cartes de détail associées.
-   Plusieurs sections peuvent rester ouvertes simultanément (pas de
-   comportement accordéon exclusif). Accessible clavier + lecteurs
-   d'écran (role="button", aria-expanded synchronisé). L'ouverture ET
-   la fermeture sont animées symétriquement (pas de disparition brutale
-   en display:none instantané). */
+   Comportement par defaut : plusieurs sections peuvent rester ouvertes
+   simultanement. Comportement 'accordeon exclusif' active par groupId
+   (ex: les 3 cartes de comptes Cash/PEA/CTO partagent le meme groupe,
+   ouvrir l'une ferme automatiquement l'autre - le detail complet de
+   chaque compte est trop grand pour se justifier a l'ecran en meme
+   temps qu'un autre, evite la confusion visuelle). Accessible clavier
+   + lecteurs d'ecran (role="button", aria-expanded synchronise).
+   L'ouverture ET la fermeture sont animees symetriquement. */
 (function () {
-    function toggle(triggerEl, targetEl, chevronEl, onOpen) {
+    // Registre des membres de chaque groupe accordeon exclusif
+    const groups = {};
+
+    function closeSection(triggerEl, targetEl, chevronEl) {
+        if (!targetEl.classList.contains("open")) return;
+        targetEl.classList.remove("open");
+        targetEl.classList.add("closing");
+        if (chevronEl) chevronEl.classList.remove("open");
+        if (triggerEl) triggerEl.setAttribute("aria-expanded", "false");
+
+        const handleAnimationEnd = function () {
+            targetEl.classList.remove("closing");
+            targetEl.removeEventListener("animationend", handleAnimationEnd);
+        };
+        targetEl.addEventListener("animationend", handleAnimationEnd);
+    }
+
+    function toggle(triggerEl, targetEl, chevronEl, onOpen, groupId) {
         const isCurrentlyOpen = targetEl.classList.contains("open");
 
         if (!isCurrentlyOpen) {
+            // Accordeon exclusif : fermer les autres membres du meme groupe
+            if (groupId && groups[groupId]) {
+                groups[groupId].forEach(function (member) {
+                    if (member.targetEl !== targetEl) {
+                        closeSection(member.triggerEl, member.targetEl, member.chevronEl);
+                    }
+                });
+            }
+
             // OUVERTURE
             targetEl.classList.remove("closing");
             targetEl.classList.add("open");
@@ -29,24 +58,20 @@
             // FERMETURE : on joue une animation de sortie avant de
             // repasser reellement a display:none (sinon le contenu
             // disparaissait instantanement, contrairement a l'ouverture).
-            targetEl.classList.remove("open");
-            targetEl.classList.add("closing");
-            if (chevronEl) chevronEl.classList.remove("open");
-            triggerEl.setAttribute("aria-expanded", "false");
-
-            const handleAnimationEnd = function () {
-                targetEl.classList.remove("closing");
-                targetEl.removeEventListener("animationend", handleAnimationEnd);
-            };
-            targetEl.addEventListener("animationend", handleAnimationEnd);
+            closeSection(triggerEl, targetEl, chevronEl);
         }
     }
 
-    function bindToggle(triggerEl, targetEl, chevronEl, onOpen) {
+    function bindToggle(triggerEl, targetEl, chevronEl, onOpen, groupId) {
         if (!triggerEl || !targetEl) return;
 
+        if (groupId) {
+            if (!groups[groupId]) groups[groupId] = [];
+            groups[groupId].push({ triggerEl, targetEl, chevronEl });
+        }
+
         triggerEl.addEventListener("click", function () {
-            toggle(triggerEl, targetEl, chevronEl, onOpen);
+            toggle(triggerEl, targetEl, chevronEl, onOpen, groupId);
         });
 
         // Accessibilite clavier : role="button" sur un div/h3 ne declenche
@@ -55,7 +80,7 @@
         triggerEl.addEventListener("keydown", function (event) {
             if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                toggle(triggerEl, targetEl, chevronEl, onOpen);
+                toggle(triggerEl, targetEl, chevronEl, onOpen, groupId);
             }
         });
     }
@@ -72,10 +97,14 @@
         document.getElementById("kpiAvancesChevron")
     );
 
+    // Les 3 cartes de comptes forment un groupe accordeon exclusif :
+    // ouvrir l'une ferme automatiquement l'autre (voir commentaire en-tete).
     bindToggle(
         document.getElementById("cashAccountCard"),
         document.getElementById("cashDetailSection"),
-        document.getElementById("cashChevron")
+        document.getElementById("cashChevron"),
+        null,
+        "comptes"
     );
 
     bindToggle(
@@ -84,7 +113,8 @@
         document.getElementById("peaChevron"),
         function () {
             window.dispatchEvent(new Event("resize"));
-        }
+        },
+        "comptes"
     );
 
     bindToggle(
@@ -93,6 +123,7 @@
         document.getElementById("ctoChevron"),
         function () {
             window.dispatchEvent(new Event("resize"));
-        }
+        },
+        "comptes"
     );
 })();
