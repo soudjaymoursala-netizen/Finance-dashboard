@@ -250,7 +250,12 @@ async function chargerDashboard() {
         DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) * tauxChange;
         DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) * tauxChange;
 
-        DATA.patrimoine = DATA.budget.patrimoine_total || 0;
+        // Patrimoine recalculé en JS avec le même taux eur_chf que le CTO,
+        // pour garantir que carte hero et donut d'allocation affichent
+        // exactement la même valeur (source unique de vérité).
+        DATA.patrimoine = (DATA.budget.cash_dispo_total || 0)
+                        + (DATA.pea.pea_valeur || 0)
+                        + DATA.ctoValeurEUR;
         DATA.progression250k = DATA.patrimoine > 0 ? (DATA.patrimoine / DATA.objectif250k) * 100 : 0;
         DATA.restant250k = Math.max(0, DATA.objectif250k - DATA.patrimoine);
 
