@@ -338,7 +338,7 @@ async function chargerDashboard() {
 
         // Allocation chart
         if (typeof updateAllocationChart === "function") {
-            updateAllocationChart(DATA.budget.cash_dispo_total || 0, DATA.pea.pea_valeur || 0, DATA.ctoValeurEUR || 0);
+            updateAllocationChart(DATA.budget.cash_dispo_total || 0, DATA.pea.pea_valeur || 0, DATA.ctoValeurEUR || 0, DATA.patrimoine || 0);
         }
 
         // Evolution chart parsing (robust)

@@ -137,16 +137,20 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
     patrimoineChart.render();
 }
 
-function updateAllocationChart(cash, pea, cto) {
+function updateAllocationChart(cash, pea, cto, patrimoineTotal) {
 
     lastAllocation.cash = cash || 0;
     lastAllocation.pea = pea || 0;
     lastAllocation.cto = cto || 0;
+    lastAllocation.patrimoineTotal = patrimoineTotal || 0;
 
     const chartElement = document.querySelector("#allocationChart");
     if (!chartElement) return;
     if (allocationChart) allocationChart.destroy();
-    const total = cash + pea + cto;
+    // Utilise patrimoine_total du Sheet (même source que la carte hero)
+    // plutôt que cash+pea+cto recalculé, pour éviter toute divergence
+    // liée à des arrondis ou à un taux de change légèrement différent.
+    const total = patrimoineTotal || (cash + pea + cto);
     const options = {
         chart: {
             type: "donut",
@@ -396,7 +400,7 @@ function refreshCharts() {
     updateHeroSparkline(lastPatrimoine.valeurs);
   }
   // même si les valeurs valent 0, on peut forcer la mise à jour
-  updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto);
+  updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto, lastAllocation.patrimoineTotal);
   updatePeaCompositionChart(lastPeaComposition.actions, lastPeaComposition.etf);
   updateCtoCompositionChart(lastCtoComposition.actions, lastCtoComposition.etf, lastCtoComposition.crypto);
   if (lastMonthlyBudget.labels && lastMonthlyBudget.labels.length) {
