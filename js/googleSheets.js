@@ -250,12 +250,10 @@ async function chargerDashboard() {
         DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) * tauxChange;
         DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) * tauxChange;
 
-        // Patrimoine recalculé en JS avec le même taux eur_chf que le CTO,
-        // pour garantir que carte hero et donut d'allocation affichent
-        // exactement la même valeur (source unique de vérité).
-        DATA.patrimoine = (DATA.budget.cash_dispo_total || 0)
-                        + (DATA.pea.pea_valeur || 0)
-                        + DATA.ctoValeurEUR;
+        // Patrimoine = dernier point de API_Evolution (calculé côté Sheet,
+        // source de référence unique). Mis à jour plus bas après parsing
+        // de la série evolution ; initialisé à 0 en attendant.
+        DATA.patrimoine = 0;
         DATA.progression250k = DATA.patrimoine > 0 ? (DATA.patrimoine / DATA.objectif250k) * 100 : 0;
         DATA.restant250k = Math.max(0, DATA.objectif250k - DATA.patrimoine);
 
@@ -379,6 +377,23 @@ async function chargerDashboard() {
             const labels = labelsRaw.slice(0, coupureIndex);
             const valeurs = valeursRaw.slice(0, coupureIndex);
 
+            // Dernière valeur connue = patrimoine réel du Sheet API_Evolution
+            const dernierPatrimoine = valeurs.length > 0 ? valeurs[valeurs.length - 1] : 0;
+            if (dernierPatrimoine > 0) {
+                DATA.patrimoine = dernierPatrimoine;
+                // Re-synchroniser tous les affichages qui dépendent du patrimoine
+                animerValeur(DOM.networth, DATA.patrimoine, " €");
+                DATA.progression250k = (DATA.patrimoine / DATA.objectif250k) * 100;
+                DATA.restant250k = Math.max(0, DATA.objectif250k - DATA.patrimoine);
+                DATA.anneesRestantes = DATA.epargneAnnuelle > 0 ? DATA.restant250k / DATA.epargneAnnuelle : 0;
+                DATA.projectionAnnee = new Date().getFullYear() + Math.ceil(DATA.anneesRestantes);
+                if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
+                if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
+                // Mettre à jour le donut avec le patrimoine corrigé
+                if (typeof updateAllocationChart === "function") {
+                    updateAllocationChart(DATA.budget.cash_dispo_total || 0, DATA.pea.pea_valeur || 0, DATA.ctoValeurEUR || 0, DATA.patrimoine);
+                }
+            }
             if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
 
