@@ -245,7 +245,28 @@ async function chargerDashboard() {
         DATA.pea = lireCSVKPI(peaTxt);
 
 
-        const tauxChange = DATA.cto.eur_chf || 1;
+        // Taux EUR/CHF en temps réel (source : Frankfurter / Banque Centrale Européenne)
+        // Fallback 1 : taux du Sheet CTO (eur_chf)
+        // Fallback 2 : 1 (neutre) si tout échoue
+        let tauxChange = DATA.cto.eur_chf || 1;
+        try {
+            const fxRes = await fetch("https://api.frankfurter.app/latest?from=EUR&to=CHF");
+            if (fxRes.ok) {
+                const fxData = await fxRes.json();
+                const tauxBCE = fxData?.rates?.CHF;
+                if (tauxBCE && tauxBCE > 0) {
+                    // Frankfurter donne EUR→CHF, on veut CHF→EUR donc on inverse
+                    tauxChange = 1 / tauxBCE;
+                    DATA.tauxEurChf = tauxBCE; // stocker pour affichage
+                    // Mettre à jour la sous-carte CTO avec le taux réel
+                    const elTaux = document.getElementById("ctoDetailEurChf");
+                    if (elTaux) elTaux.textContent = "1 € = " + tauxBCE.toFixed(4) + " CHF (BCE temps réel)";
+                }
+            }
+        } catch (fxErr) {
+            // Silencieux : on continue avec le taux du Sheet
+            console.warn("Taux BCE non disponible, fallback sur taux Sheet :", tauxChange);
+        }
         DATA.ctoValeurEUR = (DATA.cto.cto_valeur_chf || 0) * tauxChange;
         DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) * tauxChange;
         DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) * tauxChange;
