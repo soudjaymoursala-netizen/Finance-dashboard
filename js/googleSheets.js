@@ -281,7 +281,7 @@ async function chargerDashboard() {
         // Update DOM values
         animerValeur(DOM.networth, DATA.patrimoine, " €");
         animerValeur(DOM.cash, DATA.budget.cash_dispo_total || 0, " €");
-        animerValeur(DOM.investments, DATA.budget.investissements_total || 0, " €");
+        animerValeur(DOM.investments, DATA.valeurInvestie || 0, " €"); // valeur actuelle : PEA + CTO converti au même taux
         animerValeur(DOM.heroCash, DATA.budget.cash_dispo_total || 0, " €");
         animerValeur(DOM.pea, DATA.pea.pea_valeur || 0, " €");
         animerValeur(DOM.cto, DATA.cto.cto_valeur_chf || 0, " CHF");
