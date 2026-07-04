@@ -437,6 +437,40 @@ async function chargerDashboard() {
             } catch (e) {
                 console.warn("Tendance héros non calculable:", e);
             }
+
+            // Progression du patrimoine depuis la dernière synchronisation
+            // (compare la valeur actuellement chargée à celle mémorisée en
+            // local lors du chargement précédent — pas le mois précédent,
+            // mais la dernière fois que le dashboard a été ouvert/rafraîchi).
+            try {
+                const SYNC_KEY = "financeDashboard_lastSync";
+                const syncEl = document.getElementById("syncDelta");
+                const raw = localStorage.getItem(SYNC_KEY);
+                if (DATA.patrimoine > 0 && syncEl) {
+                    if (raw) {
+                        const prevSync = JSON.parse(raw);
+                        if (prevSync && prevSync.valeur > 0) {
+                            const deltaSyncPct = ((DATA.patrimoine - prevSync.valeur) / prevSync.valeur) * 100;
+                            const deltaSyncAbs = DATA.patrimoine - prevSync.valeur;
+                            syncEl.style.display = "";
+                            if (Math.abs(deltaSyncPct) < 0.01) {
+                                syncEl.className = "sync-delta flat";
+                                syncEl.textContent = "🔄 stable depuis dernière synchro";
+                                syncEl.title = "";
+                            } else {
+                                syncEl.className = "sync-delta " + (deltaSyncPct >= 0 ? "up" : "down");
+                                const signe = deltaSyncPct >= 0 ? "+" : "";
+                                syncEl.textContent = (deltaSyncPct >= 0 ? "▲ " : "▼ ") + signe + deltaSyncPct.toFixed(2) + "% depuis dernière synchro";
+                                syncEl.title = (deltaSyncAbs >= 0 ? "+" : "") + formatEUR(deltaSyncAbs) + " depuis le " + new Date(prevSync.date).toLocaleString("fr-FR");
+                            }
+                        }
+                    }
+                    // Mémoriser la valeur actuelle pour la prochaine synchro
+                    localStorage.setItem(SYNC_KEY, JSON.stringify({ valeur: DATA.patrimoine, date: new Date().toISOString() }));
+                }
+            } catch (e) {
+                console.warn("Delta synchro non calculable:", e);
+            }
         } catch (e) {
             console.warn("Erreur parsing evolution chart:", e);
         }

@@ -193,6 +193,32 @@ h1, h2, h3 {
   margin-top: 0.15rem;
 }
 
+.sync-delta {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: 0.3rem;
+}
+
+.sync-delta.up {
+  color: var(--accent-text);
+  background: rgba(45, 212, 167, 0.14);
+}
+
+.sync-delta.down {
+  color: var(--negative-color);
+  background: rgba(240, 87, 107, 0.14);
+}
+
+.sync-delta.flat {
+  color: var(--text-secondary-color);
+  background: rgba(148, 163, 184, 0.14);
+}
+
 /* ==================================================
    SECTIONS — eyebrow + rythme d'espacement
    ================================================== */
