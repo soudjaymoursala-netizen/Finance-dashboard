@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/style.css?v=4">
     <link rel="stylesheet" href="css/alerts.css">
 </head>
 <body>
@@ -40,7 +40,6 @@
                 <div id="lastUpdate" class="last-update">
                     Dernière synchronisation : --
                 </div>
-                <span id="syncDelta" class="sync-delta" style="display:none"></span>
             </div>
             <div class="header-actions">
                 <button id="themeToggle" class="theme-btn" aria-label="Changer de thème">🌙</button>
@@ -57,11 +56,11 @@
                     <div class="hero-top-row">
                         <div class="hero-label"><span class="icon-badge hero-icon">💎</span>Patrimoine Total</div>
                         <div class="hero-top-right">
-                            <span id="heroTrend" class="hero-trend" style="display:none"></span>
                             <span class="toggle-chevron" id="heroChevron" style="position:static">▾</span>
                         </div>
                     </div>
                     <div class="hero-value skeleton" id="networth">...</div>
+                    <span id="heroTrend" class="hero-trend" style="display:none"></span>
                     <div class="hero-sub" id="mainGoalProgress">🎯 Chargement...</div>
                     <div id="heroSparkline" class="hero-sparkline"></div>
                 </div>
@@ -287,7 +286,7 @@
     <script src="js/config.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/errorHandler.js"></script>
-    <script src="js/googleSheets.js"></script>
+    <script src="js/googleSheets.js?v=2"></script>
     <script src="js/runtimeConfigUI.js"></script>
     <script src="js/rippleEffect.js"></script>
     <script src="js/collapsibleSections.js"></script>

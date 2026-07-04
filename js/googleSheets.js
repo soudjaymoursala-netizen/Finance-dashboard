@@ -420,56 +420,25 @@ async function chargerDashboard() {
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
 
             // Badge de tendance : variation entre les 2 derniers points connus
+            // (indicateur unique et bien visible, avec % ET montant en €)
             try {
                 const pointsValides = valeurs.filter((v) => v && v > 0);
                 if (pointsValides.length >= 2) {
                     const dernier = pointsValides[pointsValides.length - 1];
                     const precedent = pointsValides[pointsValides.length - 2];
                     const deltaPct = precedent > 0 ? ((dernier - precedent) / precedent) * 100 : 0;
+                    const deltaAbs = dernier - precedent;
                     const trendEl = document.getElementById("heroTrend");
                     if (trendEl && Math.abs(deltaPct) > 0.05) {
                         trendEl.style.display = "";
                         trendEl.className = "hero-trend " + (deltaPct >= 0 ? "up" : "down");
-                        trendEl.textContent = (deltaPct >= 0 ? "▲ +" : "▼ ") + deltaPct.toFixed(1) + "% ce mois";
+                        const signe = deltaPct >= 0 ? "+" : "";
+                        trendEl.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe + formatEUR(deltaAbs) + ") ce mois";
                         trendEl.title = "Variation par rapport au mois précédent";
                     }
                 }
             } catch (e) {
                 console.warn("Tendance héros non calculable:", e);
-            }
-
-            // Progression du patrimoine depuis la dernière synchronisation
-            // (compare la valeur actuellement chargée à celle mémorisée en
-            // local lors du chargement précédent — pas le mois précédent,
-            // mais la dernière fois que le dashboard a été ouvert/rafraîchi).
-            try {
-                const SYNC_KEY = "financeDashboard_lastSync";
-                const syncEl = document.getElementById("syncDelta");
-                const raw = localStorage.getItem(SYNC_KEY);
-                if (DATA.patrimoine > 0 && syncEl) {
-                    if (raw) {
-                        const prevSync = JSON.parse(raw);
-                        if (prevSync && prevSync.valeur > 0) {
-                            const deltaSyncPct = ((DATA.patrimoine - prevSync.valeur) / prevSync.valeur) * 100;
-                            const deltaSyncAbs = DATA.patrimoine - prevSync.valeur;
-                            syncEl.style.display = "";
-                            if (Math.abs(deltaSyncPct) < 0.01) {
-                                syncEl.className = "sync-delta flat";
-                                syncEl.textContent = "🔄 stable depuis dernière synchro";
-                                syncEl.title = "";
-                            } else {
-                                syncEl.className = "sync-delta " + (deltaSyncPct >= 0 ? "up" : "down");
-                                const signe = deltaSyncPct >= 0 ? "+" : "";
-                                syncEl.textContent = (deltaSyncPct >= 0 ? "▲ " : "▼ ") + signe + deltaSyncPct.toFixed(2) + "% depuis dernière synchro";
-                                syncEl.title = (deltaSyncAbs >= 0 ? "+" : "") + formatEUR(deltaSyncAbs) + " depuis le " + new Date(prevSync.date).toLocaleString("fr-FR");
-                            }
-                        }
-                    }
-                    // Mémoriser la valeur actuelle pour la prochaine synchro
-                    localStorage.setItem(SYNC_KEY, JSON.stringify({ valeur: DATA.patrimoine, date: new Date().toISOString() }));
-                }
-            } catch (e) {
-                console.warn("Delta synchro non calculable:", e);
             }
         } catch (e) {
             console.warn("Erreur parsing evolution chart:", e);
