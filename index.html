@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=8">
+    <link rel="stylesheet" href="css/style.css?v=9">
     <link rel="stylesheet" href="css/alerts.css">
 </head>
 <body>
@@ -87,6 +87,7 @@
                         <div class="card account-card expandable" id="cashAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="cashDetailSection">
                             <div class="label"><span class="icon-badge blue">💵</span>Cash disponible<span class="toggle-chevron" id="cashChevron" style="position:static">▾</span></div>
                             <div class="value skeleton" id="cashMain">...</div>
+                            <div id="cashMouvements" class="account-mouvements"></div>
                         </div>
                         <div class="collapsible-block compte-detail" id="cashDetailSection">
                             <div class="goals-grid">
@@ -116,6 +117,7 @@
                             <div class="value skeleton" id="peaMain">...</div>
                             <span id="peaVarJour" class="account-trend" style="display:none"></span>
                             <div id="peaSparkline" class="account-sparkline" style="display:none"></div>
+                            <div id="peaMouvements" class="account-mouvements"></div>
                         </div>
                         <div class="collapsible-block compte-detail" id="peaDetailSection">
                             <div class="card chart-card">
@@ -141,6 +143,7 @@
                             <div class="value skeleton" id="ctoMain">...</div>
                             <span id="ctoVarJour" class="account-trend" style="display:none"></span>
                             <div id="ctoSparkline" class="account-sparkline" style="display:none"></div>
+                            <div id="ctoMouvements" class="account-mouvements"></div>
                         </div>
                         <div class="collapsible-block compte-detail" id="ctoDetailSection">
                             <div class="card chart-card">
@@ -290,7 +293,8 @@
     <script src="js/config.js"></script>
     <script src="js/charts.js?v=2"></script>
     <script src="js/errorHandler.js"></script>
-    <script src="js/googleSheets.js?v=5"></script>
+    <script src="js/mouvements.js"></script>
+    <script src="js/googleSheets.js?v=6"></script>
     <script src="js/runtimeConfigUI.js"></script>
     <script src="js/rippleEffect.js"></script>
     <script src="js/collapsibleSections.js"></script>

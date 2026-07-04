@@ -301,6 +301,7 @@ async function chargerDashboard() {
         // Update DOM values
         animerValeur(DOM.networth, DATA.patrimoine, " €");
         animerValeur(DOM.cash, DATA.budget.cash_dispo_total || 0, " €");
+        if (typeof suivreMouvement === "function") suivreMouvement("cash", DATA.budget.cash_dispo_total, "€", "cashMouvements");
         animerValeur(DOM.investments, DATA.valeurInvestie || 0, " €"); // valeur actuelle : PEA + CTO converti au même taux
         animerValeur(DOM.heroCash, DATA.budget.cash_dispo_total || 0, " €");
         animerValeur(DOM.pea, DATA.pea.pea_valeur || 0, " €");
@@ -331,6 +332,14 @@ async function chargerDashboard() {
             afficherVarJour("ctoVarJour", DATA.cto.cto_valeur_chf, DATA.cto.cto_valeur_chf_hier, "CHF");
         } catch (e) {
             console.warn("Variation jour non calculable:", e);
+        }
+        try {
+            if (typeof suivreMouvement === "function") {
+                suivreMouvement("pea", DATA.pea.pea_valeur, "€", "peaMouvements");
+                suivreMouvement("cto", DATA.cto.cto_valeur_chf, "CHF", "ctoMouvements");
+            }
+        } catch (e) {
+            console.warn("Suivi des mouvements non calculable:", e);
         }
 
         // Sous-cartes de detail Cash / PEA / CTO (reveleés au clic sur

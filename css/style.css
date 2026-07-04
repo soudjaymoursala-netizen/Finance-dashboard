@@ -268,6 +268,37 @@ main > section > h2 {
   margin-top: 0.6rem;
 }
 
+.account-mouvements {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mouvement-ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+}
+
+.mouvement-date {
+  color: var(--text-secondary-color);
+}
+
+.mouvement-delta.up {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.mouvement-delta.down {
+  color: var(--negative-color);
+  font-weight: 700;
+}
+
 /* ==================================================
    STAT CHIPS — KPI secondaires en ligne
    ================================================== */
