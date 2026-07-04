@@ -65,5 +65,12 @@ function suivreMouvement(compteKey, valeurActuelle, deviseSuffixe, containerId) 
             "</div>";
         lignesAffichees++;
     }
+    if (lignesAffichees === 0) {
+        const dernierPoint = historique[historique.length - 1];
+        html = '<div class="mouvement-ligne">' +
+            '<span class="mouvement-date">' + formatMouvementDate(dernierPoint.date) + "</span>" +
+            '<span class="mouvement-delta flat">= stable</span>' +
+            "</div>";
+    }
     container.innerHTML = html;
 }

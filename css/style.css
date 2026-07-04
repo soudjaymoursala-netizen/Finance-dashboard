@@ -299,6 +299,11 @@ main > section > h2 {
   font-weight: 700;
 }
 
+.mouvement-delta.flat {
+  color: var(--text-secondary-color);
+  font-weight: 700;
+}
+
 /* ==================================================
    STAT CHIPS — KPI secondaires en ligne
    ================================================== */
