@@ -420,12 +420,19 @@ async function chargerDashboard() {
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
 
             // Badge de tendance : variation entre les 2 derniers points connus
-            // (indicateur unique et bien visible, avec % ET montant en €)
+            // (indicateur unique et bien visible, avec % ET montant en €).
+            // On affiche la vraie date du point de comparaison plutôt que
+            // "ce mois" en dur, car les points du Sheet ne sont pas toujours
+            // espacés d'exactement un mois.
             try {
-                const pointsValides = valeurs.filter((v) => v && v > 0);
+                const pointsValides = [];
+                for (let k = 0; k < valeurs.length; k++) {
+                    if (valeurs[k] && valeurs[k] > 0) pointsValides.push({ valeur: valeurs[k], label: labels[k] });
+                }
                 if (pointsValides.length >= 2) {
-                    const dernier = pointsValides[pointsValides.length - 1];
-                    const precedent = pointsValides[pointsValides.length - 2];
+                    const dernier = pointsValides[pointsValides.length - 1].valeur;
+                    const precedentPoint = pointsValides[pointsValides.length - 2];
+                    const precedent = precedentPoint.valeur;
                     const deltaPct = precedent > 0 ? ((dernier - precedent) / precedent) * 100 : 0;
                     const deltaAbs = dernier - precedent;
                     const trendEl = document.getElementById("heroTrend");
@@ -433,8 +440,8 @@ async function chargerDashboard() {
                         trendEl.style.display = "";
                         trendEl.className = "hero-trend " + (deltaPct >= 0 ? "up" : "down");
                         const signe = deltaPct >= 0 ? "+" : "";
-                        trendEl.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe + formatEUR(deltaAbs) + ") ce mois";
-                        trendEl.title = "Variation par rapport au mois précédent";
+                        trendEl.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe + formatEUR(deltaAbs) + ") depuis " + precedentPoint.label;
+                        trendEl.title = "Variation par rapport au point précédent du suivi (" + precedentPoint.label + ")";
                     }
                 }
             } catch (e) {
