@@ -307,6 +307,32 @@ async function chargerDashboard() {
         animerValeur(DOM.cto, DATA.cto.cto_valeur_chf || 0, " CHF");
         if (DOM.performance) DOM.performance.textContent = ((DATA.budget.taux_epargne_annuel || 0) * 100).toFixed(0) + " %";
 
+        // Variation jour PEA / CTO (clôture précédente vs valeur actuelle).
+        // Nécessite les clés pea_valeur_hier / cto_valeur_chf_hier côté
+        // Sheet (calculées avec GOOGLEFINANCE(ticker, "closeyest")). Si ces
+        // clés n'existent pas encore, le badge reste simplement masqué.
+        function afficherVarJour(elementId, valeurActuelle, valeurHier, deviseSuffixe) {
+            const el = document.getElementById(elementId);
+            if (!el || !valeurHier || valeurHier <= 0 || !valeurActuelle) return;
+            const deltaPct = ((valeurActuelle - valeurHier) / valeurHier) * 100;
+            const deltaAbs = valeurActuelle - valeurHier;
+            if (Math.abs(deltaPct) < 0.01) {
+                el.style.display = "none";
+                return;
+            }
+            el.style.display = "";
+            el.className = "account-trend " + (deltaPct >= 0 ? "up" : "down");
+            const signe = deltaPct >= 0 ? "+" : "";
+            el.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(2) + "% (" + signe + Math.round(deltaAbs).toLocaleString("fr-FR") + " " + deviseSuffixe + ") aujourd'hui";
+            el.title = "Variation depuis la clôture précédente";
+        }
+        try {
+            afficherVarJour("peaVarJour", DATA.pea.pea_valeur, DATA.pea.pea_valeur_hier, "€");
+            afficherVarJour("ctoVarJour", DATA.cto.cto_valeur_chf, DATA.cto.cto_valeur_chf_hier, "CHF");
+        } catch (e) {
+            console.warn("Variation jour non calculable:", e);
+        }
+
         // Sous-cartes de detail Cash / PEA / CTO (reveleés au clic sur
         // le chip correspondant). Ecriture defensive (|| 0) : les 4
         // champs epargne_livret_* ne sont pas encore forcement presents

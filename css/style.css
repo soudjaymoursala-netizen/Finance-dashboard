@@ -692,6 +692,27 @@ main > section > h2 {
   background: rgba(240, 87, 107, 0.14);
 }
 
+.account-trend {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+}
+
+.account-trend.up {
+  color: var(--accent-text);
+  background: rgba(45, 212, 167, 0.14);
+}
+
+.account-trend.down {
+  color: var(--negative-color);
+  background: rgba(240, 87, 107, 0.14);
+}
+
 /* ==================================================
    ANIMATIONS D'ENTRÉE
    ================================================== */
