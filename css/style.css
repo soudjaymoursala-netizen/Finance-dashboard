@@ -263,6 +263,11 @@ main > section > h2 {
   margin-top: 1rem;
 }
 
+.account-sparkline {
+  height: 40px;
+  margin-top: 0.6rem;
+}
+
 /* ==================================================
    STAT CHIPS — KPI secondaires en ligne
    ================================================== */

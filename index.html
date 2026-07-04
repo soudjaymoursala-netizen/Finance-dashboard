@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=8">
     <link rel="stylesheet" href="css/alerts.css">
 </head>
 <body>
@@ -115,6 +115,7 @@
                             <div class="label"><span class="icon-badge emerald">📈</span>PEA — Trade Republic<span class="toggle-chevron" id="peaChevron" style="position:static">▾</span></div>
                             <div class="value skeleton" id="peaMain">...</div>
                             <span id="peaVarJour" class="account-trend" style="display:none"></span>
+                            <div id="peaSparkline" class="account-sparkline" style="display:none"></div>
                         </div>
                         <div class="collapsible-block compte-detail" id="peaDetailSection">
                             <div class="card chart-card">
@@ -139,6 +140,7 @@
                             <div class="label"><span class="icon-badge gold">🏦</span>CTO — YUH<span class="toggle-chevron" id="ctoChevron" style="position:static">▾</span></div>
                             <div class="value skeleton" id="ctoMain">...</div>
                             <span id="ctoVarJour" class="account-trend" style="display:none"></span>
+                            <div id="ctoSparkline" class="account-sparkline" style="display:none"></div>
                         </div>
                         <div class="collapsible-block compte-detail" id="ctoDetailSection">
                             <div class="card chart-card">
@@ -286,9 +288,9 @@
     <script src="js/lock.js?v=4"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="js/config.js"></script>
-    <script src="js/charts.js"></script>
+    <script src="js/charts.js?v=2"></script>
     <script src="js/errorHandler.js"></script>
-    <script src="js/googleSheets.js?v=4"></script>
+    <script src="js/googleSheets.js?v=5"></script>
     <script src="js/runtimeConfigUI.js"></script>
     <script src="js/rippleEffect.js"></script>
     <script src="js/collapsibleSections.js"></script>

@@ -399,12 +399,19 @@ async function chargerDashboard() {
             const lines = (evolutionTxt || "").replace(/\r/g, "").trim().split("\n");
             const labelsRaw = [];
             const valeursRaw = [];
+            const peaRaw = [];
+            const ctoRaw = [];
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
                 const cols = splitCsvLine(lines[i], sep);
                 if (cols.length < 2) continue;
                 labelsRaw.push(cols[0].trim());
                 valeursRaw.push(nettoyerNombre(cols[1].trim().replace(/^\"|\"$/g, "")));
+                // Colonnes optionnelles : historique PEA (col 3) et CTO en CHF
+                // (col 4). Si absentes du Sheet, les sparklines correspondants
+                // restent simplement masqués (voir updateAccountSparkline).
+                peaRaw.push(cols.length > 2 ? nettoyerNombre(cols[2].trim().replace(/^\"|\"$/g, "")) : null);
+                ctoRaw.push(cols.length > 3 ? nettoyerNombre(cols[3].trim().replace(/^\"|\"$/g, "")) : null);
             }
 
             // Certains Sheets reportent automatiquement la derniere valeur
@@ -424,6 +431,8 @@ async function chargerDashboard() {
             }
             const labels = labelsRaw.slice(0, coupureIndex);
             const valeurs = valeursRaw.slice(0, coupureIndex);
+            const peaSeries = peaRaw.slice(0, coupureIndex).filter((v) => v !== null);
+            const ctoSeries = ctoRaw.slice(0, coupureIndex).filter((v) => v !== null);
 
             // Dernière valeur connue = patrimoine réel du Sheet API_Evolution
             const dernierPatrimoine = valeurs.length > 0 ? valeurs[valeurs.length - 1] : 0;
@@ -444,6 +453,8 @@ async function chargerDashboard() {
             }
             if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
+            if (typeof updatePeaSparkline === "function") updatePeaSparkline(peaSeries);
+            if (typeof updateCtoSparkline === "function") updateCtoSparkline(ctoSeries);
 
             // Badge de tendance : variation entre les 2 derniers points connus
             // (indicateur unique et bien visible, avec % ET montant en €).

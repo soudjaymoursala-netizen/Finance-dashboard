@@ -9,6 +9,8 @@ let lastAllocation = { cash: 0, pea: 0, cto: 0 };
 let lastPeaComposition = { actions: 0, etf: 0 };
 let lastCtoComposition = { actions: 0, etf: 0, crypto: 0 };
 let lastMonthlyBudget = { labels: [], revenus: [], depenses: [] };
+let lastPeaSeries = { valeurs: [] };
+let lastCtoSeries = { valeurs: [] };
 
 function getThemeMode() {
   return document && document.body && document.body.classList.contains("light") ? "light" : "dark";
@@ -393,12 +395,68 @@ function updateHeroSparkline(valeurs) {
     heroSparklineChart.render();
 }
 
+/* Sparklines des cartes PEA / CTO : même logique que le hero, mais
+   masqués si aucune donnée historique par compte n'est disponible
+   (nécessite des colonnes dédiées côté Sheet — voir googleSheets.js). */
+let peaSparklineChart = null;
+let ctoSparklineChart = null;
+
+function updateAccountSparkline(elementId, chartRef, valeurs, deviseSuffixe) {
+    const chartElement = document.querySelector("#" + elementId);
+    if (!chartElement) return chartRef;
+    const pointsValides = (valeurs || []).filter((v) => v !== null && v !== undefined && !isNaN(v) && v > 0);
+    if (pointsValides.length < 2) {
+        chartElement.style.display = "none";
+        return chartRef;
+    }
+    if (chartRef) chartRef.destroy();
+    chartElement.style.display = "";
+
+    const positive = pointsValides[pointsValides.length - 1] >= pointsValides[0];
+
+    const options = {
+        chart: {
+            type: "area",
+            height: 40,
+            sparkline: { enabled: true },
+            animations: { enabled: true, speed: 800 }
+        },
+        series: [{ name: "Valeur", data: pointsValides }],
+        colors: [positive ? "#2DD4A7" : "#F0576B"],
+        stroke: { curve: "smooth", width: 2 },
+        fill: {
+            type: "gradient",
+            gradient: { shadeIntensity: 0.6, opacityFrom: 0.35, opacityTo: 0, stops: [0, 100] }
+        },
+        tooltip: {
+            theme: getThemeMode(),
+            y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " " + deviseSuffixe }
+        }
+    };
+
+    const newChart = new ApexCharts(chartElement, options);
+    newChart.render();
+    return newChart;
+}
+
+function updatePeaSparkline(valeurs) {
+    lastPeaSeries.valeurs = valeurs || [];
+    peaSparklineChart = updateAccountSparkline("peaSparkline", peaSparklineChart, valeurs, "€");
+}
+
+function updateCtoSparkline(valeurs) {
+    lastCtoSeries.valeurs = valeurs || [];
+    ctoSparklineChart = updateAccountSparkline("ctoSparkline", ctoSparklineChart, valeurs, "CHF");
+}
+
 /* Refresh charts using cached data (appelable après un changement de thème) */
 function refreshCharts() {
   if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
     updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, lastPatrimoine.objectif);
     updateHeroSparkline(lastPatrimoine.valeurs);
   }
+  if (lastPeaSeries.valeurs && lastPeaSeries.valeurs.length) updatePeaSparkline(lastPeaSeries.valeurs);
+  if (lastCtoSeries.valeurs && lastCtoSeries.valeurs.length) updateCtoSparkline(lastCtoSeries.valeurs);
   // même si les valeurs valent 0, on peut forcer la mise à jour
   updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto, lastAllocation.patrimoineTotal);
   updatePeaCompositionChart(lastPeaComposition.actions, lastPeaComposition.etf);
