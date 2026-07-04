@@ -11,6 +11,7 @@
     const input = document.getElementById("lockInput");
     const submitBtn = document.getElementById("lockSubmit");
     const errorEl = document.getElementById("lockError");
+    const toggleBtn = document.getElementById("lockToggleVisibility");
 
     function unlock() {
         if (lockScreen) lockScreen.style.display = "none";
@@ -47,6 +48,15 @@
     if (input) {
         input.addEventListener("keydown", function (e) {
             if (e.key === "Enter") tryUnlock();
+        });
+    }
+    if (toggleBtn && input) {
+        toggleBtn.addEventListener("click", function () {
+            const isHidden = input.type === "password";
+            input.type = isHidden ? "text" : "password";
+            toggleBtn.textContent = isHidden ? "🙈" : "👁️";
+            toggleBtn.setAttribute("aria-label", isHidden ? "Masquer le code" : "Afficher le code");
+            input.focus();
         });
     }
 
