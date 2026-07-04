@@ -3,7 +3,7 @@
 // visible dans ce fichier. Objectif = éviter un accès par erreur, pas
 // se protéger d'un attaquant motivé.
 (function () {
-    const CODE = "Dashboard"; // <-- change ce mot ici pour changer le code
+    const CODE = "Dash"; // <-- change ce mot ici pour changer le code
     const SESSION_KEY = "financeDashboard_unlocked";
 
     const lockScreen = document.getElementById("lockScreen");
