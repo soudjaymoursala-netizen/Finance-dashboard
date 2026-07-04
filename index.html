@@ -20,7 +20,17 @@
     <link rel="stylesheet" href="css/alerts.css">
 </head>
 <body>
-    <div class="container">
+    <div id="lockScreen" class="lock-screen">
+        <div class="lock-box">
+            <div class="lock-icon">🔒</div>
+            <h2>Finance Dashboard</h2>
+            <p>Entrez le code d'accès</p>
+            <input type="password" id="lockInput" class="lock-input" placeholder="Code" autocomplete="off">
+            <button id="lockSubmit" class="lock-submit">Déverrouiller</button>
+            <p id="lockError" class="lock-error" style="display:none">Code incorrect</p>
+        </div>
+    </div>
+    <div class="container blurred" id="mainContainer">
         <header class="header">
             <div>
                 <h1>💰 Finance Dashboard</h1>
@@ -269,6 +279,7 @@
     <!-- JavaScript -->
     <!-- ApexCharts chargé ici (pas dans le head) pour ne pas bloquer
          l'affichage initial de la page -->
+    <script src="js/lock.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="js/config.js"></script>
     <script src="js/charts.js"></script>

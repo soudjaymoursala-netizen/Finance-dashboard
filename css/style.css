@@ -957,3 +957,91 @@ main > section > h2 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==================================================
+   LOCK SCREEN — écran de verrouillage par code
+   ================================================== */
+.lock-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.lock-box {
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  background: var(--card-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 2.25rem 1.75rem;
+}
+
+.lock-icon {
+  font-size: 2.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.lock-box h2 {
+  font-family: 'Sora', sans-serif;
+  color: var(--text-color);
+  margin: 0 0 0.4rem;
+  font-size: 1.25rem;
+}
+
+.lock-box p {
+  color: var(--text-secondary-color);
+  font-size: 0.9rem;
+  margin: 0 0 1.25rem;
+}
+
+.lock-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--primary-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 0.9rem;
+}
+
+.lock-input:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 1px;
+}
+
+.lock-submit {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: none;
+  background: var(--accent-color);
+  color: #0B1120;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.lock-submit:hover {
+  opacity: 0.9;
+}
+
+.lock-error {
+  color: var(--negative-color);
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0;
+}
+
+.container.blurred {
+  filter: blur(12px);
+  pointer-events: none;
+  user-select: none;
+}
