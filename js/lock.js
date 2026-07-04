@@ -18,6 +18,14 @@
         sessionStorage.setItem(SESSION_KEY, "1");
     }
 
+    function lock() {
+        if (lockScreen) lockScreen.style.display = "flex";
+        if (container) container.classList.add("blurred");
+        if (errorEl) errorEl.style.display = "none";
+        if (input) input.value = "";
+        sessionStorage.removeItem(SESSION_KEY);
+    }
+
     function tryUnlock() {
         if (input && input.value === CODE) {
             unlock();
@@ -41,4 +49,14 @@
             if (e.key === "Enter") tryUnlock();
         });
     }
+
+    // Re-verrouillage automatique dès que la page quitte le premier plan
+    // (changement d'appli, verrouillage de l'écran, mise en arrière-plan
+    // de l'onglet). Comportement type "appli bancaire" : on redemande le
+    // code à chaque retour, même si l'onglet n'a jamais été fermé.
+    document.addEventListener("visibilitychange", function () {
+        if (document.hidden) lock();
+    });
+    window.addEventListener("pagehide", lock);
+    window.addEventListener("blur", lock);
 })();
