@@ -230,9 +230,9 @@ main > section > h2 {
   position: absolute;
   top: -40%;
   right: -10%;
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(45,212,167,0.16), transparent 70%);
+  width: 340px;
+  height: 340px;
+  background: radial-gradient(circle, rgba(45,212,167,0.32), transparent 70%);
   pointer-events: none;
 }
 
@@ -311,6 +311,19 @@ main > section > h2 {
   border-radius: var(--radius);
   padding: 1.5rem;
   box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  top: -35%;
+  right: -12%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(45,212,167,0.14), transparent 70%);
+  pointer-events: none;
 }
 
 .card .label {
@@ -624,9 +637,9 @@ main > section > h2 {
   position: absolute;
   bottom: -30%;
   left: -8%;
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(240,180,41,0.10), transparent 70%);
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(240,180,41,0.22), transparent 70%);
   pointer-events: none;
 }
 
