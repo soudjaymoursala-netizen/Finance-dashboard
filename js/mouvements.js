@@ -1,9 +1,14 @@
 /* Suivi des mouvements par compte (Cash / PEA / CTO), affiché directement
-   sur la carte. Fonctionne en local (localStorage) : à chaque chargement,
-   on compare la valeur actuelle à la dernière valeur connue du compte ; si
-   elle a changé, on enregistre un nouveau point. La liste affichée montre
-   les derniers changements détectés (delta entre 2 synchros), du plus
-   récent au plus ancien.
+   sur la carte. Fonctionne en local (localStorage) : à CHAQUE chargement,
+   on compare la valeur actuelle à la dernière valeur vérifiée du compte,
+   qu'il y ait eu un changement ou non — c'est le point clé qui évite 2 bugs :
+     1) le badge qui reste bloqué sur un ancien mouvement même quand la
+        valeur s'est stabilisée depuis (la "dernière valeur vérifiée" n'était
+        mise à jour qu'en cas de changement) ;
+     2) l'absence totale de badge sur un compte qui ne bouge jamais (il ne
+        pouvait jamais atteindre 2 points enregistrés).
+   Une seule ligne de statut est affichée : soit le dernier changement
+   détecté, soit "= stable" avec l'heure de la dernière vérification.
    Limite : pas d'historique rétroactif, et un "mouvement" = un changement
    de valeur détecté entre deux ouvertures du dashboard, pas un mouvement
    bancaire individuel. */
@@ -18,59 +23,53 @@ function suivreMouvement(compteKey, valeurActuelle, deviseSuffixe, containerId) 
     const container = document.getElementById(containerId);
     if (!container || !valeurActuelle || valeurActuelle <= 0) return;
 
-    const STORAGE_KEY = "financeDashboard_mouvements_" + compteKey;
-    const MAX_ENTRIES = 6;
-    const MAX_LIGNES_AFFICHEES = 4;
+    const STORAGE_KEY = "financeDashboard_lastCheck_" + compteKey;
     const SEUIL = 0.5; // en unité de la devise, pour ignorer le bruit d'arrondi
+    const maintenant = new Date().toISOString();
 
-    let historique = [];
+    let etat = null;
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) historique = JSON.parse(raw) || [];
+        if (raw) etat = JSON.parse(raw);
     } catch (e) {
-        historique = [];
+        etat = null;
     }
 
-    const dernier = historique.length ? historique[historique.length - 1] : null;
-    if (!dernier || Math.abs(dernier.valeur - valeurActuelle) > SEUIL) {
-        historique.push({ date: new Date().toISOString(), valeur: valeurActuelle });
-        if (historique.length > MAX_ENTRIES) {
-            historique = historique.slice(historique.length - MAX_ENTRIES);
-        }
+    if (!etat || etat.valeur === undefined) {
+        // Première vérification jamais faite pour ce compte : rien à
+        // afficher encore (pas de point de comparaison), mais on enregistre
+        // ce premier point pour pouvoir comparer au prochain chargement.
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(historique));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ valeur: valeurActuelle, date: maintenant }));
         } catch (e) {
-            console.warn("Impossible d'enregistrer le mouvement:", e);
+            console.warn("Impossible d'enregistrer l'état initial:", e);
         }
-    }
-
-    if (historique.length < 2) {
         container.innerHTML = "";
         return;
     }
 
-    let html = "";
-    let lignesAffichees = 0;
-    for (let i = historique.length - 1; i >= 1 && lignesAffichees < MAX_LIGNES_AFFICHEES; i--) {
-        const actuel = historique[i];
-        const precedent = historique[i - 1];
-        const delta = actuel.valeur - precedent.valeur;
-        if (Math.abs(delta) < SEUIL) continue;
+    const delta = valeurActuelle - etat.valeur;
+    const aChange = Math.abs(delta) >= SEUIL;
+
+    // On met à jour l'état vérifié à CHAQUE chargement (changement ou pas)
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ valeur: valeurActuelle, date: maintenant }));
+    } catch (e) {
+        console.warn("Impossible d'enregistrer l'état:", e);
+    }
+
+    if (aChange) {
         const cls = delta >= 0 ? "up" : "down";
         const signe = delta >= 0 ? "+" : "";
-        html += '<div class="mouvement-ligne">' +
-            '<span class="mouvement-date">' + formatMouvementDate(actuel.date) + "</span>" +
+        container.innerHTML = '<div class="mouvement-ligne">' +
+            '<span class="mouvement-date">' + formatMouvementDate(maintenant) + "</span>" +
             '<span class="mouvement-delta ' + cls + '">' + (delta >= 0 ? "▲ " : "▼ ") +
             signe + Math.round(delta).toLocaleString("fr-FR") + " " + deviseSuffixe + "</span>" +
             "</div>";
-        lignesAffichees++;
-    }
-    if (lignesAffichees === 0) {
-        const dernierPoint = historique[historique.length - 1];
-        html = '<div class="mouvement-ligne">' +
-            '<span class="mouvement-date">' + formatMouvementDate(dernierPoint.date) + "</span>" +
+    } else {
+        container.innerHTML = '<div class="mouvement-ligne">' +
+            '<span class="mouvement-date">' + formatMouvementDate(maintenant) + "</span>" +
             '<span class="mouvement-delta flat">= stable</span>' +
             "</div>";
     }
-    container.innerHTML = html;
 }
