@@ -111,13 +111,15 @@
         });
     }
 
-    // Re-verrouillage automatique dès que la page quitte le premier plan
-    // (changement d'appli, verrouillage de l'écran, mise en arrière-plan
-    // de l'onglet). Comportement type "appli bancaire" : on redemande le
-    // code à chaque retour, même si l'onglet n'a jamais été fermé.
+    // Re-verrouillage automatique quand l'onglet passe reellement en
+    // arriere-plan (changement d'appli, minimisation, autre onglet) ou
+    // a la fermeture/navigation. On n'ecoute PAS "blur" : cet evenement
+    // se declenche sur n'importe quelle perte de focus de la fenetre
+    // (outil de capture d'ecran, DevTools sur un second ecran, clic sur
+    // une autre fenetre) meme quand la page reste parfaitement visible,
+    // ce qui reverrouillait de facon intempestive.
     document.addEventListener("visibilitychange", function () {
         if (document.hidden) lock();
     });
     window.addEventListener("pagehide", lock);
-    window.addEventListener("blur", lock);
 })();
