@@ -39,10 +39,13 @@
         sessionStorage.removeItem(SESSION_KEY);
     }
 
-    function setBusy(busy) {
+    let busy = false;
+
+    function setBusy(b) {
+        busy = b;
         if (submitBtn) {
-            submitBtn.disabled = busy;
-            submitBtn.textContent = busy ? "Vérification…" : "Déverrouiller";
+            submitBtn.disabled = b;
+            submitBtn.textContent = b ? "Vérification…" : "Déverrouiller";
         }
     }
 
@@ -57,6 +60,7 @@
     }
 
     async function tryUnlock() {
+        if (busy) return; // deja une verification en cours (evite le double-appel Entree+clic)
         const code = input ? input.value : "";
         if (!code) return;
 
