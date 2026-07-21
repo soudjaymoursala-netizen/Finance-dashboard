@@ -371,6 +371,15 @@ function updateHeroSparkline(valeurs) {
 
     const positive = valeurs[valeurs.length - 1] >= valeurs[0];
 
+    // Recalage de l'axe Y sur la plage reelle des valeurs (+ marge de
+    // 15% de chaque cote) : sans ca, ApexCharts choisit une echelle qui
+    // ecrase souvent une variation de quelques % en une ligne quasi
+    // plate collee en bas du sparkline. Fallback si toutes les valeurs
+    // sont identiques (plage nulle) pour eviter min === max.
+    const valMin = Math.min(...valeurs);
+    const valMax = Math.max(...valeurs);
+    const marge = (valMax - valMin) * 0.15 || Math.abs(valMax) * 0.05 || 1;
+
     const options = {
         chart: {
             type: "area",
@@ -385,6 +394,7 @@ function updateHeroSparkline(valeurs) {
             type: "gradient",
             gradient: { shadeIntensity: 0.6, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] }
         },
+        yaxis: { min: valMin - marge, max: valMax + marge },
         tooltip: {
             theme: getThemeMode(),
             y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
@@ -413,6 +423,9 @@ function updateAccountSparkline(elementId, chartRef, valeurs, deviseSuffixe) {
     chartElement.style.display = "";
 
     const positive = pointsValides[pointsValides.length - 1] >= pointsValides[0];
+    const valMin = Math.min(...pointsValides);
+    const valMax = Math.max(...pointsValides);
+    const marge = (valMax - valMin) * 0.15 || Math.abs(valMax) * 0.05 || 1;
 
     const options = {
         chart: {
@@ -428,6 +441,7 @@ function updateAccountSparkline(elementId, chartRef, valeurs, deviseSuffixe) {
             type: "gradient",
             gradient: { shadeIntensity: 0.6, opacityFrom: 0.35, opacityTo: 0, stops: [0, 100] }
         },
+        yaxis: { min: valMin - marge, max: valMax + marge },
         tooltip: {
             theme: getThemeMode(),
             y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " " + deviseSuffixe }

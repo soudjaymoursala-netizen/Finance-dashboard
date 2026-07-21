@@ -382,6 +382,12 @@ main > section > h2 {
   font-weight: 700;
 }
 
+.account-fx-note {
+  font-size: 0.8rem;
+  color: var(--text-secondary-color);
+  margin-top: -0.35rem;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -646,11 +652,11 @@ main > section > h2 {
   flex-shrink: 0;
 }
 
-.icon-badge.emerald { background: rgba(23, 140, 110, 0.16); }
-.icon-badge.gold    { background: rgba(185, 133, 39, 0.16); }
-.icon-badge.violet  { background: rgba(108, 92, 224, 0.16); }
-.icon-badge.blue    { background: rgba(29, 143, 166, 0.16); }
-.icon-badge.warn    { background: rgba(245, 166, 35, 0.14); }
+.icon-badge.emerald { background: rgba(23, 140, 110, 0.30); border: 1px solid rgba(23, 140, 110, 0.4); }
+.icon-badge.gold    { background: rgba(185, 133, 39, 0.30); border: 1px solid rgba(185, 133, 39, 0.4); }
+.icon-badge.violet  { background: rgba(108, 92, 224, 0.30); border: 1px solid rgba(108, 92, 224, 0.4); }
+.icon-badge.blue    { background: rgba(29, 143, 166, 0.30); border: 1px solid rgba(29, 143, 166, 0.4); }
+.icon-badge.warn    { background: rgba(245, 166, 35, 0.26); border: 1px solid rgba(245, 166, 35, 0.4); }
 
 .hero-label .icon-badge { width: 2.4rem; height: 2.4rem; font-size: 1.25rem; border-radius: 11px; }
 .icon-badge.hero-icon { background: rgba(45, 212, 167, 0.16); }

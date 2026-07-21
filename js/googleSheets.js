@@ -331,6 +331,11 @@ async function chargerDashboard() {
         animerValeur(DOM.heroCash, DATA.budget.cash_dispo_total || 0, " €");
         animerValeur(DOM.pea, DATA.pea.pea_valeur || 0, " €");
         animerValeur(DOM.cto, DATA.cto.cto_valeur_chf || 0, " CHF");
+        const ctoFxNoteEl = document.getElementById("ctoFxNote");
+        if (ctoFxNoteEl) {
+            ctoFxNoteEl.classList.remove("skeleton");
+            ctoFxNoteEl.textContent = "≈ " + formatEUR(DATA.ctoValeurEUR || 0);
+        }
         if (DOM.performance) DOM.performance.textContent = ((DATA.budget.taux_epargne_annuel || 0) * 100).toFixed(0) + " %";
 
         // Variation jour PEA / CTO (clôture précédente vs valeur actuelle).
