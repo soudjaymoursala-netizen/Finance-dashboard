@@ -284,37 +284,15 @@ async function chargerDashboard() {
         DATA.pea = lireCSVKPI(peaTxt);
 
 
-        // Taux EUR/CHF en temps réel (source : Frankfurter / Banque Centrale Européenne)
-        // Fallback 1 : taux du Sheet CTO (eur_chf)
-        // Fallback 2 : 1 (neutre) si tout échoue
-        let tauxChange = DATA.cto.eur_chf || 1;
-        try {
-            // Timeout de 4s : si l'API de change traine, on ne bloque pas
-            // tout le chargement du dashboard derriere elle (fallback sur
-            // le taux du Sheet, deja disponible).
-            const fxController = new AbortController();
-            const fxTimeout = setTimeout(() => fxController.abort(), 4000);
-            const fxRes = await fetch("https://api.frankfurter.app/latest?from=EUR&to=CHF", {
-                signal: fxController.signal,
-            });
-            clearTimeout(fxTimeout);
-            if (fxRes.ok) {
-                const fxData = await fxRes.json();
-                const tauxBCE = fxData?.rates?.CHF;
-                if (tauxBCE && tauxBCE > 0) {
-                    // Frankfurter donne EUR→CHF, on veut CHF→EUR donc on inverse
-                    tauxChange = 1 / tauxBCE;
-                    DATA.tauxEurChf = tauxBCE; // stocker pour affichage
-                    // Mettre à jour la sous-carte CTO avec le taux réel
-                    const elTaux = document.getElementById("ctoDetailEurChf");
-                    if (elTaux) elTaux.textContent = "1 € = " + tauxBCE.toFixed(4) + " CHF (BCE temps réel)";
-                }
-            }
-        } catch (fxErr) {
-            // Silencieux : on continue avec le taux du Sheet
-            console.warn("Taux BCE non disponible, fallback sur taux Sheet :", tauxChange);
-        }
-        DATA.tauxChange = tauxChange; // taux BCE temps réel (ou fallback Sheet)
+        // Taux EUR/CHF : vient directement du Sheet CTO (colonne eur_chf),
+        // qui utilise une formule GOOGLEFINANCE cote Sheet et se met donc
+        // deja a jour automatiquement. Pas besoin d'un second appel API
+        // cote client : un essai via api.frankfurter.app a ete tente ici
+        // auparavant, mais il echoue systematiquement (CORS bloque depuis
+        // GitHub Pages) et duplique une donnee deja live. Retire pour
+        // eviter une erreur console a chaque chargement.
+        const tauxChange = DATA.cto.eur_chf || 1;
+        DATA.tauxChange = tauxChange;
         DATA.ctoValeurEUR = (DATA.cto.cto_valeur_chf || 0) * tauxChange;
         DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) * tauxChange;
         DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) * tauxChange;
@@ -676,10 +654,10 @@ async function chargerDashboard() {
             // donc plus besoin de ce texte separe redondant. Le taux
             // EUR/CHF (info non dupliquee ailleurs) devient sa propre
             // sous-carte dans le detail CTO.
-            // Afficher le taux BCE temps réel (stocké dans DATA.tauxChange = CHF→EUR)
+            // Afficher le taux EUR/CHF (source : formule GOOGLEFINANCE du Sheet CTO)
             // On réinverse pour afficher EUR→CHF (convention lisible)
             const tauxEurChfAffichage = DATA.tauxChange > 0 ? (1 / DATA.tauxChange) : (DATA.cto.eur_chf || 0);
-            setTxt("ctoDetailEurChf", "1 € = " + tauxEurChfAffichage.toFixed(4) + " CHF (BCE)");
+            setTxt("ctoDetailEurChf", "1 € = " + tauxEurChfAffichage.toFixed(4) + " CHF");
         } catch (e) {
             console.warn("Erreur composition portefeuille:", e);
         }
