@@ -2,6 +2,7 @@
 .alert{padding:10px;border-radius:6px;margin-bottom:8px}
 .alert-error{background:#2b021f;color:#ffd1dc;border:1px solid #5a0b2a}
 .alert-success{background:#042814;color:#b6ffd1;border:1px solid #0b5a2a}
+.alert-warning{background:#2b1f02;color:#ffe6a3;border:1px solid #5a4a0b}
 
 /* make sure runtime config panel inputs are readable in light/dark */
 #runtime-config input{background:#0b1220}

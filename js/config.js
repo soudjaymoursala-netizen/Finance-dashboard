@@ -96,6 +96,7 @@
 
   // Expose global window.CONFIG compatible avec googleSheets.js (flat keys)
   window.CONFIG = {
+    PROXY_BASE_URL: CONFIG.PROXY_BASE_URL,
     URL_BUDGET: CONFIG.SHEETS.BUDGET,
     URL_EVOLUTION: CONFIG.SHEETS.EVOLUTION,
     URL_OBJECTIF: CONFIG.SHEETS.OBJECTIF,

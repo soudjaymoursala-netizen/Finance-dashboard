@@ -216,16 +216,50 @@ async function chargerDashboard() {
     try {
         if (!window.CONFIG) throw new Error("window.CONFIG introuvable");
 
+        // Fallback hors-ligne : si un fetch echoue (Worker down, reseau
+        // coupe, etc.), on retombe sur le dernier CSV recupere avec succes
+        // pour cette source (stocke en localStorage) plutot que d'afficher
+        // un dashboard vide. Un bandeau precise depuis quand ces donnees
+        // datent, pour ne pas laisser croire qu'elles sont a jour.
+        const CACHE_PREFIX = "financeDashboard_cache_";
+        let donneesPerimees = false;
+        let dateCachePlusAncienne = null;
+
+        function lireCache(label) {
+            try {
+                const raw = localStorage.getItem(CACHE_PREFIX + label);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function ecrireCache(label, csv) {
+            try {
+                localStorage.setItem(CACHE_PREFIX + label, JSON.stringify({ csv, date: new Date().toISOString() }));
+            } catch (e) {
+                // localStorage plein ou indisponible (navigation privee) : tant pis, pas de cache
+            }
+        }
+
         // helper to fetch and handle errors
         async function fetchTextOrLog(url, label) {
             try {
                 const r = await fetch(url);
-                if (!r.ok) {
-                    showError(`${label} fetch failed: ${r.status} ${r.statusText}`);
-                    return "";
-                }
-                return await r.text();
+                if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+                const txt = await r.text();
+                ecrireCache(label, txt);
+                return txt;
             } catch (e) {
+                const cache = lireCache(label);
+                if (cache && cache.csv) {
+                    donneesPerimees = true;
+                    const d = new Date(cache.date);
+                    if (!dateCachePlusAncienne || d < dateCachePlusAncienne) dateCachePlusAncienne = d;
+                    console.warn(`${label} fetch echoue, utilisation du cache local (${cache.date}):`, e.message);
+                    return cache.csv;
+                }
                 showError(`${label} fetch error: ${e.message}`);
                 console.error(e);
                 return "";
@@ -240,6 +274,11 @@ async function chargerDashboard() {
             fetchTextOrLog(window.CONFIG.URL_OBJECTIF, "Objectif"),
         ]);
 
+        if (donneesPerimees && dateCachePlusAncienne) {
+            const dateTxt = dateCachePlusAncienne.toLocaleString("fr-FR");
+            addAlert(`⚠️ Certaines données n'ont pas pu être rechargées (Worker ou réseau indisponible). Affichage des dernières données connues, datant du ${dateTxt}.`, "warning");
+        }
+
         DATA.budget = lireCSVKPI(budgetTxt);
         DATA.cto = lireCSVKPI(ctoTxt);
         DATA.pea = lireCSVKPI(peaTxt);
@@ -250,7 +289,15 @@ async function chargerDashboard() {
         // Fallback 2 : 1 (neutre) si tout échoue
         let tauxChange = DATA.cto.eur_chf || 1;
         try {
-            const fxRes = await fetch("https://api.frankfurter.app/latest?from=EUR&to=CHF");
+            // Timeout de 4s : si l'API de change traine, on ne bloque pas
+            // tout le chargement du dashboard derriere elle (fallback sur
+            // le taux du Sheet, deja disponible).
+            const fxController = new AbortController();
+            const fxTimeout = setTimeout(() => fxController.abort(), 4000);
+            const fxRes = await fetch("https://api.frankfurter.app/latest?from=EUR&to=CHF", {
+                signal: fxController.signal,
+            });
+            clearTimeout(fxTimeout);
             if (fxRes.ok) {
                 const fxData = await fxRes.json();
                 const tauxBCE = fxData?.rates?.CHF;
