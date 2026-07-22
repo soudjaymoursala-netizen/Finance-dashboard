@@ -148,10 +148,18 @@ async function chargerDashboard() {
         DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) / tauxChange;
         DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) / tauxChange;
 
-        // Patrimoine = dernier point de API_Evolution (calculé côté Sheet,
-        // source de référence unique). Mis à jour plus bas après parsing
-        // de la série evolution ; initialisé à 0 en attendant.
-        DATA.patrimoine = 0;
+        // Patrimoine Total = calcule en direct a partir des 3 comptes reels
+        // (Cash + PEA valeur actuelle + CTO valeur actuelle convertie),
+        // PAS depuis le dernier point de la Sheet API_Evolution.
+        //
+        // Pourquoi ce changement : la Sheet Evolution ne trackait que le
+        // capital INVESTI pour le PEA et le CTO, pas leur valeur actuelle
+        // (donc sans les gains/pertes en temps reel) - ecart decouvert en
+        // comparant la somme des 3 comptes au Patrimoine Total affiche,
+        // qui ne concordaient pas une fois la conversion CHF corrigee.
+        // pea_valeur et ctoValeurEUR sont deja les valeurs ACTUELLES
+        // (pas investies), donc ce calcul inclut naturellement les gains.
+        DATA.patrimoine = (DATA.budget.cash_dispo_total || 0) + (DATA.pea.pea_valeur || 0) + (DATA.ctoValeurEUR || 0);
         DATA.progression250k = DATA.patrimoine > 0 ? (DATA.patrimoine / DATA.objectif250k) * 100 : 0;
         DATA.restant250k = Math.max(0, DATA.objectif250k - DATA.patrimoine);
 
@@ -333,22 +341,18 @@ async function chargerDashboard() {
             const peaSeries = peaRaw.slice(0, coupureIndex).filter((v) => v !== null);
             const ctoSeries = ctoRaw.slice(0, coupureIndex).filter((v) => v !== null);
 
-            // Dernière valeur connue = patrimoine réel du Sheet API_Evolution
-            const dernierPatrimoine = valeurs.length > 0 ? valeurs[valeurs.length - 1] : 0;
-            if (dernierPatrimoine > 0) {
-                DATA.patrimoine = dernierPatrimoine;
-                // Re-synchroniser tous les affichages qui dépendent du patrimoine
-                animerValeur(DOM.networth, DATA.patrimoine, " €");
-                DATA.progression250k = (DATA.patrimoine / DATA.objectif250k) * 100;
-                DATA.restant250k = Math.max(0, DATA.objectif250k - DATA.patrimoine);
-                DATA.anneesRestantes = DATA.epargneAnnuelle > 0 ? DATA.restant250k / DATA.epargneAnnuelle : 0;
-                DATA.projectionAnnee = new Date().getFullYear() + Math.ceil(DATA.anneesRestantes);
-                if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
-                if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
-                // Mettre à jour le donut avec le patrimoine corrigé
-                if (typeof updateAllocationChart === "function") {
-                    updateAllocationChart(DATA.budget.cash_dispo_total || 0, DATA.pea.pea_valeur || 0, DATA.ctoValeurEUR || 0, DATA.patrimoine);
-                }
+            // Le dernier point de la Sheet Evolution ne reflete que le
+            // capital investi historique (pas les gains en temps reel) -
+            // on ne l'utilise donc plus pour DATA.patrimoine (calcule plus
+            // haut a partir des vraies valeurs actuelles des comptes). On
+            // remplace uniquement le DERNIER point de la courbe par cette
+            // valeur exacte, pour que le graphique se termine coherent
+            // avec le chiffre affiche en haut - le reste de la courbe
+            // (mois precedents) garde l'historique tel que trackee dans
+            // la Sheet, faute de pouvoir recalculer retroactivement les
+            // gains des mois passes.
+            if (valeurs.length > 0 && DATA.patrimoine > 0) {
+                valeurs[valeurs.length - 1] = DATA.patrimoine;
             }
             if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
