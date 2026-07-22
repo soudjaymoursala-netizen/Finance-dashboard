@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v1";
+const CACHE_VERSION = "shell-v2"; // v2 : passage a la strategie network-first (voir fetch handler)
 
 const PRECACHE_URLS = [
     "./",
@@ -87,22 +87,18 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
+    // Network-first : on tente TOUJOURS le reseau en premier, pour voir
+    // les derniers changements des le premier rechargement (utile en
+    // developpement actif). Le cache ne sert que si le reseau echoue
+    // vraiment (vraiment hors-ligne), pas juste pour aller plus vite.
     event.respondWith(
-        caches.match(req, { ignoreSearch: true }).then((cached) => {
-            const networkFetch = fetch(req)
-                .then((res) => {
-                    // Rafraichit le cache en arriere-plan avec la version
-                    // reseau la plus recente (stale-while-revalidate) :
-                    // l'utilisateur voit la version en cache tout de suite,
-                    // la prochaine visite aura la version a jour.
-                    if (res && res.ok) {
-                        caches.open(CACHE_VERSION).then((cache) => cache.put(req, res.clone()));
-                    }
-                    return res;
-                })
-                .catch(() => cached); // hors-ligne et rien en cache -> echec silencieux
-
-            return cached || networkFetch;
-        })
+        fetch(req)
+            .then((res) => {
+                if (res && res.ok) {
+                    caches.open(CACHE_VERSION).then((cache) => cache.put(req, res.clone()));
+                }
+                return res;
+            })
+            .catch(() => caches.match(req, { ignoreSearch: true }))
     );
 });
