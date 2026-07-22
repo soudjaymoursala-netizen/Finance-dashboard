@@ -1118,22 +1118,32 @@ main > section > h2 {
   margin: 0.75rem 0 0;
 }
 
-.lock-faceid {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border-radius: 12px;
-  border: 1.5px solid var(--accent-color);
-  background: transparent;
-  color: var(--accent-color);
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  margin-bottom: 1.1rem;
-  transition: background 150ms ease;
+.lock-box {
+  position: relative;
 }
 
-.lock-faceid:hover {
-  background: rgba(45, 212, 167, 0.1);
+.lock-faceid-icon {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.lock-faceid-icon:hover {
+  opacity: 1;
+  transform: scale(1.06);
 }
 
 .lock-faceid-reset {
