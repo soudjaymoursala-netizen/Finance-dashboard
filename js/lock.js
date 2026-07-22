@@ -18,7 +18,6 @@
     const errorEl = document.getElementById("lockError");
     const toggleBtn = document.getElementById("lockToggleVisibility");
     const faceIdBtn = document.getElementById("lockFaceId");
-    const faceIdResetBtn = document.getElementById("lockFaceIdReset");
     const faceIdOffer = document.getElementById("faceIdOffer");
     const faceIdOfferAccept = document.getElementById("faceIdOfferAccept");
     const faceIdOfferDecline = document.getElementById("faceIdOfferDecline");
@@ -36,21 +35,6 @@
     // secours (autre appareil/navigateur, ou Face ID indisponible).
     const FACEID_CRED_KEY = "financeDashboard_faceIdCredId";
     const FACEID_OFFER_DISMISSED_KEY = "financeDashboard_faceIdOfferDismissed";
-
-    function bufferToBase64url(buf) {
-        const bytes = new Uint8Array(buf);
-        let str = "";
-        for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
-        return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-    }
-
-    function base64urlToBuffer(str) {
-        const base64 = str.replace(/-/g, "+").replace(/_/g, "/").padEnd(str.length + (4 - (str.length % 4)) % 4, "=");
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-        return bytes.buffer;
-    }
 
     function webAuthnSupported() {
         return !!(window.PublicKeyCredential && navigator.credentials);
@@ -83,13 +67,27 @@
                     authenticatorSelection: {
                         authenticatorAttachment: "platform",
                         userVerification: "required",
+                        // Cle residente/decouvrable (passkey) : stockee dans
+                        // le trousseau du systeme (Keychain iOS, Credential
+                        // Manager Android/Windows), associee au DOMAINE et
+                        // non a ce navigateur/contexte precis. C'est ce qui
+                        // permet de la retrouver aussi bien depuis Safari
+                        // que depuis l'app installee sur l'ecran d'accueil,
+                        // qui ont un localStorage totalement separe sur iOS.
+                        residentKey: "required",
+                        requireResidentKey: true, // alias pour compatibilite navigateurs plus anciens
                     },
                     timeout: 60000,
                     attestation: "none",
                 },
             });
             if (!cred) return false;
-            localStorage.setItem(FACEID_CRED_KEY, bufferToBase64url(cred.rawId));
+            // Le localStorage sert desormais seulement d'indice local pour
+            // savoir si CE navigateur/contexte a deja propose Face ID une
+            // fois (evite de re-proposer la banniere a chaque session) -
+            // la veritable source de verite est le trousseau systeme,
+            // interroge directement dans unlockWithFaceId() ci-dessous.
+            localStorage.setItem(FACEID_CRED_KEY, "1");
             return true;
         } catch (e) {
             console.warn("Enregistrement Face ID annulé ou échoué :", e);
@@ -98,34 +96,37 @@
     }
 
     async function unlockWithFaceId() {
-        const storedId = localStorage.getItem(FACEID_CRED_KEY);
-        if (!storedId) return;
         try {
+            // Pas de allowCredentials : on laisse l'OS chercher lui-meme
+            // une cle decouvrable existante pour ce domaine dans son
+            // trousseau, qu'elle ait ete enregistree depuis Safari ou
+            // depuis l'app installee - les deux partagent le meme trousseau
+            // systeme meme si leur localStorage est separe.
             const assertion = await navigator.credentials.get({
                 publicKey: {
                     challenge: crypto.getRandomValues(new Uint8Array(32)),
-                    allowCredentials: [{ id: base64urlToBuffer(storedId), type: "public-key" }],
                     userVerification: "required",
                     timeout: 60000,
                 },
             });
-            if (assertion) unlock();
+            if (assertion) {
+                unlock();
+                localStorage.setItem(FACEID_CRED_KEY, "1"); // met a jour l'indice local au passage
+            }
         } catch (e) {
-            // Annulé par l'utilisateur ou échec biométrique : on reste
-            // simplement sur l'écran de code, pas d'erreur bloquante.
+            // Annulé, aucune cle trouvée pour ce domaine, ou échec
+            // biométrique : on reste simplement sur l'écran de code.
             console.warn("Face ID annulé ou échoué :", e);
         }
     }
 
     function updateFaceIdUI(available) {
-        const hasCred = !!localStorage.getItem(FACEID_CRED_KEY);
-        if (faceIdBtn) faceIdBtn.style.display = (available && hasCred) ? "" : "none";
-        if (faceIdResetBtn) faceIdResetBtn.style.display = hasCred ? "" : "none";
+        if (faceIdBtn) faceIdBtn.style.display = available ? "" : "none";
     }
 
     async function maybeOfferFaceId() {
         if (!faceIdOffer) return;
-        if (localStorage.getItem(FACEID_CRED_KEY)) return; // deja active
+        if (localStorage.getItem(FACEID_CRED_KEY)) return; // deja propose/configure dans ce contexte
         if (localStorage.getItem(FACEID_OFFER_DISMISSED_KEY)) return; // deja refusee une fois
         const available = await platformAuthAvailable();
         if (available) faceIdOffer.style.display = "";
@@ -228,14 +229,6 @@
 
     if (faceIdBtn) {
         faceIdBtn.addEventListener("click", unlockWithFaceId);
-    }
-
-    if (faceIdResetBtn) {
-        faceIdResetBtn.addEventListener("click", function () {
-            localStorage.removeItem(FACEID_CRED_KEY);
-            localStorage.removeItem(FACEID_OFFER_DISMISSED_KEY);
-            platformAuthAvailable().then(updateFaceIdUI);
-        });
     }
 
     if (faceIdOfferAccept) {
