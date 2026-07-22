@@ -233,7 +233,11 @@ async function chargerDashboard() {
         setTxt("cashLivretA", formatEUR(DATA.budget.epargne_livret_A || 0));
         setTxt("cashLdds", formatEUR(DATA.budget.epargne_livret_ldds || 0));
         setTxt("cashNickel", formatEUR(DATA.budget.epargne_nickel || 0));
-        setTxt("cashYuh", formatEUR(DATA.budget.epargne_livret_yuh || 0));
+        // Livret YUH : compte suisse en CHF (comme le CTO), donc meme
+        // conversion necessaire avant affichage - contrairement au CTO,
+        // aucune conversion n'etait appliquee ici avant (pas juste un
+        // mauvais sens de calcul, une conversion totalement absente).
+        setTxt("cashYuh", formatEUR((DATA.budget.epargne_livret_yuh || 0) / tauxChange));
 
         setTxt("peaDetailValeur", formatEUR(DATA.pea.pea_valeur || 0));
         setTxt("peaDetailInvesti", formatEUR(DATA.pea.pea_investi || 0));
