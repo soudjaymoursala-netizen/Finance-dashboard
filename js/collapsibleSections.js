@@ -85,6 +85,12 @@
         });
     }
 
+    // Expose pour les cartes generees dynamiquement (ex: cartes "Suivi
+    // annuel" par annee, construites dans googleSheets.js une fois les
+    // donnees chargees - impossible de les cabler ici puisqu'elles
+    // n'existent pas encore dans le HTML statique a ce stade).
+    window.bindToggleSection = bindToggle;
+
     bindToggle(
         document.getElementById("heroCard"),
         document.getElementById("heroChipRow"),

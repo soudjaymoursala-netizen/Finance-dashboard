@@ -2,13 +2,13 @@ let patrimoineChart = null;
 let allocationChart = null;
 let peaCompositionChart = null;
 let ctoCompositionChart = null;
-let monthlyBudgetChart = null;
+let monthlyBudgetCharts = {}; // { [containerId]: ApexCharts instance }
+let lastMonthlyBudgetByYear = {}; // { [containerId]: { labels, revenus, depenses } } - pour refreshCharts (changement de theme)
 
 let lastPatrimoine = { labels: [], valeurs: [], objectif: 250000 };
 let lastAllocation = { cash: 0, pea: 0, cto: 0 };
 let lastPeaComposition = { actions: 0, etf: 0 };
 let lastCtoComposition = { actions: 0, etf: 0, crypto: 0 };
-let lastMonthlyBudget = { labels: [], revenus: [], depenses: [] };
 let lastPeaSeries = { valeurs: [] };
 let lastCtoSeries = { valeurs: [] };
 
@@ -311,15 +311,17 @@ function updateCtoCompositionChart(actions, etf, crypto) {
 }
 
 /* Suivi mensuel : Revenus vs Dépenses (optionnel, API_BUDGET_MENSUEL) */
-function updateMonthlyBudgetChart(labels, revenus, depenses) {
+/* Suivi mensuel : Revenus vs Dépenses (optionnel, API_BUDGET_MENSUEL).
+   containerId permet d'avoir un graphique distinct par annee (voir
+   googleSheets.js : chaque annee comportant 2+ mois recoit sa propre
+   carte depliable avec son propre graphique). */
+function updateMonthlyBudgetChart(labels, revenus, depenses, containerId = "monthlyBudgetChart") {
 
-    lastMonthlyBudget.labels = labels || [];
-    lastMonthlyBudget.revenus = revenus || [];
-    lastMonthlyBudget.depenses = depenses || [];
+    lastMonthlyBudgetByYear[containerId] = { labels: labels || [], revenus: revenus || [], depenses: depenses || [] };
 
-    const chartElement = document.querySelector("#monthlyBudgetChart");
+    const chartElement = document.querySelector("#" + containerId);
     if (!chartElement) return;
-    if (monthlyBudgetChart) monthlyBudgetChart.destroy();
+    if (monthlyBudgetCharts[containerId]) monthlyBudgetCharts[containerId].destroy();
 
     // Detection de valeur exceptionnelle (ex: gros achat/depot ponctuel un
     // mois donne) : si la plus grande valeur ecrase largement toutes les
@@ -357,8 +359,8 @@ function updateMonthlyBudgetChart(labels, revenus, depenses) {
         theme: { mode: getThemeMode() }
     };
 
-    monthlyBudgetChart = new ApexCharts(chartElement, options);
-    monthlyBudgetChart.render();
+    monthlyBudgetCharts[containerId] = new ApexCharts(chartElement, options);
+    monthlyBudgetCharts[containerId].render();
 }
 
 /* Sparkline dans la carte héros : tendance récente du patrimoine */
@@ -475,9 +477,12 @@ function refreshCharts() {
   updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto, lastAllocation.patrimoineTotal);
   updatePeaCompositionChart(lastPeaComposition.actions, lastPeaComposition.etf);
   updateCtoCompositionChart(lastCtoComposition.actions, lastCtoComposition.etf, lastCtoComposition.crypto);
-  if (lastMonthlyBudget.labels && lastMonthlyBudget.labels.length) {
-    updateMonthlyBudgetChart(lastMonthlyBudget.labels, lastMonthlyBudget.revenus, lastMonthlyBudget.depenses);
-  }
+  Object.keys(lastMonthlyBudgetByYear).forEach((containerId) => {
+    const d = lastMonthlyBudgetByYear[containerId];
+    if (d.labels && d.labels.length) {
+      updateMonthlyBudgetChart(d.labels, d.revenus, d.depenses, containerId);
+    }
+  });
 }
 
 /* rendre refreshCharts accessible globalement depuis les autres scripts */

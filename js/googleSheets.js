@@ -667,9 +667,21 @@ async function chargerDashboard() {
             console.warn("Erreur composition portefeuille:", e);
         }
 
-        // Suivi mensuel (nouveau, optionnel) : n'affiche la section que si
+        // Suivi annuel (nouveau, optionnel) : n'affiche la section que si
         // API_BUDGET_MENSUEL est configuré côté Cloudflare (sinon la section reste masquée,
         // aucune alerte affichée pour ne pas gêner tant que ce n'est pas branché).
+        //
+        // Chaque ligne de la Sheet est regroupée par année (déduite du
+        // suffixe du label, ex: "Dec_25" -> 2025, "Jan_26" -> 2026).
+        // Une année avec une seule ligne est traitée comme un résumé
+        // annuel (chips Revenus/Dépenses/Épargne) plutôt qu'un graphique
+        // à 1 seule barre - c'est le cas typique d'une année pour
+        // laquelle seul un total global a été saisi, sans détail mois
+        // par mois (ex: 2025 dans ce projet). Une année avec 2+ lignes
+        // devient un graphique Revenus vs Dépenses comme avant. Ce
+        // découpage reste valable automatiquement les années suivantes
+        // (janvier d'une nouvelle année démarre en carte résumé à 1
+        // ligne, puis bascule seule en graphique dès que février arrive).
         try {
             const monthlySection = document.getElementById("monthlyBudgetSection");
             if (window.CONFIG.URL_BUDGET_MENSUEL) {
@@ -683,7 +695,7 @@ async function chargerDashboard() {
                 if (monthlyTxt) {
                     const sep = detectSeparator(monthlyTxt);
                     const lines = monthlyTxt.replace(/\r/g, "").trim().split("\n");
-                    const labels = [], revenus = [], depenses = [];
+                    const rows = [];
                     for (let i = 1; i < lines.length; i++) {
                         if (!lines[i]) continue;
                         const cols = splitCsvLine(lines[i], sep);
@@ -691,18 +703,114 @@ async function chargerDashboard() {
                         const rev = nettoyerNombre(cols[1]);
                         const dep = nettoyerNombre(cols[2]);
                         if (rev === 0 && dep === 0) continue; // ligne future non renseignée
-                        labels.push(cols[0].trim());
-                        revenus.push(rev);
-                        depenses.push(dep);
+                        rows.push({ label: cols[0].trim(), rev, dep });
                     }
-                    if (labels.length && typeof updateMonthlyBudgetChart === "function") {
-                        updateMonthlyBudgetChart(labels, revenus, depenses);
+
+                    // Regroupement par année (suffixe "_AA" a la fin du label,
+                    // ex: Dec_25 -> 25 -> 2025). Label sans suffixe reconnu ->
+                    // classe sous "?" plutot que de planter.
+                    const parAnnee = {};
+                    rows.forEach((row) => {
+                        const m = row.label.match(/_(\d{2})$/);
+                        const annee = m ? "20" + m[1] : "?";
+                        if (!parAnnee[annee]) parAnnee[annee] = [];
+                        parAnnee[annee].push(row);
+                    });
+
+                    const anneesTriees = Object.keys(parAnnee).sort();
+                    const container = document.getElementById("suiviAnnuelContainer");
+
+                    if (anneesTriees.length && container) {
+                        container.innerHTML = "";
+
+                        anneesTriees.forEach((annee) => {
+                            const rowsAnnee = parAnnee[annee];
+                            const toggleId = "annee" + annee + "Toggle";
+                            const contentId = "annee" + annee + "Content";
+                            const chevronId = "annee" + annee + "Chevron";
+
+                            if (rowsAnnee.length < 2) {
+                                // Une seule ligne = résumé annuel (pas de détail mensuel disponible)
+                                const totalRev = rowsAnnee[0].rev;
+                                const totalDep = rowsAnnee[0].dep;
+                                const epargne = totalRev - totalDep;
+                                const card = document.createElement("div");
+                                card.className = "suivi-annee-card";
+                                card.innerHTML = `
+                                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0" aria-expanded="false" aria-controls="${contentId}">
+                                        <span class="icon-badge blue">📅</span>
+                                        <span class="toggle-card-label">${annee} — Résumé</span>
+                                        <span class="toggle-chevron" id="${chevronId}" style="position:static">▾</span>
+                                    </div>
+                                    <div class="chip-row collapsible-content" id="${contentId}">
+                                        <div class="chip">
+                                            <span class="chip-label"><span class="icon-badge emerald">💰</span>Revenus totaux</span>
+                                            <span class="chip-value">${formatEUR(totalRev)}</span>
+                                        </div>
+                                        <div class="chip">
+                                            <span class="chip-label"><span class="icon-badge gold">💸</span>Dépenses totales</span>
+                                            <span class="chip-value">${formatEUR(totalDep)}</span>
+                                        </div>
+                                        <div class="chip">
+                                            <span class="chip-label"><span class="icon-badge blue">🏦</span>Épargne</span>
+                                            <span class="chip-value">${formatEUR(epargne)}</span>
+                                        </div>
+                                    </div>
+                                `;
+                                container.appendChild(card);
+                                if (window.bindToggleSection) {
+                                    window.bindToggleSection(
+                                        document.getElementById(toggleId),
+                                        document.getElementById(contentId),
+                                        document.getElementById(chevronId),
+                                        null,
+                                        "suiviAnnuel"
+                                    );
+                                }
+                            } else {
+                                // 2+ lignes = vrai suivi mois par mois -> graphique
+                                const chartId = "suiviChart" + annee;
+                                const card = document.createElement("div");
+                                card.className = "suivi-annee-card";
+                                card.innerHTML = `
+                                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0" aria-expanded="false" aria-controls="${contentId}">
+                                        <span class="icon-badge emerald">📅</span>
+                                        <span class="toggle-card-label">${annee} — Suivi mensuel</span>
+                                        <span class="toggle-chevron" id="${chevronId}" style="position:static">▾</span>
+                                    </div>
+                                    <div class="collapsible-content" id="${contentId}">
+                                        <div class="card chart-card">
+                                            <div id="${chartId}" class="chart"></div>
+                                        </div>
+                                    </div>
+                                `;
+                                container.appendChild(card);
+                                if (typeof updateMonthlyBudgetChart === "function") {
+                                    updateMonthlyBudgetChart(
+                                        rowsAnnee.map(r => r.label),
+                                        rowsAnnee.map(r => r.rev),
+                                        rowsAnnee.map(r => r.dep),
+                                        chartId
+                                    );
+                                }
+                                if (window.bindToggleSection) {
+                                    window.bindToggleSection(
+                                        document.getElementById(toggleId),
+                                        document.getElementById(contentId),
+                                        document.getElementById(chevronId),
+                                        function () { window.dispatchEvent(new Event("resize")); },
+                                        "suiviAnnuel"
+                                    );
+                                }
+                            }
+                        });
+
                         if (monthlySection) monthlySection.style.display = "";
                     }
                 }
             }
         } catch (e) {
-            console.warn("Suivi mensuel non disponible:", e);
+            console.warn("Suivi annuel non disponible:", e);
         }
 
         // theme handling unchanged
