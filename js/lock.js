@@ -33,7 +33,7 @@
     // avec userVerification "required" = preuve suffisante de presence
     // biometrique pour ce niveau de menace. Le code reste le filet de
     // secours (autre appareil/navigateur, ou Face ID indisponible).
-    const FACEID_CRED_KEY = "financeDashboard_faceIdCredId";
+    const FACEID_CRED_KEY = "financeDashboard_faceIdResidentKeySetup"; // v2 (cle residente) - nom different de l'ancienne cle pour forcer une re-proposition chez ceux qui avaient configure l'ancienne version non-residente
     const FACEID_OFFER_DISMISSED_KEY = "financeDashboard_faceIdOfferDismissed";
 
     function webAuthnSupported() {
