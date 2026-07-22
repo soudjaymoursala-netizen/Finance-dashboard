@@ -550,3 +550,24 @@ async function chargerDashboard() {
 /* ================================================== */
 
 document.addEventListener("DOMContentLoaded", chargerDashboard);
+
+// Rafraichissement manuel (bouton 🔄 du header) : relance simplement
+// chargerDashboard(), qui refait ses fetch (network-first) et met a
+// jour tout le DOM/graphiques normalement. Desactive le bouton et fait
+// tourner l'icone pendant le chargement pour eviter les doubles-clics
+// et donner un retour visuel clair.
+document.addEventListener("DOMContentLoaded", function () {
+    const refreshBtn = document.getElementById("refreshBtn");
+    if (!refreshBtn) return;
+    refreshBtn.addEventListener("click", async function () {
+        if (refreshBtn.disabled) return;
+        refreshBtn.disabled = true;
+        refreshBtn.classList.add("spinning");
+        try {
+            await chargerDashboard();
+        } finally {
+            refreshBtn.disabled = false;
+            refreshBtn.classList.remove("spinning");
+        }
+    });
+});

@@ -165,6 +165,26 @@ h1, h2, h3 {
   transform: scale(1.06);
 }
 
+.theme-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.theme-btn.spinning {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-btn.spinning {
+    animation: none;
+  }
+}
+
 .status {
   background: rgba(45, 212, 167, 0.14);
   color: var(--accent-text);
