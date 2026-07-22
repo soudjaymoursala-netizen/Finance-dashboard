@@ -1118,6 +1118,88 @@ main > section > h2 {
   margin: 0.75rem 0 0;
 }
 
+.lock-faceid {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent-color);
+  background: transparent;
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 1.1rem;
+  transition: background 150ms ease;
+}
+
+.lock-faceid:hover {
+  background: rgba(45, 212, 167, 0.1);
+}
+
+.lock-faceid-reset {
+  background: none;
+  border: none;
+  color: var(--text-secondary-color);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 1rem;
+  padding: 0.25rem;
+}
+
+.lock-faceid-reset:hover {
+  color: var(--text-color);
+}
+
+.faceid-offer {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  z-index: 10000;
+  width: min(92vw, 380px);
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  animation: fadeInUp 300ms ease both;
+}
+
+.faceid-offer span {
+  display: block;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.faceid-offer-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.faceid-offer-accept, .faceid-offer-decline {
+  flex: 1;
+  padding: 0.55rem;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.faceid-offer-accept {
+  border: none;
+  background: var(--accent-color);
+  color: #0B1120;
+}
+
+.faceid-offer-decline {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary-color);
+}
+
 .container.blurred {
   filter: blur(12px);
   pointer-events: none;

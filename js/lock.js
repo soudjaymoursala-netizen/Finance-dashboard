@@ -17,6 +17,120 @@
     const submitBtn = document.getElementById("lockSubmit");
     const errorEl = document.getElementById("lockError");
     const toggleBtn = document.getElementById("lockToggleVisibility");
+    const faceIdBtn = document.getElementById("lockFaceId");
+    const faceIdResetBtn = document.getElementById("lockFaceIdReset");
+    const faceIdOffer = document.getElementById("faceIdOffer");
+    const faceIdOfferAccept = document.getElementById("faceIdOfferAccept");
+    const faceIdOfferDecline = document.getElementById("faceIdOfferDecline");
+
+    // --- Face ID / Touch ID (WebAuthn) ---------------------------------
+    // Couche de confort LOCALE, distincte de la verification du code par
+    // le Worker : WebAuthn genere une paire de cles sur l'appareil (via
+    // l'enclave securisee derriere Face ID/Touch ID/Windows Hello), la
+    // cle privee ne quitte JAMAIS l'appareil et n'est jamais envoyee a
+    // mon Worker Cloudflare. On ne verifie pas la signature cote serveur
+    // (pas de backend WebAuthn complet ici, ce serait disproportionne
+    // pour un dashboard perso) : succes de navigator.credentials.get()
+    // avec userVerification "required" = preuve suffisante de presence
+    // biometrique pour ce niveau de menace. Le code reste le filet de
+    // secours (autre appareil/navigateur, ou Face ID indisponible).
+    const FACEID_CRED_KEY = "financeDashboard_faceIdCredId";
+    const FACEID_OFFER_DISMISSED_KEY = "financeDashboard_faceIdOfferDismissed";
+
+    function bufferToBase64url(buf) {
+        const bytes = new Uint8Array(buf);
+        let str = "";
+        for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
+        return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function base64urlToBuffer(str) {
+        const base64 = str.replace(/-/g, "+").replace(/_/g, "/").padEnd(str.length + (4 - (str.length % 4)) % 4, "=");
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        return bytes.buffer;
+    }
+
+    function webAuthnSupported() {
+        return !!(window.PublicKeyCredential && navigator.credentials);
+    }
+
+    async function platformAuthAvailable() {
+        if (!webAuthnSupported()) return false;
+        try {
+            return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async function registerFaceId() {
+        try {
+            const cred = await navigator.credentials.create({
+                publicKey: {
+                    challenge: crypto.getRandomValues(new Uint8Array(32)),
+                    rp: { name: "Finance Dashboard" },
+                    user: {
+                        id: crypto.getRandomValues(new Uint8Array(16)),
+                        name: "dashboard",
+                        displayName: "Finance Dashboard",
+                    },
+                    pubKeyCredParams: [
+                        { type: "public-key", alg: -7 },   // ES256
+                        { type: "public-key", alg: -257 }, // RS256
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform",
+                        userVerification: "required",
+                    },
+                    timeout: 60000,
+                    attestation: "none",
+                },
+            });
+            if (!cred) return false;
+            localStorage.setItem(FACEID_CRED_KEY, bufferToBase64url(cred.rawId));
+            return true;
+        } catch (e) {
+            console.warn("Enregistrement Face ID annulé ou échoué :", e);
+            return false;
+        }
+    }
+
+    async function unlockWithFaceId() {
+        const storedId = localStorage.getItem(FACEID_CRED_KEY);
+        if (!storedId) return;
+        try {
+            const assertion = await navigator.credentials.get({
+                publicKey: {
+                    challenge: crypto.getRandomValues(new Uint8Array(32)),
+                    allowCredentials: [{ id: base64urlToBuffer(storedId), type: "public-key" }],
+                    userVerification: "required",
+                    timeout: 60000,
+                },
+            });
+            if (assertion) unlock();
+        } catch (e) {
+            // Annulé par l'utilisateur ou échec biométrique : on reste
+            // simplement sur l'écran de code, pas d'erreur bloquante.
+            console.warn("Face ID annulé ou échoué :", e);
+        }
+    }
+
+    function updateFaceIdUI(available) {
+        const hasCred = !!localStorage.getItem(FACEID_CRED_KEY);
+        if (faceIdBtn) faceIdBtn.style.display = (available && hasCred) ? "" : "none";
+        if (faceIdResetBtn) faceIdResetBtn.style.display = hasCred ? "" : "none";
+    }
+
+    async function maybeOfferFaceId() {
+        if (!faceIdOffer) return;
+        if (localStorage.getItem(FACEID_CRED_KEY)) return; // deja active
+        if (localStorage.getItem(FACEID_OFFER_DISMISSED_KEY)) return; // deja refusee une fois
+        const available = await platformAuthAvailable();
+        if (available) faceIdOffer.style.display = "";
+    }
+    // --------------------------------------------------------------------
 
     function getProxyBaseUrl() {
         // config.js est chargé avant lock.js (voir index.html) et expose
@@ -80,6 +194,7 @@
             const data = await res.json().catch(() => ({ ok: false }));
             if (data && data.ok) {
                 unlock();
+                maybeOfferFaceId();
             } else {
                 showError("Code incorrect");
             }
@@ -110,6 +225,38 @@
             input.focus();
         });
     }
+
+    if (faceIdBtn) {
+        faceIdBtn.addEventListener("click", unlockWithFaceId);
+    }
+
+    if (faceIdResetBtn) {
+        faceIdResetBtn.addEventListener("click", function () {
+            localStorage.removeItem(FACEID_CRED_KEY);
+            localStorage.removeItem(FACEID_OFFER_DISMISSED_KEY);
+            platformAuthAvailable().then(updateFaceIdUI);
+        });
+    }
+
+    if (faceIdOfferAccept) {
+        faceIdOfferAccept.addEventListener("click", async function () {
+            const ok = await registerFaceId();
+            if (faceIdOffer) faceIdOffer.style.display = "none";
+            if (ok) platformAuthAvailable().then(updateFaceIdUI);
+        });
+    }
+
+    if (faceIdOfferDecline) {
+        faceIdOfferDecline.addEventListener("click", function () {
+            localStorage.setItem(FACEID_OFFER_DISMISSED_KEY, "1");
+            if (faceIdOffer) faceIdOffer.style.display = "none";
+        });
+    }
+
+    // Initialise la visibilite du bouton Face ID des le chargement (si
+    // deja configure sur cet appareil/navigateur, propose le fast-path
+    // tout de suite plutot que d'attendre un premier deverrouillage par code)
+    platformAuthAvailable().then(updateFaceIdUI);
 
     // Re-verrouillage automatique quand l'onglet passe reellement en
     // arriere-plan (changement d'appli, minimisation, autre onglet) ou

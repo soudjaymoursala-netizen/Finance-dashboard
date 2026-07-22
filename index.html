@@ -35,12 +35,21 @@
             <div class="lock-icon">🔒</div>
             <h2>Finance Dashboard</h2>
             <p>Entrez le code d'accès</p>
+            <button type="button" id="lockFaceId" class="lock-faceid" style="display:none">🆔 Déverrouiller avec Face ID / Touch ID</button>
             <div class="lock-input-wrap">
                 <input type="password" id="lockInput" class="lock-input" placeholder="Code" autocomplete="off">
                 <button type="button" id="lockToggleVisibility" class="lock-eye" aria-label="Afficher le code">👁️</button>
             </div>
             <button id="lockSubmit" class="lock-submit">Déverrouiller</button>
             <p id="lockError" class="lock-error" style="display:none">Code incorrect</p>
+            <button type="button" id="lockFaceIdReset" class="lock-faceid-reset" style="display:none">Réinitialiser Face ID</button>
+        </div>
+    </div>
+    <div id="faceIdOffer" class="faceid-offer" style="display:none">
+        <span>🆔 Activer Face ID / Touch ID pour la prochaine fois ?</span>
+        <div class="faceid-offer-actions">
+            <button type="button" id="faceIdOfferAccept" class="faceid-offer-accept">Activer</button>
+            <button type="button" id="faceIdOfferDecline" class="faceid-offer-decline">Non merci</button>
         </div>
     </div>
     <div class="container blurred" id="mainContainer">
@@ -298,7 +307,7 @@
     <!-- ApexCharts chargé ici (pas dans le head) pour ne pas bloquer
          l'affichage initial de la page -->
     <script src="js/config.js?v=2"></script>
-    <script src="js/lock.js?v=5"></script>
+    <script src="js/lock.js?v=6"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="js/charts.js?v=3"></script>
     <script src="js/errorHandler.js?v=1"></script>
