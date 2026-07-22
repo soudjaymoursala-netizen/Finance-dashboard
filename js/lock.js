@@ -259,14 +259,13 @@
     // une autre fenetre) meme quand la page reste parfaitement visible,
     // ce qui reverrouillait de facon intempestive.
     //
-    // Periode de grace de 2 minutes : reverrouiller INSTANTANEMENT a
+    // Periode de grace de 30 secondes : reverrouiller INSTANTANEMENT a
     // chaque passage en arriere-plan est trop agressif pour un usage
     // quotidien frequent (ex: on jette un oeil, on change d'appli 5
     // secondes, on revient - redemander le code a chaque fois decourage
     // d'ouvrir l'app "juste pour verifier"). On ne relock que si
-    // l'absence a dure plus longtemps que ca, ce qui reste largement
-    // suffisant pour empecher un acces prolonge non surveille.
-    const RELOCK_GRACE_MS = 2 * 60 * 1000;
+    // l'absence a dure plus longtemps que ca.
+    const RELOCK_GRACE_MS = 30 * 1000;
     let hiddenSince = null;
 
     document.addEventListener("visibilitychange", function () {
