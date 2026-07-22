@@ -327,7 +327,21 @@
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", function () {
-                navigator.serviceWorker.register("sw.js").catch(function (err) {
+                navigator.serviceWorker.register("sw.js").then(function (registration) {
+                    // Force une verification immediate de nouvelle version
+                    // au lieu d'attendre le calendrier interne du navigateur
+                    // (utile surtout en app installee sur iOS, qui verifie
+                    // moins souvent que dans un onglet Safari classique).
+                    registration.update();
+
+                    // Idem a chaque retour au premier plan de l'app (utile
+                    // en PWA installee : rouvrir l'app depuis l'ecran
+                    // d'accueil est souvent traite comme une reprise par
+                    // iOS, pas un vrai rechargement).
+                    document.addEventListener("visibilitychange", function () {
+                        if (!document.hidden) registration.update();
+                    });
+                }).catch(function (err) {
                     console.warn("Service worker non enregistré :", err);
                 });
             });
