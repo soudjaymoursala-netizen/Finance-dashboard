@@ -6,6 +6,16 @@
     <meta name="theme-color" content="#0B1120">
     <title>Finance Dashboard</title>
 
+    <!-- PWA : installable sur l'ecran d'accueil, ouverture en plein
+         ecran sans barre de navigateur -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <!-- iOS ne lit pas le manifest.json pour le mode plein ecran : ces
+         3 meta tags sont necessaires en plus, specifiquement pour Safari/iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finance">
+
     <!-- Favicon (evite l'icone generique dans l'onglet du navigateur) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
 
@@ -300,5 +310,19 @@
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=1"></script>
+
+    <!-- Enregistrement du service worker PWA (voir sw.js). Silencieux si
+         non supporte (vieux navigateur) ou si ca echoue - l'appli
+         fonctionne normalement dans les deux cas, seule l'installation/
+         le mode hors-ligne du shell ne serait pas disponible. -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker.register("sw.js").catch(function (err) {
+                    console.warn("Service worker non enregistré :", err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
