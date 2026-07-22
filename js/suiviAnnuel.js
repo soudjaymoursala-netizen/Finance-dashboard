@@ -63,11 +63,20 @@ async function chargerSuiviAnnuel() {
 
         container.innerHTML = "";
 
-        anneesTriees.forEach((annee) => {
+        anneesTriees.forEach((annee, index) => {
+            const estLaPlusRecente = index === anneesTriees.length - 1; // annees triees croissant -> derniere = plus recente
             const rowsAnnee = parAnnee[annee];
             const toggleId = "annee" + annee + "Toggle";
             const contentId = "annee" + annee + "Content";
             const chevronId = "annee" + annee + "Chevron";
+            // Etat initial ouvert : uniquement l'annee la plus recente, celle
+            // qu'on consulte le plus souvent au quotidien. Les annees
+            // passees (simples resumes ou suivis clos) restent repliees.
+            const ouvertAttrs = estLaPlusRecente
+                ? ' aria-expanded="true"'
+                : ' aria-expanded="false"';
+            const ouvertClass = estLaPlusRecente ? " open" : "";
+            const chevronOuvertClass = estLaPlusRecente ? " open" : "";
 
             if (rowsAnnee.length < 2) {
                 // Une seule ligne = résumé annuel (pas de détail mensuel disponible)
@@ -77,12 +86,12 @@ async function chargerSuiviAnnuel() {
                 const card = document.createElement("div");
                 card.className = "suivi-annee-card";
                 card.innerHTML = `
-                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0" aria-expanded="false" aria-controls="${contentId}">
+                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0"${ouvertAttrs} aria-controls="${contentId}">
                         <span class="icon-badge blue">📅</span>
                         <span class="toggle-card-label">${annee} — Résumé</span>
-                        <span class="toggle-chevron" id="${chevronId}" style="position:static">▾</span>
+                        <span class="toggle-chevron${chevronOuvertClass}" id="${chevronId}" style="position:static">▾</span>
                     </div>
-                    <div class="chip-row collapsible-content" id="${contentId}">
+                    <div class="chip-row collapsible-content${ouvertClass}" id="${contentId}">
                         <div class="chip">
                             <span class="chip-label"><span class="icon-badge emerald">💰</span>Revenus totaux</span>
                             <span class="chip-value">${formatEUR(totalRev)}</span>
@@ -113,12 +122,12 @@ async function chargerSuiviAnnuel() {
                 const card = document.createElement("div");
                 card.className = "suivi-annee-card";
                 card.innerHTML = `
-                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0" aria-expanded="false" aria-controls="${contentId}">
+                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0"${ouvertAttrs} aria-controls="${contentId}">
                         <span class="icon-badge emerald">📅</span>
                         <span class="toggle-card-label">${annee} — Suivi mensuel</span>
-                        <span class="toggle-chevron" id="${chevronId}" style="position:static">▾</span>
+                        <span class="toggle-chevron${chevronOuvertClass}" id="${chevronId}" style="position:static">▾</span>
                     </div>
-                    <div class="collapsible-content" id="${contentId}">
+                    <div class="collapsible-content${ouvertClass}" id="${contentId}">
                         <div class="card chart-card">
                             <div id="${chartId}" class="chart"></div>
                         </div>

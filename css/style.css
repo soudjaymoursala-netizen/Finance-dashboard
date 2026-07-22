@@ -584,6 +584,19 @@ main > section > h2 {
 /* ==================================================
    Objectifs (financiers + annuels) — cartes unifiées
    ================================================== */
+/* "Budget de l'année" regroupe dans un panneau distinct : suivi
+   operationnel de l'annee EN COURS, par opposition aux "Objectifs
+   d'epargne" (cartes libres juste en dessous) qui sont des cibles
+   long terme. Meme systeme de cartes/couleurs a l'interieur (coherence
+   visuelle voulue), mais le cadre exterieur aide a distinguer les deux
+   d'un coup d'oeil sans avoir a lire les titres de section. */
+.objectifs-annuels-section {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.4rem 1.4rem 1.6rem;
+}
+
 .goals-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -1031,6 +1044,10 @@ main > section > h2 {
 
   .chip-row {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .objectifs-annuels-section {
+    padding: 1rem 1rem 1.2rem;
   }
 }
 

@@ -267,7 +267,12 @@ async function chargerDashboard() {
             const fireProgressWrapper = DOM.fireBar.parentElement;
             if (fireProgressWrapper) fireProgressWrapper.setAttribute("aria-valuenow", Math.round(pct));
         }
-        if (DOM.lastUpdate) DOM.lastUpdate.textContent = "Dernière synchronisation : " + new Date().toLocaleString("fr-FR");
+        if (DOM.lastUpdate) {
+            const now = new Date();
+            const dateTxt = now.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
+            const heureTxt = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+            DOM.lastUpdate.textContent = "Dernière synchronisation : " + dateTxt + " à " + heureTxt;
+        }
 
 
         // Allocation chart
