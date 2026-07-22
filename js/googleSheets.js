@@ -1,130 +1,13 @@
 /* ================================================== */
 /* FINANCE DASHBOARD V5 - googleSheets.js (patched)   */
+/* Orchestration principale : recuperation des CSV,    */
+/* calcul des KPI derives, mise a jour du DOM et des   */
+/* graphiques. Le parsing/formatage (parsing.js), le   */
+/* cache hors-ligne (dataCache.js) et le suivi annuel   */
+/* (suiviAnnuel.js) ont ete extraits dans des fichiers  */
+/* dedies pour la lisibilite.                          */
 /* ================================================== */
 
-/* ================================================== */
-/* UTILITAIRES                                        */
-/* ================================================== */
-
-function nettoyerNombre(valeur) {
-
-    if (
-        valeur === null ||
-        valeur === undefined ||
-        valeur === ""
-    ) {
-        return 0;
-    }
-
-    return parseFloat(
-        valeur
-            .toString()
-            .replace(/"/g, "")
-            .replace(/\u202F/g, "")
-            .replace(/\u00A0/g, "")
-            .replace(/\s/g, "")
-            .replace(",", ".")
-    ) || 0;
-
-}
-
-function formatEUR(valeur) {
-
-    return Number(
-        valeur || 0
-    ).toLocaleString(
-        "fr-FR",
-        {
-            maximumFractionDigits: 0
-        }
-    ) + " €";
-
-}
-
-function formatCHF(valeur) {
-
-    return Number(
-        valeur || 0
-    ).toLocaleString(
-        "fr-FR",
-        {
-            maximumFractionDigits: 0
-        }
-    ) + " CHF";
-
-}
-
-function formatPourcentage(valeur) {
-
-    return Number(
-        valeur || 0
-    ).toFixed(1) + " %";
-
-}
-
-/* ================================================== */
-/* CSV helpers                                        */
-/* ================================================== */
-function detectSeparator(sampleText) {
-    const sample = (sampleText || "").slice(0, 2000);
-    const commas = (sample.match(/,/g) || []).length;
-    const semis = (sample.match(/;/g) || []).length;
-    return (semis > commas) ? ";" : ",";
-}
-
-function splitCsvLine(line, sep) {
-    // split by sep not inside quotes
-    const re = new RegExp(sep + "(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-    return line.split(re);
-}
-
-/* ================================================== */
-/* LECTURE CSV KPI                                    */
-/* Robust: detects separator and handles quoted vals  */
-/* ================================================== */
-
-function lireCSVKPI(csv) {
-    try {
-        if (!csv) {
-            showError("CSV introuvable ou vide lors du parsing des KPI.");
-            return {};
-        }
-
-        const text = csv.replace(/\r/g, "").trim();
-        if (!text) {
-            showError("CSV vide après nettoyage (retours chariot retirés).");
-            return {};
-        }
-
-        const lignes = text.split("\n");
-        if (lignes.length < 2) return {};
-
-        const sample = lignes.slice(0, Math.min(6, lignes.length)).join("\n");
-        const sep = detectSeparator(sample);
-
-        const resultat = {};
-
-        for (let i = 1; i < lignes.length; i++) {
-            const ligne = lignes[i];
-            if (!ligne || !ligne.trim()) continue;
-            const cols = splitCsvLine(ligne, sep);
-            if (cols.length < 2) continue;
-            const key = cols[0].trim().replace(/^\"|\"$/g, "");
-            const valRaw = cols.slice(1).join(sep).trim().replace(/^\"|\"$/g, "");
-            resultat[key] = nettoyerNombre(valRaw);
-        }
-
-        if (Object.keys(resultat).length === 0) {
-            showError("Parser CSV : aucune clé reconnue dans le CSV des KPI. Vérifie le format (séparateur ',' vs ';').");
-        }
-
-        return resultat;
-    } catch (e) {
-        console.error("Erreur lors du parsing CSV:", e);
-        showError("Erreur lors du parsing du CSV des KPI. Voir la console pour plus de détails.");
-        return {};
-    }
-}
 
 /* ================================================== */
 /* ANIMATION KPI                                      */
@@ -217,65 +100,26 @@ async function chargerDashboard() {
         if (!window.CONFIG) throw new Error("window.CONFIG introuvable");
 
         // Fallback hors-ligne : si un fetch echoue (Worker down, reseau
-        // coupe, etc.), on retombe sur le dernier CSV recupere avec succes
-        // pour cette source (stocke en localStorage) plutot que d'afficher
-        // un dashboard vide. Un bandeau precise depuis quand ces donnees
-        // datent, pour ne pas laisser croire qu'elles sont a jour.
-        const CACHE_PREFIX = "financeDashboard_cache_";
-        let donneesPerimees = false;
-        let dateCachePlusAncienne = null;
-
-        function lireCache(label) {
-            try {
-                const raw = localStorage.getItem(CACHE_PREFIX + label);
-                if (!raw) return null;
-                return JSON.parse(raw);
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function ecrireCache(label, csv) {
-            try {
-                localStorage.setItem(CACHE_PREFIX + label, JSON.stringify({ csv, date: new Date().toISOString() }));
-            } catch (e) {
-                // localStorage plein ou indisponible (navigation privee) : tant pis, pas de cache
-            }
-        }
-
-        // helper to fetch and handle errors
-        async function fetchTextOrLog(url, label) {
-            try {
-                const r = await fetch(url);
-                if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-                const txt = await r.text();
-                ecrireCache(label, txt);
-                return txt;
-            } catch (e) {
-                const cache = lireCache(label);
-                if (cache && cache.csv) {
-                    donneesPerimees = true;
-                    const d = new Date(cache.date);
-                    if (!dateCachePlusAncienne || d < dateCachePlusAncienne) dateCachePlusAncienne = d;
-                    console.warn(`${label} fetch echoue, utilisation du cache local (${cache.date}):`, e.message);
-                    return cache.csv;
-                }
-                showError(`${label} fetch error: ${e.message}`);
-                console.error(e);
-                return "";
-            }
-        }
-
-        const [budgetTxt, ctoTxt, peaTxt, evolutionTxt, objectifTxt] = await Promise.all([
+        // coupe, etc.), fetchTextOrLog() (dataCache.js) retombe sur le
+        // dernier CSV recupere avec succes pour cette source plutot que
+        // de laisser un dashboard vide. On agrege ici les infos de
+        // fraicheur retournees par chaque appel pour savoir s'il faut
+        // afficher un bandeau d'avertissement.
+        const [budgetRes, ctoRes, peaRes, evolutionRes, objectifRes] = await Promise.all([
             fetchTextOrLog(window.CONFIG.URL_BUDGET, "Budget"),
             fetchTextOrLog(window.CONFIG.URL_CTO, "CTO"),
             fetchTextOrLog(window.CONFIG.URL_PEA, "PEA"),
             fetchTextOrLog(window.CONFIG.URL_EVOLUTION, "Evolution"),
             fetchTextOrLog(window.CONFIG.URL_OBJECTIF, "Objectif"),
         ]);
+        const budgetTxt = budgetRes.text, ctoTxt = ctoRes.text, peaTxt = peaRes.text,
+            evolutionTxt = evolutionRes.text, objectifTxt = objectifRes.text;
 
-        if (donneesPerimees && dateCachePlusAncienne) {
-            const dateTxt = dateCachePlusAncienne.toLocaleString("fr-FR");
+        const resultatsFetch = [budgetRes, ctoRes, peaRes, evolutionRes, objectifRes];
+        const perimes = resultatsFetch.filter(r => r.stale);
+        if (perimes.length) {
+            const datePlusAncienne = perimes.reduce((min, r) => (!min || r.cacheDate < min) ? r.cacheDate : min, null);
+            const dateTxt = datePlusAncienne.toLocaleString("fr-FR");
             addAlert(`⚠️ Certaines données n'ont pas pu être rechargées (Worker ou réseau indisponible). Affichage des dernières données connues, datant du ${dateTxt}.`, "warning");
         }
 
@@ -667,152 +511,12 @@ async function chargerDashboard() {
             console.warn("Erreur composition portefeuille:", e);
         }
 
-        // Suivi annuel (nouveau, optionnel) : n'affiche la section que si
-        // API_BUDGET_MENSUEL est configuré côté Cloudflare (sinon la section reste masquée,
-        // aucune alerte affichée pour ne pas gêner tant que ce n'est pas branché).
-        //
-        // Chaque ligne de la Sheet est regroupée par année (déduite du
-        // suffixe du label, ex: "Dec_25" -> 2025, "Jan_26" -> 2026).
-        // Une année avec une seule ligne est traitée comme un résumé
-        // annuel (chips Revenus/Dépenses/Épargne) plutôt qu'un graphique
-        // à 1 seule barre - c'est le cas typique d'une année pour
-        // laquelle seul un total global a été saisi, sans détail mois
-        // par mois (ex: 2025 dans ce projet). Une année avec 2+ lignes
-        // devient un graphique Revenus vs Dépenses comme avant. Ce
-        // découpage reste valable automatiquement les années suivantes
-        // (janvier d'une nouvelle année démarre en carte résumé à 1
-        // ligne, puis bascule seule en graphique dès que février arrive).
-        try {
-            const monthlySection = document.getElementById("monthlyBudgetSection");
-            if (window.CONFIG.URL_BUDGET_MENSUEL) {
-                let monthlyTxt = "";
-                try {
-                    const r = await fetch(window.CONFIG.URL_BUDGET_MENSUEL);
-                    if (r.ok) monthlyTxt = await r.text();
-                } catch (fetchErr) {
-                    // silencieux : feature optionnelle, pas encore configuree
-                }
-                if (monthlyTxt) {
-                    const sep = detectSeparator(monthlyTxt);
-                    const lines = monthlyTxt.replace(/\r/g, "").trim().split("\n");
-                    const rows = [];
-                    for (let i = 1; i < lines.length; i++) {
-                        if (!lines[i]) continue;
-                        const cols = splitCsvLine(lines[i], sep);
-                        if (cols.length < 3) continue;
-                        const rev = nettoyerNombre(cols[1]);
-                        const dep = nettoyerNombre(cols[2]);
-                        if (rev === 0 && dep === 0) continue; // ligne future non renseignée
-                        rows.push({ label: cols[0].trim(), rev, dep });
-                    }
-
-                    // Regroupement par année (suffixe "_AA" a la fin du label,
-                    // ex: Dec_25 -> 25 -> 2025). Label sans suffixe reconnu ->
-                    // classe sous "?" plutot que de planter.
-                    const parAnnee = {};
-                    rows.forEach((row) => {
-                        const m = row.label.match(/_(\d{2})$/);
-                        const annee = m ? "20" + m[1] : "?";
-                        if (!parAnnee[annee]) parAnnee[annee] = [];
-                        parAnnee[annee].push(row);
-                    });
-
-                    const anneesTriees = Object.keys(parAnnee).sort();
-                    const container = document.getElementById("suiviAnnuelContainer");
-
-                    if (anneesTriees.length && container) {
-                        container.innerHTML = "";
-
-                        anneesTriees.forEach((annee) => {
-                            const rowsAnnee = parAnnee[annee];
-                            const toggleId = "annee" + annee + "Toggle";
-                            const contentId = "annee" + annee + "Content";
-                            const chevronId = "annee" + annee + "Chevron";
-
-                            if (rowsAnnee.length < 2) {
-                                // Une seule ligne = résumé annuel (pas de détail mensuel disponible)
-                                const totalRev = rowsAnnee[0].rev;
-                                const totalDep = rowsAnnee[0].dep;
-                                const epargne = totalRev - totalDep;
-                                const card = document.createElement("div");
-                                card.className = "suivi-annee-card";
-                                card.innerHTML = `
-                                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0" aria-expanded="false" aria-controls="${contentId}">
-                                        <span class="icon-badge blue">📅</span>
-                                        <span class="toggle-card-label">${annee} — Résumé</span>
-                                        <span class="toggle-chevron" id="${chevronId}" style="position:static">▾</span>
-                                    </div>
-                                    <div class="chip-row collapsible-content" id="${contentId}">
-                                        <div class="chip">
-                                            <span class="chip-label"><span class="icon-badge emerald">💰</span>Revenus totaux</span>
-                                            <span class="chip-value">${formatEUR(totalRev)}</span>
-                                        </div>
-                                        <div class="chip">
-                                            <span class="chip-label"><span class="icon-badge gold">💸</span>Dépenses totales</span>
-                                            <span class="chip-value">${formatEUR(totalDep)}</span>
-                                        </div>
-                                        <div class="chip">
-                                            <span class="chip-label"><span class="icon-badge blue">🏦</span>Épargne</span>
-                                            <span class="chip-value">${formatEUR(epargne)}</span>
-                                        </div>
-                                    </div>
-                                `;
-                                container.appendChild(card);
-                                if (window.bindToggleSection) {
-                                    window.bindToggleSection(
-                                        document.getElementById(toggleId),
-                                        document.getElementById(contentId),
-                                        document.getElementById(chevronId),
-                                        null,
-                                        "suiviAnnuel"
-                                    );
-                                }
-                            } else {
-                                // 2+ lignes = vrai suivi mois par mois -> graphique
-                                const chartId = "suiviChart" + annee;
-                                const card = document.createElement("div");
-                                card.className = "suivi-annee-card";
-                                card.innerHTML = `
-                                    <div class="toggle-card" id="${toggleId}" role="button" tabindex="0" aria-expanded="false" aria-controls="${contentId}">
-                                        <span class="icon-badge emerald">📅</span>
-                                        <span class="toggle-card-label">${annee} — Suivi mensuel</span>
-                                        <span class="toggle-chevron" id="${chevronId}" style="position:static">▾</span>
-                                    </div>
-                                    <div class="collapsible-content" id="${contentId}">
-                                        <div class="card chart-card">
-                                            <div id="${chartId}" class="chart"></div>
-                                        </div>
-                                    </div>
-                                `;
-                                container.appendChild(card);
-                                if (typeof updateMonthlyBudgetChart === "function") {
-                                    updateMonthlyBudgetChart(
-                                        rowsAnnee.map(r => r.label),
-                                        rowsAnnee.map(r => r.rev),
-                                        rowsAnnee.map(r => r.dep),
-                                        chartId
-                                    );
-                                }
-                                if (window.bindToggleSection) {
-                                    window.bindToggleSection(
-                                        document.getElementById(toggleId),
-                                        document.getElementById(contentId),
-                                        document.getElementById(chevronId),
-                                        function () { window.dispatchEvent(new Event("resize")); },
-                                        "suiviAnnuel"
-                                    );
-                                }
-                            }
-                        });
-
-                        if (monthlySection) monthlySection.style.display = "";
-                    }
-                }
-            }
-        } catch (e) {
-            console.warn("Suivi annuel non disponible:", e);
+        // Suivi annuel (optionnel, cf. suiviAnnuel.js pour le detail :
+        // resume si un seul point de donnee pour l'annee, graphique
+        // mensuel si 2+ mois disponibles).
+        if (typeof chargerSuiviAnnuel === "function") {
+            await chargerSuiviAnnuel();
         }
-
         // theme handling unchanged
         const themeButton = document.getElementById("themeToggle");
         if (themeButton) {
