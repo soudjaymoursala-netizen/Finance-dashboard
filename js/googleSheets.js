@@ -135,11 +135,18 @@ async function chargerDashboard() {
         // auparavant, mais il echoue systematiquement (CORS bloque depuis
         // GitHub Pages) et duplique une donnee deja live. Retire pour
         // eviter une erreur console a chaque chargement.
+        //
+        // IMPORTANT sur le sens du taux : "eur_chf" represente combien
+        // de CHF vaut 1 EUR (ex: 0.93 => 1€ = 0.93 CHF), c'est la
+        // convention standard de la paire EUR/CHF. Pour convertir un
+        // montant CHF -> EUR il faut donc DIVISER par ce taux, pas
+        // multiplier (montant_CHF / (CHF pour 1€) = montant en €).
+        // Multiplier revenait a sous-evaluer chaque conversion CTO.
         const tauxChange = DATA.cto.eur_chf || 1;
         DATA.tauxChange = tauxChange;
-        DATA.ctoValeurEUR = (DATA.cto.cto_valeur_chf || 0) * tauxChange;
-        DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) * tauxChange;
-        DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) * tauxChange;
+        DATA.ctoValeurEUR = (DATA.cto.cto_valeur_chf || 0) / tauxChange;
+        DATA.ctoInvestiEUR = (DATA.cto.cto_investi_chf || 0) / tauxChange;
+        DATA.ctoPlusValueEUR = (DATA.cto.cto_plusvalue_chf || 0) / tauxChange;
 
         // Patrimoine = dernier point de API_Evolution (calculé côté Sheet,
         // source de référence unique). Mis à jour plus bas après parsing
@@ -509,8 +516,10 @@ async function chargerDashboard() {
             // EUR/CHF (info non dupliquee ailleurs) devient sa propre
             // sous-carte dans le detail CTO.
             // Afficher le taux EUR/CHF (source : formule GOOGLEFINANCE du Sheet CTO)
-            // On réinverse pour afficher EUR→CHF (convention lisible)
-            const tauxEurChfAffichage = DATA.tauxChange > 0 ? (1 / DATA.tauxChange) : (DATA.cto.eur_chf || 0);
+            // tauxChange represente deja directement "combien de CHF pour
+            // 1 EUR" (voir commentaire plus haut sur le sens du taux) -
+            // pas besoin de l'inverser pour cet affichage.
+            const tauxEurChfAffichage = DATA.tauxChange > 0 ? DATA.tauxChange : (DATA.cto.eur_chf || 0);
             setTxt("ctoDetailEurChf", "1 € = " + tauxEurChfAffichage.toFixed(4) + " CHF");
         } catch (e) {
             console.warn("Erreur composition portefeuille:", e);
