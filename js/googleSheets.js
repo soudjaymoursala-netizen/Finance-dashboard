@@ -184,6 +184,7 @@ async function chargerDashboard() {
 
         // Update DOM values
         animerValeur(DOM.networth, DATA.patrimoine, " €");
+        if (typeof suivreMouvement === "function") suivreMouvement("patrimoine", DATA.patrimoine, "€", "patrimoineMouvement");
         animerValeur(DOM.cash, DATA.budget.cash_dispo_total || 0, " €");
         if (typeof suivreMouvement === "function") suivreMouvement("cash", DATA.budget.cash_dispo_total, "€", "cashMouvements");
         animerValeur(DOM.investments, DATA.valeurInvestie || 0, " €"); // valeur actuelle : PEA + CTO converti au même taux
