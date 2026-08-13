@@ -182,6 +182,23 @@
   animation: fadeInUp 300ms ease both;
 }
 
+.historique-transaction-header {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr 1.2fr 1.2fr 1.2fr 0.9fr;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.historique-transaction-header > div:not(:first-child) {
+  text-align: right;
+}
+
 .historique-transaction-row {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr 1fr 1.2fr 1.2fr 1.2fr 0.9fr;
@@ -310,11 +327,13 @@
     border-top: 1px solid var(--border-color);
   }
 
+  .historique-transaction-header,
   .historique-transaction-row {
     grid-template-columns: 1fr 0.8fr 1fr 1fr 0.9fr;
     font-size: 0.75rem;
   }
 
+  .historique-transaction-header > div:nth-child(3),
   .historique-tx-prix {
     display: none;
   }
@@ -339,6 +358,7 @@
     padding-top: 0.5rem;
   }
 
+  .historique-transaction-header,
   .historique-transaction-row {
     grid-template-columns: 1fr 1fr 1fr;
     font-size: 0.7rem;
@@ -346,12 +366,17 @@
     padding: 0.6rem;
   }
 
+  .historique-transaction-header > div:nth-child(2),
+  .historique-transaction-header > div:nth-child(6),
+  .historique-transaction-header > div:nth-child(7),
   .historique-tx-qty,
   .historique-tx-gain,
   .historique-tx-perf {
     display: none;
   }
 
+  .historique-transaction-header > div:nth-child(4),
+  .historique-transaction-header > div:nth-child(5),
   .historique-tx-investi,
   .historique-tx-valeur {
     text-align: left;

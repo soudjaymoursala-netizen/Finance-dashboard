@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v4"; // v4 : restructuration Performance par achat (2 cartes CTO/PEA + code couleur)
+const CACHE_VERSION = "shell-v5"; // v5 : en-tetes de colonnes ajoutees au detail des achats
 
 const PRECACHE_URLS = [
     "./",

@@ -195,7 +195,18 @@ function rendreLignePosition(pos) {
     `;
 
     if (isExpanded) {
-        html += '<div class="historique-transactions">';
+        html += `
+            <div class="historique-transactions">
+                <div class="historique-transaction-header">
+                    <div>Date</div>
+                    <div>Quantité</div>
+                    <div>Prix achat</div>
+                    <div>Investi</div>
+                    <div>Valeur actuelle</div>
+                    <div>Gain/Perte</div>
+                    <div>Perf %</div>
+                </div>
+        `;
         pos.transactions.forEach((tx) => { html += rendreLigneTransaction(tx); });
         html += '</div>';
     }
