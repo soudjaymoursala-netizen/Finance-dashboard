@@ -1,21 +1,12 @@
 /* ================================================== */
 /* PERFORMANCE PAR ACHAT (CTO + PEA)                  */
-/* Optionnel : n'affiche la section que si les onglets */
-/* API_CTO_Historique / API_PEA_Historique existent et */
-/* sont branches cote Worker Cloudflare (SHEET_CTO_    */
-/* HISTORIQUE / SHEET_PEA_HISTORIQUE). Reste masque    */
-/* silencieusement sinon, comme le Suivi mensuel.      */
-/*                                                      */
-/* Chaque ligne = un achat individuel (pas une position */
-/* agregee) : ticker, date d'achat, prix d'achat, valeur */
-/* actuelle de CE lot precis, gain/perte. Permet de voir */
-/* quels achats ont bien/mal performe selon leur date -  */
-/* remplace ce que Google Finance ne propose plus.       */
+/* Affichage simplifié : une ligne par actif/ETF      */
+/* dépliable pour voir le détail des transactions      */
 /* ================================================== */
 
 let historiqueLignesActuelles = [];
-let historiqueTriColonne = "perf";
-let historiqueTriSens = "desc";
+let historiquePositions = {};
+let historiqueExpandedPositions = new Set();
 
 async function fetchHistoriqueCsv(url, compte, devise) {
     try {
@@ -38,6 +29,8 @@ async function fetchHistoriqueCsv(url, compte, devise) {
                 ticker: ticker,
                 societe: (cols[1] || "").trim(),
                 date: (cols[2] || "").trim(),
+                prix_achat: nettoyerNombre(cols[4]),
+                quantite: nettoyerNombre(cols[5]),
                 investi: nettoyerNombre(cols[5]),
                 valeurActuelle: nettoyerNombre(cols[7]),
                 gain: nettoyerNombre(cols[8]),
@@ -68,7 +61,29 @@ async function chargerHistoriqueAchats() {
         ]);
 
         historiqueLignesActuelles = ctoLignes.concat(peaLignes);
-        if (!historiqueLignesActuelles.length) return; // pas encore configure cote Worker
+        if (!historiqueLignesActuelles.length) return;
+
+        // Agréger par ticker pour afficher une ligne par actif
+        historiquePositions = {};
+        historiqueLignesActuelles.forEach((ligne) => {
+            const key = `${ligne.ticker}|${ligne.compte}`;
+            if (!historiquePositions[key]) {
+                historiquePositions[key] = {
+                    ticker: ligne.ticker,
+                    societe: ligne.societe,
+                    compte: ligne.compte,
+                    devise: ligne.devise,
+                    transactions: [],
+                    totalInvesti: 0,
+                    totalValeur: 0,
+                    totalGain: 0,
+                };
+            }
+            historiquePositions[key].transactions.push(ligne);
+            historiquePositions[key].totalInvesti += ligne.investi;
+            historiquePositions[key].totalValeur += ligne.valeurActuelle;
+            historiquePositions[key].totalGain += ligne.gain;
+        });
 
         rendreHistoriqueAchats();
         if (section) section.style.display = "";
@@ -81,66 +96,90 @@ function rendreHistoriqueAchats() {
     const container = document.getElementById("historiqueAchatsContainer");
     if (!container) return;
 
-    const lignes = historiqueLignesActuelles.slice().sort((a, b) => {
-        let va = a[historiqueTriColonne];
-        let vb = b[historiqueTriColonne];
-        if (typeof va === "string") { va = va.toLowerCase(); vb = vb.toLowerCase(); }
-        if (va < vb) return historiqueTriSens === "asc" ? -1 : 1;
-        if (va > vb) return historiqueTriSens === "asc" ? 1 : -1;
-        return 0;
+    const positions = Object.values(historiquePositions).sort((a, b) => {
+        return b.totalGain - a.totalGain; // Tri par gain (décroissant)
     });
 
-    const colonnes = [
-        { key: "compte", label: "Compte" },
-        { key: "ticker", label: "Ticker" },
-        { key: "societe", label: "Société" },
-        { key: "date", label: "Date" },
-        { key: "investi", label: "Investi" },
-        { key: "valeurActuelle", label: "Valeur actuelle" },
-        { key: "gain", label: "Gain/Perte" },
-        { key: "perf", label: "Perf %" },
-    ];
+    let html = '<div class="historique-positions">';
 
-    let html = '<div class="historique-table-wrap"><table class="historique-table"><thead><tr>';
-    colonnes.forEach((col) => {
-        const actif = col.key === historiqueTriColonne;
-        const fleche = actif ? (historiqueTriSens === "asc" ? " ▲" : " ▼") : "";
-        html += `<th data-col="${col.key}" class="${actif ? "sorted" : ""}" role="button" tabindex="0">${col.label}${fleche}</th>`;
+    positions.forEach((pos, idx) => {
+        const positionId = `${pos.ticker}|${pos.compte}`;
+        const isExpanded = historiqueExpandedPositions.has(positionId);
+        const perf = pos.totalInvesti > 0 ? (pos.totalGain / pos.totalInvesti) : 0;
+        const gainClass = pos.totalGain >= 0 ? "historique-positif" : "historique-negatif";
+        const badgeClass = pos.compte === "CTO" ? "gold" : "blue";
+
+        html += `
+            <div class="historique-position-row" data-position="${positionId}">
+                <div class="historique-position-header" role="button" tabindex="0" aria-expanded="${isExpanded}">
+                    <div class="historique-position-toggle">
+                        <span class="historique-chevron ${isExpanded ? 'open' : ''}">▼</span>
+                    </div>
+                    <div class="historique-position-ticker">
+                        <span class="historique-badge ${badgeClass}">${pos.compte}</span>
+                        <strong>${pos.ticker}</strong>
+                    </div>
+                    <div class="historique-position-societe">${pos.societe}</div>
+                    <div class="historique-position-stats">
+                        <div class="historique-stat">
+                            <span class="historique-stat-label">Investi</span>
+                            <span class="historique-stat-value">${Math.round(pos.totalInvesti).toLocaleString("fr-FR")} ${pos.devise}</span>
+                        </div>
+                        <div class="historique-stat">
+                            <span class="historique-stat-label">Valeur</span>
+                            <span class="historique-stat-value">${Math.round(pos.totalValeur).toLocaleString("fr-FR")} ${pos.devise}</span>
+                        </div>
+                        <div class="historique-stat">
+                            <span class="historique-stat-label ${gainClass}">Gain</span>
+                            <span class="historique-stat-value ${gainClass}">${pos.totalGain >= 0 ? "+" : ""}${Math.round(pos.totalGain).toLocaleString("fr-FR")} ${pos.devise}</span>
+                        </div>
+                        <div class="historique-stat">
+                            <span class="historique-stat-label ${gainClass}">Perf</span>
+                            <span class="historique-stat-value ${gainClass}">${perf >= 0 ? "+" : ""}${(perf * 100).toFixed(1)}%</span>
+                        </div>
+                    </div>
+                </div>
+        `;
+
+        if (isExpanded) {
+            html += '<div class="historique-transactions">';
+            pos.transactions.forEach((tx) => {
+                const txGainClass = tx.gain >= 0 ? "historique-positif" : "historique-negatif";
+                html += `
+                    <div class="historique-transaction-row">
+                        <div class="historique-tx-date">${tx.date}</div>
+                        <div class="historique-tx-qty">${Math.round(tx.quantite)} u.</div>
+                        <div class="historique-tx-prix">${Math.round(tx.prix_achat).toLocaleString("fr-FR")} ${tx.devise}</div>
+                        <div class="historique-tx-investi">${Math.round(tx.investi).toLocaleString("fr-FR")} ${tx.devise}</div>
+                        <div class="historique-tx-valeur">${Math.round(tx.valeurActuelle).toLocaleString("fr-FR")} ${tx.devise}</div>
+                        <div class="historique-tx-gain ${txGainClass}">${tx.gain >= 0 ? "+" : ""}${Math.round(tx.gain).toLocaleString("fr-FR")} ${tx.devise}</div>
+                        <div class="historique-tx-perf ${txGainClass}">${tx.perf >= 0 ? "+" : ""}${(tx.perf * 100).toFixed(1)}%</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        html += '</div>';
     });
-    html += "</tr></thead><tbody>";
 
-    lignes.forEach((l) => {
-        const gainClass = l.gain >= 0 ? "historique-positif" : "historique-negatif";
-        const perfTxt = (l.perf * 100).toFixed(1) + " %";
-        const badgeClass = l.compte === "CTO" ? "gold" : "blue";
-        html += `<tr>
-            <td><span class="historique-badge ${badgeClass}">${l.compte}</span></td>
-            <td class="historique-ticker">${l.ticker}</td>
-            <td class="historique-societe">${l.societe}</td>
-            <td>${l.date}</td>
-            <td>${Math.round(l.investi).toLocaleString("fr-FR")} ${l.devise}</td>
-            <td>${Math.round(l.valeurActuelle).toLocaleString("fr-FR")} ${l.devise}</td>
-            <td class="${gainClass}">${l.gain >= 0 ? "+" : ""}${Math.round(l.gain).toLocaleString("fr-FR")} ${l.devise}</td>
-            <td class="${gainClass}">${l.perf >= 0 ? "+" : ""}${perfTxt}</td>
-        </tr>`;
-    });
-    html += "</tbody></table></div>";
-
+    html += '</div>';
     container.innerHTML = html;
 
-    container.querySelectorAll("th[data-col]").forEach((th) => {
+    // Ajouter les listeners
+    container.querySelectorAll(".historique-position-header").forEach((header) => {
         const activer = () => {
-            const col = th.getAttribute("data-col");
-            if (historiqueTriColonne === col) {
-                historiqueTriSens = historiqueTriSens === "asc" ? "desc" : "asc";
+            const row = header.closest(".historique-position-row");
+            const positionId = row.getAttribute("data-position");
+            if (historiqueExpandedPositions.has(positionId)) {
+                historiqueExpandedPositions.delete(positionId);
             } else {
-                historiqueTriColonne = col;
-                historiqueTriSens = (col === "perf" || col === "gain" || col === "investi" || col === "valeurActuelle") ? "desc" : "asc";
+                historiqueExpandedPositions.add(positionId);
             }
             rendreHistoriqueAchats();
         };
-        th.addEventListener("click", activer);
-        th.addEventListener("keydown", (e) => {
+        header.addEventListener("click", activer);
+        header.addEventListener("keydown", (e) => {
             if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activer(); }
         });
     });
