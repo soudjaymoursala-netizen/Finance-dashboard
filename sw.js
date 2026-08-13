@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v5"; // v5 : en-tetes de colonnes ajoutees au detail des achats
+const CACHE_VERSION = "shell-v6"; // v6 : Performance par achat integree directement dans les cartes PEA/CTO existantes
 
 const PRECACHE_URLS = [
     "./",

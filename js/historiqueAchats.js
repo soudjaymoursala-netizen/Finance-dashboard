@@ -1,26 +1,27 @@
 /* ================================================== */
 /* PERFORMANCE PAR ACHAT (CTO + PEA)                  */
-/* Optionnel : n'affiche la section que si les onglets */
+/* Optionnel : n'affiche le contenu que si les onglets */
 /* API_CTO_Historique / API_PEA_Historique existent et */
 /* sont branches cote Worker Cloudflare (SHEET_CTO_    */
 /* HISTORIQUE / SHEET_PEA_HISTORIQUE). Reste masque    */
 /* silencieusement sinon, comme le Suivi mensuel.      */
 /*                                                      */
-/* Hierarchie a 3 niveaux :                            */
-/*   Compte (CTO / PEA)                                */
-/*     -> Actif (ticker, ex: NVDA) - agrege tous les    */
-/*        achats de ce titre                            */
-/*        -> Achat individuel (date, prix, quantite,    */
-/*           perf de CE lot precis), tries par date      */
-/*           d'achat croissante.                          */
-/* Code couleur (vert/rouge) applique a chaque niveau :   */
-/* carte compte, ligne actif, et ligne achat - gain ou    */
-/* perte visible d'un coup d'oeil sans lire les chiffres. */
+/* Integre DIRECTEMENT dans les cartes de compte PEA et */
+/* CTO existantes (peaDetailSection / ctoDetailSection), */
+/* plutot que dans une section separee qui dupliquait   */
+/* des cartes CTO/PEA deja presentes ailleurs.           */
+/*                                                        */
+/* Hierarchie a 2 niveaux (le niveau "compte" existe deja */
+/* via la carte parente) :                                */
+/*   Actif (ticker, ex: NVDA) - agrege tous les achats     */
+/*   de ce titre                                            */
+/*     -> Achat individuel (date, prix, quantite, perf de   */
+/*        CE lot precis), tries par date d'achat croissante. */
+/* Code couleur (vert/rouge) applique a chaque niveau.        */
 /* ================================================== */
 
 let historiqueLignesActuelles = [];
 let historiqueComptesGroupes = {};
-let historiqueComptesOuverts = new Set();
 let historiqueExpandedPositions = new Set();
 
 function parseDateFr(str) {
@@ -71,9 +72,6 @@ async function fetchHistoriqueCsv(url, compte, devise) {
 
 async function chargerHistoriqueAchats() {
     try {
-        const section = document.getElementById("historiqueAchatsSection");
-        const container = document.getElementById("historiqueAchatsContainer");
-        if (!container) return;
         if (!window.CONFIG.URL_CTO_HISTORIQUE && !window.CONFIG.URL_PEA_HISTORIQUE) return;
 
         const [ctoLignes, peaLignes] = await Promise.all([
@@ -95,9 +93,6 @@ async function chargerHistoriqueAchats() {
                     compte: ligne.compte,
                     devise: ligne.devise,
                     positions: {},
-                    totalInvesti: 0,
-                    totalValeur: 0,
-                    totalGain: 0,
                 };
             }
             const compteData = historiqueComptesGroupes[ligne.compte];
@@ -119,10 +114,6 @@ async function chargerHistoriqueAchats() {
             pos.totalInvesti += ligne.investi;
             pos.totalValeur += ligne.valeurActuelle;
             pos.totalGain += ligne.gain;
-
-            compteData.totalInvesti += ligne.investi;
-            compteData.totalValeur += ligne.valeurActuelle;
-            compteData.totalGain += ligne.gain;
         });
 
         Object.values(historiqueComptesGroupes).forEach((compteData) => {
@@ -131,8 +122,15 @@ async function chargerHistoriqueAchats() {
             });
         });
 
-        rendreHistoriqueAchats();
-        if (section) section.style.display = "";
+        // Rendu direct dans la carte du compte concerne (deja presente
+        // plus haut dans la page, section "Comptes") - plus de carte
+        // compte dupliquee ici, juste la liste des actifs.
+        if (historiqueComptesGroupes.PEA) {
+            rendrePositionsDansConteneur("peaHistoriqueContainer", historiqueComptesGroupes.PEA);
+        }
+        if (historiqueComptesGroupes.CTO) {
+            rendrePositionsDansConteneur("ctoHistoriqueContainer", historiqueComptesGroupes.CTO);
+        }
     } catch (e) {
         console.warn("Performance par achat non disponible:", e);
     }
@@ -215,86 +213,28 @@ function rendreLignePosition(pos) {
     return html;
 }
 
-function rendreCarteCompte(compteData) {
-    const isOpen = historiqueComptesOuverts.has(compteData.compte);
-    const perf = compteData.totalInvesti > 0 ? (compteData.totalGain / compteData.totalInvesti) : 0;
-    const cls = classeGainPerte(compteData.totalGain);
-    const badgeClass = compteData.compte === "CTO" ? "gold" : "blue";
+function rendrePositionsDansConteneur(containerId, compteData) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
     const positions = Object.values(compteData.positions).sort((a, b) => b.totalGain - a.totalGain);
 
     let html = `
-        <div class="historique-compte-card ${cls}" data-compte="${compteData.compte}">
-            <div class="historique-compte-header" role="button" tabindex="0" aria-expanded="${isOpen}">
-                <span class="icon-badge ${badgeClass}">${compteData.compte === "CTO" ? "🏦" : "📈"}</span>
-                <span class="historique-compte-title">${compteData.compte}</span>
-                <div class="historique-compte-stats">
-                    <div class="historique-stat">
-                        <span class="historique-stat-label">Investi</span>
-                        <span class="historique-stat-value">${Math.round(compteData.totalInvesti).toLocaleString("fr-FR")} ${compteData.devise}</span>
-                    </div>
-                    <div class="historique-stat">
-                        <span class="historique-stat-label">Valeur</span>
-                        <span class="historique-stat-value">${Math.round(compteData.totalValeur).toLocaleString("fr-FR")} ${compteData.devise}</span>
-                    </div>
-                    <div class="historique-stat">
-                        <span class="historique-stat-label ${cls}">Gain</span>
-                        <span class="historique-stat-value ${cls}">${compteData.totalGain >= 0 ? "+" : ""}${Math.round(compteData.totalGain).toLocaleString("fr-FR")} ${compteData.devise}</span>
-                    </div>
-                    <div class="historique-stat">
-                        <span class="historique-stat-label ${cls}">Perf</span>
-                        <span class="historique-stat-value ${cls}">${perf >= 0 ? "+" : ""}${(perf * 100).toFixed(1)}%</span>
-                    </div>
-                </div>
-                <span class="historique-chevron historique-compte-chevron ${isOpen ? 'open' : ''}">▼</span>
-            </div>
+        <div class="historique-inline-header">
+            <span class="icon-badge violet">🎯</span>
+            <span>Performance par achat</span>
+        </div>
+        <div class="historique-positions">
     `;
-
-    if (isOpen) {
-        html += '<div class="historique-compte-content"><div class="historique-positions">';
-        positions.forEach((pos) => { html += rendreLignePosition(pos); });
-        html += '</div></div>';
-    }
-
-    html += '</div>';
-    return html;
-}
-
-function rendreHistoriqueAchats() {
-    const container = document.getElementById("historiqueAchatsContainer");
-    if (!container) return;
-
-    const ordreComptes = ["CTO", "PEA"];
-    let html = '<div class="historique-comptes">';
-    ordreComptes.forEach((compte) => {
-        if (historiqueComptesGroupes[compte]) {
-            html += rendreCarteCompte(historiqueComptesGroupes[compte]);
-        }
-    });
+    positions.forEach((pos) => { html += rendreLignePosition(pos); });
     html += '</div>';
 
     container.innerHTML = html;
-
-    container.querySelectorAll(".historique-compte-header").forEach((header) => {
-        const activer = () => {
-            const carte = header.closest(".historique-compte-card");
-            const compte = carte.getAttribute("data-compte");
-            if (historiqueComptesOuverts.has(compte)) {
-                historiqueComptesOuverts.delete(compte);
-            } else {
-                historiqueComptesOuverts.add(compte);
-            }
-            rendreHistoriqueAchats();
-        };
-        header.addEventListener("click", activer);
-        header.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activer(); }
-        });
-    });
+    container.style.display = "";
 
     container.querySelectorAll(".historique-position-header").forEach((header) => {
         const activer = (e) => {
-            e.stopPropagation();
+            e.stopPropagation(); // ne pas re-declencher le toggle de la carte compte parente
             const row = header.closest(".historique-position-row");
             const positionId = row.getAttribute("data-position");
             if (historiqueExpandedPositions.has(positionId)) {
@@ -302,7 +242,7 @@ function rendreHistoriqueAchats() {
             } else {
                 historiqueExpandedPositions.add(positionId);
             }
-            rendreHistoriqueAchats();
+            rendrePositionsDansConteneur(containerId, compteData);
         };
         header.addEventListener("click", activer);
         header.addEventListener("keydown", (e) => {

@@ -28,7 +28,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css?v=11">
     <link rel="stylesheet" href="css/alerts.css">
-    <link rel="stylesheet" href="css/historique.css?v=3">
+    <link rel="stylesheet" href="css/historique.css?v=4">
 </head>
 <body>
     <div id="lockScreen" class="lock-screen">
@@ -155,6 +155,7 @@
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">⚖️</span>Part ETF</span></div><div class="fire-stat-value" id="peaDetailPartEtf">...</div></div>
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">🔢</span>Positions</span></div><div class="fire-stat-value" id="peaDetailPositions">...</div></div>
                             </div>
+                            <div id="peaHistoriqueContainer" class="historique-inline" style="display:none"></div>
                         </div>
                     </div>
 
@@ -184,6 +185,7 @@
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">🔢</span>Positions</span></div><div class="fire-stat-value" id="ctoDetailPositions">...</div></div>
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">💱</span>Taux EUR/CHF</span></div><div class="fire-stat-value" id="ctoDetailEurChf">...</div></div>
                             </div>
+                            <div id="ctoHistoriqueContainer" class="historique-inline" style="display:none"></div>
                         </div>
                     </div>
                 </div>
@@ -245,11 +247,6 @@
             <section id="monthlyBudgetSection" class="monthly-budget-section" style="display:none">
                 <h2>Suivi annuel</h2>
                 <div id="suiviAnnuelContainer"></div>
-            </section>
-
-            <section id="historiqueAchatsSection" style="display:none">
-                <h2>Performance par achat</h2>
-                <div id="historiqueAchatsContainer"></div>
             </section>
 
             <section class="objectifs-annuels-section">
@@ -322,7 +319,7 @@
     <script src="js/dataCache.js?v=1"></script>
     <script src="js/mouvements.js?v=3"></script>
     <script src="js/suiviAnnuel.js?v=2"></script>
-    <script src="js/historiqueAchats.js?v=3"></script>
+    <script src="js/historiqueAchats.js?v=4"></script>
     <script src="js/googleSheets.js?v=15"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
