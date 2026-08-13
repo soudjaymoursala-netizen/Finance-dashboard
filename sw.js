@@ -95,7 +95,13 @@ self.addEventListener("fetch", (event) => {
         fetch(req)
             .then((res) => {
                 if (res && res.ok) {
-                    caches.open(CACHE_VERSION).then((cache) => cache.put(req, res.clone()));
+                    // Cloner IMMEDIATEMENT avant toute opération asynchrone
+                    const resClone = res.clone();
+                    // Utiliser event.waitUntil pour s'assurer que l'opération de cache
+                    // peut se terminer même si la fetch/response est déjà retournée.
+                    event.waitUntil(
+                        caches.open(CACHE_VERSION).then((cache) => cache.put(req, resClone))
+                    );
                 }
                 return res;
             })
