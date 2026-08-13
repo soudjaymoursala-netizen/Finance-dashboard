@@ -10,7 +10,8 @@
  * 2. Collez ce code dans l'éditeur, cliquez "Deploy"
  * 3. Allez dans Settings -> Variables and Secrets -> Add -> pour CHAQUE clé
  *    ci-dessous, ajoutez une variable de type "Secret" (pas "Text") :
- *      SHEET_BUDGET, SHEET_EVOLUTION, SHEET_OBJECTIF, SHEET_PEA, SHEET_CTO
+ *      SHEET_BUDGET, SHEET_EVOLUTION, SHEET_OBJECTIF, SHEET_PEA, SHEET_CTO,
+ *      SHEET_MENSUEL, SHEET_CTO_HISTORIQUE, SHEET_PEA_HISTORIQUE
  *    Valeur = l'URL complète d'export CSV de chaque Google Sheet.
  * 4. Settings -> Variables and Secrets -> ALLOWED_ORIGIN (Text, pas secret)
  *    = https://soudjaymoursala-netizen.github.io  (adaptez si domaine perso)
@@ -18,7 +19,7 @@
  *    -> à mettre dans js/config.js (voir instructions séparées)
  */
 
-const ALLOWED_KEYS = ["BUDGET", "EVOLUTION", "OBJECTIF", "PEA", "CTO", "MENSUEL"];
+const ALLOWED_KEYS = ["BUDGET", "EVOLUTION", "OBJECTIF", "PEA", "CTO", "MENSUEL", "CTO_HISTORIQUE", "PEA_HISTORIQUE"];
 
 // Anti-brute-force minimal pour /api/auth : compteur en mémoire par IP.
 // Reinitialise a chaque redemarrage/redeploiement du Worker (pas de

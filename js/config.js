@@ -53,6 +53,8 @@
       EVOLUTION: buildSheetUrl("EVOLUTION", "VITE_URL_EVOLUTION"),
       OBJECTIF: buildSheetUrl("OBJECTIF", "VITE_URL_OBJECTIF"),
       BUDGET_MENSUEL: buildSheetUrl("MENSUEL", "VITE_URL_BUDGET_MENSUEL"),
+      CTO_HISTORIQUE: buildSheetUrl("CTO_HISTORIQUE", "VITE_URL_CTO_HISTORIQUE"),
+      PEA_HISTORIQUE: buildSheetUrl("PEA_HISTORIQUE", "VITE_URL_PEA_HISTORIQUE"),
     },
     CHARTS: {
       PATRIMOINE: {
@@ -103,19 +105,23 @@
     URL_PEA: CONFIG.SHEETS.PEA,
     URL_CTO: CONFIG.SHEETS.CTO,
     URL_BUDGET_MENSUEL: CONFIG.SHEETS.BUDGET_MENSUEL,
+    URL_CTO_HISTORIQUE: CONFIG.SHEETS.CTO_HISTORIQUE,
+    URL_PEA_HISTORIQUE: CONFIG.SHEETS.PEA_HISTORIQUE,
     CHARTS: CONFIG.CHARTS,
     GOALS: CONFIG.GOALS,
     FIRE: CONFIG.FIRE,
     utils: CONFIG.utils,
   };
 
-  // URL_BUDGET_MENSUEL est optionnelle (feature pas encore configuree cote
-  // Cloudflare) : on l'exclut volontairement de la verification "missing"
-  // pour ne pas afficher une alerte tant que ce n'est pas branche.
+  // URL_BUDGET_MENSUEL, URL_CTO_HISTORIQUE et URL_PEA_HISTORIQUE sont
+  // optionnelles (features pas encore configurees cote Cloudflare) : on les
+  // exclut volontairement de la verification "missing" pour ne pas afficher
+  // une alerte tant que ce n'est pas branche.
 
   // Aide au debug et message utilisateur si config manquante
+  const OPTIONAL_URLS = ["URL_BUDGET_MENSUEL", "URL_CTO_HISTORIQUE", "URL_PEA_HISTORIQUE"];
   const missing = Object.entries(window.CONFIG)
-    .filter(([k, v]) => k.startsWith("URL_") && k !== "URL_BUDGET_MENSUEL" && (!v || v === ""))
+    .filter(([k, v]) => k.startsWith("URL_") && !OPTIONAL_URLS.includes(k) && (!v || v === ""))
     .map(([k]) => k);
 
   if (missing.length) {

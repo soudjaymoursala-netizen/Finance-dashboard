@@ -17,6 +17,10 @@ sans exposer vos identifiants de Sheet.
    - `SHEET_PEA`
    - `SHEET_CTO`
    - `SHEET_MENSUEL` (optionnel, suivi mensuel)
+   - `SHEET_CTO_HISTORIQUE` — onglet API_CTO_Historique du fichier CTO
+     (performance individuelle par achat)
+   - `SHEET_PEA_HISTORIQUE` — onglet API_PEA_Historique du fichier PEA
+     (performance individuelle par achat)
    - `LOCK_CODE` — le code d'accès de l'écran de verrouillage (remplace la
      constante `CODE` qui était en clair dans `js/lock.js`). Choisissez une
      valeur ici, c'est elle qui compte désormais ; le code côté client a

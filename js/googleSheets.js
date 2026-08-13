@@ -540,6 +540,11 @@ async function chargerDashboard() {
         if (typeof chargerSuiviAnnuel === "function") {
             await chargerSuiviAnnuel();
         }
+
+        // Performance par achat (optionnel, cf. historiqueAchats.js)
+        if (typeof chargerHistoriqueAchats === "function") {
+            await chargerHistoriqueAchats();
+        }
         // theme handling unchanged
         const themeButton = document.getElementById("themeToggle");
         if (themeButton) {
