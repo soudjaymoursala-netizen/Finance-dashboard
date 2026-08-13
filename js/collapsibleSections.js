@@ -132,10 +132,4 @@
         },
         "comptes"
     );
-
-    bindToggle(
-        document.getElementById("historiqueAchatsToggle"),
-        document.getElementById("historiqueAchatsContent"),
-        document.getElementById("historiqueAchatsChevron")
-    );
 })();

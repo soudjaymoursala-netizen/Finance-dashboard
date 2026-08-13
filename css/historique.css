@@ -2,6 +2,60 @@
    HISTORIQUE ACHATS — Positions dépliables
    ================================================== */
 
+.historique-comptes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.historique-compte-card {
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.historique-compte-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 200ms ease;
+}
+
+.historique-compte-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.historique-compte-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  flex-shrink: 0;
+}
+
+.historique-compte-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  flex: 1;
+}
+
+.historique-compte-chevron {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.historique-compte-content {
+  border-top: 1px solid var(--border-color);
+  padding: 1rem;
+  animation: fadeInUp 300ms ease both;
+}
+
 .historique-positions {
   display: flex;
   flex-direction: column;
@@ -176,6 +230,30 @@
   color: var(--negative-color);
 }
 
+/* Code couleur au niveau du CONTENEUR entier (pas seulement du texte) :
+   bordure gauche coloree + fond legerement teinte, pour que le gain/perte
+   se voie d'un coup d'oeil sans avoir a lire les chiffres. Applique aux
+   3 niveaux : carte compte, ligne actif, ligne achat individuel. */
+.historique-compte-card.historique-positif,
+.historique-position-row.historique-positif {
+  border-left: 3px solid var(--positive-color);
+}
+
+.historique-compte-card.historique-negatif,
+.historique-position-row.historique-negatif {
+  border-left: 3px solid var(--negative-color);
+}
+
+.historique-transaction-row.historique-positif {
+  border-left: 3px solid var(--positive-color);
+  background: rgba(45, 212, 167, 0.04);
+}
+
+.historique-transaction-row.historique-negatif {
+  border-left: 3px solid var(--negative-color);
+  background: rgba(240, 87, 107, 0.04);
+}
+
 .historique-badge {
   display: inline-flex;
   align-items: center;
@@ -211,6 +289,17 @@
 
 /* Responsive */
 @media (max-width: 1200px) {
+  .historique-compte-header {
+    flex-wrap: wrap;
+  }
+
+  .historique-compte-stats {
+    grid-template-columns: repeat(2, 1fr);
+    flex-basis: 100%;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+  }
+
   .historique-position-header {
     grid-template-columns: auto 1fr 1fr;
   }

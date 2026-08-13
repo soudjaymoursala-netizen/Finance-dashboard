@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v3"; // v3 : ajout historique.css / historiqueAchats.js au precache
+const CACHE_VERSION = "shell-v4"; // v4 : restructuration Performance par achat (2 cartes CTO/PEA + code couleur)
 
 const PRECACHE_URLS = [
     "./",
