@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v2"; // v2 : passage a la strategie network-first (voir fetch handler)
+const CACHE_VERSION = "shell-v3"; // v3 : ajout historique.css / historiqueAchats.js au precache
 
 const PRECACHE_URLS = [
     "./",
@@ -24,6 +24,7 @@ const PRECACHE_URLS = [
     "./manifest.json",
     "./css/style.css",
     "./css/alerts.css",
+    "./css/historique.css",
     "./js/config.js",
     "./js/lock.js",
     "./js/charts.js",
@@ -32,6 +33,7 @@ const PRECACHE_URLS = [
     "./js/dataCache.js",
     "./js/mouvements.js",
     "./js/suiviAnnuel.js",
+    "./js/historiqueAchats.js",
     "./js/googleSheets.js",
     "./js/runtimeConfigUI.js",
     "./js/rippleEffect.js",
