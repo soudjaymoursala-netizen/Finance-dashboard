@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v6"; // v6 : Performance par achat integree directement dans les cartes PEA/CTO existantes
+const CACHE_VERSION = "shell-v7"; // v7 : restructuration - reordonnancement, densite reduite, barre de navigation
 
 const PRECACHE_URLS = [
     "./",
@@ -38,6 +38,7 @@ const PRECACHE_URLS = [
     "./js/runtimeConfigUI.js",
     "./js/rippleEffect.js",
     "./js/collapsibleSections.js",
+    "./js/bottomNav.js",
     "./icons/icon-192.png",
     "./icons/icon-512.png",
     "./icons/apple-touch-icon.png",

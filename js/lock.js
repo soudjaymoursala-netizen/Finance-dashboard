@@ -143,12 +143,16 @@
     function unlock() {
         if (lockScreen) lockScreen.style.display = "none";
         if (container) container.classList.remove("blurred");
+        const bottomNav = document.getElementById("bottomNav");
+        if (bottomNav) bottomNav.classList.add("visible");
         sessionStorage.setItem(SESSION_KEY, "1");
     }
 
     function lock() {
         if (lockScreen) lockScreen.style.display = "flex";
         if (container) container.classList.add("blurred");
+        const bottomNav = document.getElementById("bottomNav");
+        if (bottomNav) bottomNav.classList.remove("visible");
         if (errorEl) errorEl.style.display = "none";
         if (input) input.value = "";
         sessionStorage.removeItem(SESSION_KEY);

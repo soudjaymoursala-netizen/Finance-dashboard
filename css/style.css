@@ -1238,3 +1238,75 @@ main > section > h2 {
   user-select: none;
 }
 
+/* ==================================================
+   BARRE DE NAVIGATION EN BAS (bottomNav.js)
+   Mobile uniquement (pattern app native) - le desktop
+   garde le scroll classique, pas besoin de barre fixe.
+   ================================================== */
+.bottom-nav {
+  display: none; /* affichee via .visible ci-dessous, uniquement <900px */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(11, 17, 32, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color);
+  padding: 0.45rem 0.4rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+}
+
+body.light .bottom-nav {
+  background: rgba(248, 250, 252, 0.88);
+}
+
+@media (max-width: 899px) {
+  .bottom-nav.visible {
+    display: flex;
+  }
+
+  /* Espace reserve en bas pour que la derniere section ne se retrouve
+     jamais cachee derriere la barre fixe. */
+  .container {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  flex: 1;
+  max-width: 110px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  color: var(--text-secondary-color);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.bottom-nav-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bottom-nav-item.active {
+  color: var(--accent-color);
+  background: rgba(45, 212, 167, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav-item {
+    transition: none;
+  }
+}
+

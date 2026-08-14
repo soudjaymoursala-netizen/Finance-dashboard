@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/style.css?v=12">
     <link rel="stylesheet" href="css/alerts.css">
-    <link rel="stylesheet" href="css/historique.css?v=4">
+    <link rel="stylesheet" href="css/historique.css?v=5">
 </head>
 <body>
     <div id="lockScreen" class="lock-screen">
@@ -70,7 +70,7 @@
         <main>
             <section id="alerts" aria-live="polite"></section>
 
-            <section class="hero-section">
+            <section class="hero-section" id="navAccueil">
                 <h2>Vue d'ensemble</h2>
                 <div class="hero-card expandable" id="heroCard" role="button" tabindex="0" aria-expanded="false" aria-controls="heroChipRow">
                     <div class="hero-top-row">
@@ -101,7 +101,19 @@
                 </div>
             </section>
 
-            <section class="comptes-section">
+            <section class="fire-section" id="navAccueilFire">
+                <h2>Objectif indépendance financière</h2>
+                <div class="fire-tracker" id="fireCard">
+                    <div class="fire-label"><span class="icon-badge emerald">🔥</span>Route vers l'indépendance financière</div>
+                    <div id="fireProgress" class="fire-percentage skeleton">...</div>
+                    <div id="fireDetails" class="fire-details skeleton">...</div>
+                    <div class="fire-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div id="fireBar" class="fire-progress-fill"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="comptes-section" id="navComptes">
                 <h2>Comptes</h2>
                 <div class="comptes-grid">
                     <div class="compte-group">
@@ -191,46 +203,7 @@
                 </div>
             </section>
 
-            <section class="kpi-advanced-section">
-                <h2>Mes investissements</h2>
-                <div class="toggle-card" id="kpiAvancesToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="kpiAvancesChipRow">
-                    <span class="icon-badge violet">💼</span>
-                    <span class="toggle-card-label">Bilan de tous mes placements : valeur, gains et performance</span>
-                    <span class="toggle-chevron" id="kpiAvancesChevron" style="position:static">▾</span>
-                </div>
-                <div class="chip-row collapsible-content" id="kpiAvancesChipRow">
-                    <div class="chip">
-                        <span class="chip-label"><span class="icon-badge violet">💼</span>Valeur actuelle</span>
-                        <span class="chip-value skeleton" id="valeurInvestie">...</span>
-                    </div>
-                    <div class="chip">
-                        <span class="chip-label"><span class="icon-badge gold">💰</span>Capital investi</span>
-                        <span class="chip-value skeleton" id="capitalInvesti">...</span>
-                    </div>
-                    <div class="chip">
-                        <span class="chip-label"><span class="icon-badge emerald">💹</span>Plus-value totale</span>
-                        <span class="chip-value skeleton" id="totalGain">...</span>
-                    </div>
-                    <div class="chip">
-                        <span class="chip-label"><span class="icon-badge blue">📈</span>Performance</span>
-                        <span class="chip-value skeleton" id="globalPerformance">...</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="fire-section">
-                <h2>Objectif indépendance financière</h2>
-                <div class="fire-tracker" id="fireCard">
-                    <div class="fire-label"><span class="icon-badge emerald">🔥</span>Route vers l'indépendance financière</div>
-                    <div id="fireProgress" class="fire-percentage skeleton">...</div>
-                    <div id="fireDetails" class="fire-details skeleton">...</div>
-                    <div class="fire-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <div id="fireBar" class="fire-progress-fill"></div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="charts-section">
+            <section class="charts-section" id="navHistorique">
                 <h2>Évolution & répartition</h2>
                 <div class="chart-grid">
                     <div class="card chart-card">
@@ -249,7 +222,7 @@
                 <div id="suiviAnnuelContainer"></div>
             </section>
 
-            <section class="objectifs-annuels-section">
+            <section class="objectifs-annuels-section" id="navObjectifs">
                 <h2>Budget de l'année</h2>
                 <div class="goals-grid" id="objectifsAnnuelsContainer"></div>
             </section>
@@ -307,6 +280,30 @@
         </main>
     </div>
 
+    <!-- Barre de navigation en bas (mobile uniquement, cachee sur desktop
+         via CSS - voir style.css). En dehors de #mainContainer : un
+         'filter' CSS sur un ancetre cree un nouveau contexte de
+         positionnement pour les elements 'position:fixed', ce qui
+         casserait son ancrage a l'ecran pendant le flou de verrouillage. -->
+    <nav id="bottomNav" class="bottom-nav" aria-label="Navigation principale">
+        <button type="button" class="bottom-nav-item" data-target="navAccueil" aria-label="Accueil">
+            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-label">Accueil</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-target="navComptes" aria-label="Comptes">
+            <span class="bottom-nav-icon">💳</span>
+            <span class="bottom-nav-label">Comptes</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-target="navHistorique" aria-label="Historique">
+            <span class="bottom-nav-icon">📊</span>
+            <span class="bottom-nav-label">Historique</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-target="navObjectifs" aria-label="Objectifs">
+            <span class="bottom-nav-icon">🎯</span>
+            <span class="bottom-nav-label">Objectifs</span>
+        </button>
+    </nav>
+
     <!-- JavaScript -->
     <!-- ApexCharts chargé ici (pas dans le head) pour ne pas bloquer
          l'affichage initial de la page -->
@@ -319,11 +316,12 @@
     <script src="js/dataCache.js?v=1"></script>
     <script src="js/mouvements.js?v=3"></script>
     <script src="js/suiviAnnuel.js?v=2"></script>
-    <script src="js/historiqueAchats.js?v=4"></script>
+    <script src="js/historiqueAchats.js?v=5"></script>
     <script src="js/googleSheets.js?v=15"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=3"></script>
+    <script src="js/bottomNav.js?v=1"></script>
 
     <!-- Enregistrement du service worker PWA (voir sw.js). Silencieux si
          non supporte (vieux navigateur) ou si ca echoue - l'appli

@@ -19,10 +19,35 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-secondary-color);
-  margin-bottom: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.4rem 0;
+  transition: color 150ms ease;
+}
+
+.historique-inline-header:hover,
+.historique-inline-header.open {
+  color: var(--text-color);
+}
+
+.historique-inline-count {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-secondary-color);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.historique-inline-header .historique-chevron {
+  margin-left: auto;
+  font-size: 0.7rem;
 }
 
 .historique-positions {
+  margin-top: 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;

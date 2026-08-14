@@ -213,24 +213,48 @@ function rendreLignePosition(pos) {
     return html;
 }
 
+let historiqueSectionsOuvertes = new Set();
+
 function rendrePositionsDansConteneur(containerId, compteData) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
     const positions = Object.values(compteData.positions).sort((a, b) => b.totalGain - a.totalGain);
+    const estOuvert = historiqueSectionsOuvertes.has(containerId);
 
     let html = `
-        <div class="historique-inline-header">
+        <div class="historique-inline-header ${estOuvert ? 'open' : ''}" role="button" tabindex="0" aria-expanded="${estOuvert}">
             <span class="icon-badge violet">🎯</span>
             <span>Performance par achat</span>
+            <span class="historique-inline-count">${positions.length} actif${positions.length > 1 ? 's' : ''}</span>
+            <span class="historique-chevron ${estOuvert ? 'open' : ''}">▼</span>
         </div>
-        <div class="historique-positions">
     `;
-    positions.forEach((pos) => { html += rendreLignePosition(pos); });
-    html += '</div>';
+
+    if (estOuvert) {
+        html += '<div class="historique-positions">';
+        positions.forEach((pos) => { html += rendreLignePosition(pos); });
+        html += '</div>';
+    }
 
     container.innerHTML = html;
     container.style.display = "";
+
+    const inlineHeader = container.querySelector(".historique-inline-header");
+    if (inlineHeader) {
+        const activerSection = () => {
+            if (historiqueSectionsOuvertes.has(containerId)) {
+                historiqueSectionsOuvertes.delete(containerId);
+            } else {
+                historiqueSectionsOuvertes.add(containerId);
+            }
+            rendrePositionsDansConteneur(containerId, compteData);
+        };
+        inlineHeader.addEventListener("click", activerSection);
+        inlineHeader.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activerSection(); }
+        });
+    }
 
     container.querySelectorAll(".historique-position-header").forEach((header) => {
         const activer = (e) => {
