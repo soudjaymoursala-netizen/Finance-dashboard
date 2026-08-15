@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v7"; // v7 : restructuration - reordonnancement, densite reduite, barre de navigation
+const CACHE_VERSION = "shell-v8"; // v8 : accordeon anime, donut cliquable, pull-to-refresh
 
 const PRECACHE_URLS = [
     "./",
@@ -39,6 +39,7 @@ const PRECACHE_URLS = [
     "./js/rippleEffect.js",
     "./js/collapsibleSections.js",
     "./js/bottomNav.js",
+    "./js/pullToRefresh.js",
     "./icons/icon-192.png",
     "./icons/icon-512.png",
     "./icons/apple-touch-icon.png",

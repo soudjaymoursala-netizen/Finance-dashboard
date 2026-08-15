@@ -157,7 +157,20 @@ function updateAllocationChart(cash, pea, cto, patrimoineTotal) {
         chart: {
             type: "donut",
             height: 420,
-            background: "transparent"
+            background: "transparent",
+            events: {
+                // Clic sur une part du donut -> ouvre et scroll vers la
+                // carte du compte correspondant (reutilise le systeme
+                // d'accordeon existant en simulant le clic utilisateur,
+                // plutot que de dupliquer sa logique d'ouverture ici).
+                dataPointSelection: function (event, chartContext, config) {
+                    const idsParIndex = ["cashAccountCard", "peaAccountCard", "ctoAccountCard"];
+                    const card = document.getElementById(idsParIndex[config.dataPointIndex]);
+                    if (!card) return;
+                    if (card.getAttribute("aria-expanded") !== "true") card.click();
+                    card.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            }
         },
 
         series: [cash, pea, cto],

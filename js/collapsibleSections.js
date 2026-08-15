@@ -97,12 +97,6 @@
         document.getElementById("heroChevron")
     );
 
-    bindToggle(
-        document.getElementById("kpiAvancesToggle"),
-        document.getElementById("kpiAvancesChipRow"),
-        document.getElementById("kpiAvancesChevron")
-    );
-
     // Les 3 cartes de comptes forment un groupe accordeon exclusif :
     // ouvrir l'une ferme automatiquement l'autre (voir commentaire en-tete).
     bindToggle(

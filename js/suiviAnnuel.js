@@ -91,7 +91,8 @@ async function chargerSuiviAnnuel() {
                         <span class="toggle-card-label">${annee} — Résumé</span>
                         <span class="toggle-chevron${chevronOuvertClass}" id="${chevronId}" style="position:static">▾</span>
                     </div>
-                    <div class="chip-row collapsible-content${ouvertClass}" id="${contentId}">
+                    <div class="collapsible-content${ouvertClass}" id="${contentId}">
+                    <div class="chip-row collapsible-inner">
                         <div class="chip">
                             <span class="chip-label"><span class="icon-badge emerald">💰</span>Revenus totaux</span>
                             <span class="chip-value">${formatEUR(totalRev)}</span>
@@ -104,6 +105,7 @@ async function chargerSuiviAnnuel() {
                             <span class="chip-label"><span class="icon-badge blue">🏦</span>Épargne</span>
                             <span class="chip-value">${formatEUR(epargne)}</span>
                         </div>
+                    </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -128,9 +130,11 @@ async function chargerSuiviAnnuel() {
                         <span class="toggle-chevron${chevronOuvertClass}" id="${chevronId}" style="position:static">▾</span>
                     </div>
                     <div class="collapsible-content${ouvertClass}" id="${contentId}">
+                    <div class="collapsible-inner">
                         <div class="card chart-card">
                             <div id="${chartId}" class="chart"></div>
                         </div>
+                    </div>
                     </div>
                 `;
                 container.appendChild(card);
