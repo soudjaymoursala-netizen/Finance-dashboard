@@ -126,4 +126,16 @@
         },
         "comptes"
     );
+
+    bindToggle(
+        document.getElementById("chartsToggle"),
+        document.getElementById("chartsContent"),
+        document.getElementById("chartsChevron"),
+        function () {
+            // Les graphiques ApexCharts rendus pendant que leur conteneur
+            // etait masque (largeur 0) ont besoin d'un evenement resize
+            // pour se redimensionner correctement une fois visibles.
+            window.dispatchEvent(new Event("resize"));
+        }
+    );
 })();

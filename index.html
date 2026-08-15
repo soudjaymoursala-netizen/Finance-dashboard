@@ -210,24 +210,33 @@
 
             <section class="charts-section" id="navHistorique">
                 <h2>📊 Graphiques</h2>
-                <div class="chart-grid">
-                    <div class="card chart-card">
-                        <h3><span class="icon-badge emerald">📈</span>Évolution du patrimoine</h3>
-                        <div id="patrimoineChart" class="chart"></div>
-                    </div>
-                    <div class="card chart-card">
-                        <h3><span class="icon-badge violet">🥧</span>Allocation du patrimoine</h3>
-                        <div id="allocationChart" class="chart"></div>
-                    </div>
+                <div class="toggle-card" id="chartsToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="chartsContent">
+                    <span class="icon-badge violet">📊</span>
+                    <span class="toggle-card-label">Voir les graphiques (évolution, allocation, composition)</span>
+                    <span class="toggle-chevron" id="chartsChevron" style="position:static">▾</span>
                 </div>
-                <div class="chart-grid chart-grid-small">
-                    <div class="card chart-card">
-                        <h3><span class="icon-badge emerald">📈</span>Composition PEA</h3>
-                        <div id="peaCompositionChart" class="chart chart-small"></div>
+                <div class="collapsible-block" id="chartsContent">
+                    <div class="collapsible-inner">
+                    <div class="chart-grid">
+                        <div class="card chart-card">
+                            <h3><span class="icon-badge emerald">📈</span>Évolution du patrimoine</h3>
+                            <div id="patrimoineChart" class="chart"></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3><span class="icon-badge violet">🥧</span>Allocation du patrimoine</h3>
+                            <div id="allocationChart" class="chart"></div>
+                        </div>
                     </div>
-                    <div class="card chart-card">
-                        <h3><span class="icon-badge gold">🏦</span>Composition CTO</h3>
-                        <div id="ctoCompositionChart" class="chart chart-small"></div>
+                    <div class="chart-grid chart-grid-small">
+                        <div class="card chart-card">
+                            <h3><span class="icon-badge emerald">📈</span>Composition PEA</h3>
+                            <div id="peaCompositionChart" class="chart chart-small"></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3><span class="icon-badge gold">🏦</span>Composition CTO</h3>
+                            <div id="ctoCompositionChart" class="chart chart-small"></div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </section>
@@ -335,7 +344,7 @@
     <script src="js/googleSheets.js?v=16"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
-    <script src="js/collapsibleSections.js?v=4"></script>
+    <script src="js/collapsibleSections.js?v=5"></script>
     <script src="js/bottomNav.js?v=1"></script>
     <script src="js/pullToRefresh.js?v=1"></script>
 

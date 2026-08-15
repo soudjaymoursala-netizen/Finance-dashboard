@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v9"; // v9 : section Graphiques regroupee, correctif patrimoine objectif
+const CACHE_VERSION = "shell-v10"; // v10 : section Graphiques repliable par defaut
 
 const PRECACHE_URLS = [
     "./",
