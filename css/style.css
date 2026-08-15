@@ -420,6 +420,11 @@ main > section > h2 {
   gap: 1.5rem;
 }
 
+.chart-grid-small {
+  grid-template-columns: 1fr 1fr;
+  margin-top: 1.5rem;
+}
+
 .chart-card h3 {
   font-size: 1rem;
   font-weight: 600;

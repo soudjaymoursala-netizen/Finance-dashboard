@@ -26,7 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=13">
+    <link rel="stylesheet" href="css/style.css?v=14">
     <link rel="stylesheet" href="css/alerts.css">
     <link rel="stylesheet" href="css/historique.css?v=5">
 </head>
@@ -161,9 +161,6 @@
                         </div>
                         <div class="collapsible-block" id="peaDetailSection">
                             <div class="compte-detail collapsible-inner">
-                            <div class="card chart-card">
-                                <div id="peaCompositionChart" class="chart chart-small"></div>
-                            </div>
                             <div class="goals-grid">
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💎</span>Valeur totale</span></div><div class="fire-stat-value" id="peaDetailValeur">...</div></div>
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💰</span>Investi</span></div><div class="fire-stat-value" id="peaDetailInvesti">...</div></div>
@@ -191,9 +188,6 @@
                         </div>
                         <div class="collapsible-block" id="ctoDetailSection">
                             <div class="compte-detail collapsible-inner">
-                            <div class="card chart-card">
-                                <div id="ctoCompositionChart" class="chart chart-small"></div>
-                            </div>
                             <div class="goals-grid">
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💰</span>Investi</span></div><div class="fire-stat-value" id="ctoDetailInvesti">...</div></div>
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💹</span>Plus-value</span></div><div class="fire-stat-value" id="ctoDetailPlusvalue">...</div></div>
@@ -215,7 +209,7 @@
             </section>
 
             <section class="charts-section" id="navHistorique">
-                <h2>Évolution & répartition</h2>
+                <h2>📊 Graphiques</h2>
                 <div class="chart-grid">
                     <div class="card chart-card">
                         <h3><span class="icon-badge emerald">📈</span>Évolution du patrimoine</h3>
@@ -224,6 +218,16 @@
                     <div class="card chart-card">
                         <h3><span class="icon-badge violet">🥧</span>Allocation du patrimoine</h3>
                         <div id="allocationChart" class="chart"></div>
+                    </div>
+                </div>
+                <div class="chart-grid chart-grid-small">
+                    <div class="card chart-card">
+                        <h3><span class="icon-badge emerald">📈</span>Composition PEA</h3>
+                        <div id="peaCompositionChart" class="chart chart-small"></div>
+                    </div>
+                    <div class="card chart-card">
+                        <h3><span class="icon-badge gold">🏦</span>Composition CTO</h3>
+                        <div id="ctoCompositionChart" class="chart chart-small"></div>
                     </div>
                 </div>
             </section>
@@ -328,7 +332,7 @@
     <script src="js/mouvements.js?v=3"></script>
     <script src="js/suiviAnnuel.js?v=3"></script>
     <script src="js/historiqueAchats.js?v=5"></script>
-    <script src="js/googleSheets.js?v=15"></script>
+    <script src="js/googleSheets.js?v=16"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=4"></script>

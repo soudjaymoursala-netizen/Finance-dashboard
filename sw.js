@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v8"; // v8 : accordeon anime, donut cliquable, pull-to-refresh
+const CACHE_VERSION = "shell-v9"; // v9 : section Graphiques regroupee, correctif patrimoine objectif
 
 const PRECACHE_URLS = [
     "./",

@@ -414,6 +414,20 @@ async function chargerDashboard() {
                 OBJECTIFS[nom] = { cible, actuel };
             }
 
+            // La colonne ACTUEL de la ligne "patrimoine_total" dans la Sheet
+            // Objectif est mise a jour independamment (meme souci que la
+            // Sheet Evolution corrige plus tot ce soir - une source separee
+            // qui peut trainer derriere la vraie valeur en temps reel).
+            // On l'ecrase par DATA.patrimoine (deja calcule en direct plus
+            // haut : Cash + PEA + CTO convertis), pour que la carte
+            // "Patrimoine" des Objectifs d'epargne affiche TOUJOURS le
+            // meme chiffre que partout ailleurs sur le dashboard - seule
+            // la CIBLE (250k, modifiable par l'utilisateur) reste lue
+            // depuis la Sheet.
+            if (OBJECTIFS.patrimoine_total) {
+                OBJECTIFS.patrimoine_total.actuel = DATA.patrimoine;
+            }
+
             // Objectif patrimoine 250k : piloté dynamiquement par le Sheet
             // (au lieu d'une valeur figée dans le code)
             if (OBJECTIFS.patrimoine_total && OBJECTIFS.patrimoine_total.cible > 0) {
