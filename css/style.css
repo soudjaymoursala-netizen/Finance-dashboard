@@ -254,6 +254,18 @@ main > section > h2 {
   height: 340px;
   background: radial-gradient(circle, rgba(45,212,167,0.32), transparent 70%);
   pointer-events: none;
+  animation: heroGlowBreathe 7s ease-in-out infinite;
+}
+
+@keyframes heroGlowBreathe {
+  0%, 100% { opacity: 0.75; transform: scale(1) translate(0, 0); }
+  50% { opacity: 1; transform: scale(1.15) translate(-12px, 12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-card::after {
+    animation: none;
+  }
 }
 
 .hero-label {
@@ -701,6 +713,28 @@ main > section > h2 {
   box-shadow: var(--shadow-card), 0 0 0 1px rgba(45, 212, 167, 0.12), 0 12px 28px rgba(45, 212, 167, 0.08);
 }
 
+/* Retour tactile : leger "enfoncement" au clic/tap sur tout ce qui est
+   reellement interactif (role="button") - sensation plus proche d'une
+   app native que d'une simple page web statique. */
+[role="button"]:active,
+.bottom-nav-item:active,
+.theme-btn:active,
+.lock-submit:active,
+.lock-faceid-icon:active {
+  transform: scale(0.96);
+  transition: transform 100ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [role="button"]:active,
+  .bottom-nav-item:active,
+  .theme-btn:active,
+  .lock-submit:active,
+  .lock-faceid-icon:active {
+    transform: none;
+  }
+}
+
 .hero-card {
   box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 60px rgba(45, 212, 167, 0.06);
 }
@@ -1076,6 +1110,23 @@ main > section > h2 {
 .lock-icon {
   font-size: 2.25rem;
   margin-bottom: 0.75rem;
+  display: inline-block;
+}
+
+.lock-icon-success {
+  animation: lockPopOpen 380ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes lockPopOpen {
+  0% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0 rgba(45,212,167,0)); }
+  40% { transform: scale(1.35) rotate(-8deg); filter: drop-shadow(0 0 14px rgba(45,212,167,0.65)); }
+  100% { transform: scale(1.1) rotate(0deg); filter: drop-shadow(0 0 6px rgba(45,212,167,0.3)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lock-icon-success {
+    animation: none;
+  }
 }
 
 .lock-box h2 {
@@ -1364,3 +1415,61 @@ body.light .bottom-nav {
   }
 }
 
+
+/* ==================================================
+   CELEBRATIONS (celebration.js) - confettis + toast
+   ================================================== */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9500; /* sous le lock screen (9999), au-dessus de tout le reste */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 8px;
+  height: 14px;
+  opacity: 0.9;
+  border-radius: 2px;
+  animation-name: confettiFall;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation-fill-mode: forwards;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) translateX(var(--drift)) rotate(var(--rot)); opacity: 0; }
+}
+
+.celebration-toast {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  z-index: 9600;
+  max-width: 90vw;
+  text-align: center;
+  background: linear-gradient(135deg, var(--accent-color), #4EC5CF);
+  color: #0B1120;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(45, 212, 167, 0.35);
+  opacity: 0;
+  transform: translate(-50%, -20px);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.celebration-toast.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-container {
+    display: none;
+  }
+}

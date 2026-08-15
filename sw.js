@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v10"; // v10 : section Graphiques repliable par defaut
+const CACHE_VERSION = "shell-v11"; // v11 : effets wow - confettis paliers, reflet ambiant, retour tactile, deverrouillage anime
 
 const PRECACHE_URLS = [
     "./",
@@ -34,6 +34,7 @@ const PRECACHE_URLS = [
     "./js/mouvements.js",
     "./js/suiviAnnuel.js",
     "./js/historiqueAchats.js",
+    "./js/celebration.js",
     "./js/googleSheets.js",
     "./js/runtimeConfigUI.js",
     "./js/rippleEffect.js",

@@ -576,6 +576,12 @@ async function chargerDashboard() {
             });
         }
 
+        // Verifie si un palier significatif vient d'etre franchi
+        // (patrimoine ou avancement FIRE) - voir celebration.js
+        if (typeof verifierPaliers === "function") {
+            verifierPaliers(DATA.patrimoine, DATA.progression250k);
+        }
+
         // Chargement termine : on retire la pulsation de tous les
         // placeholders restants (au cas ou une donnee precise n'aurait
         // pas ete ecrite individuellement plus haut).

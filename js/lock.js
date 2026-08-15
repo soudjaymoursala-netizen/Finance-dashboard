@@ -110,7 +110,7 @@
                 },
             });
             if (assertion) {
-                unlock();
+                unlockAvecCelebration();
                 localStorage.setItem(FACEID_CRED_KEY, "1"); // met a jour l'indice local au passage
             }
         } catch (e) {
@@ -148,6 +148,24 @@
         sessionStorage.setItem(SESSION_KEY, "1");
     }
 
+    // Petit moment de satisfaction a la reussite d'un VRAI deverrouillage
+    // (code correct ou Face ID) : le cadenas "s'ouvre" avec un pop avant
+    // que l'ecran ne disparaisse. Volontairement PAS utilise pour la
+    // reprise silencieuse de session (sessionStorage deja valide au
+    // chargement) - l'animation ne doit se jouer qu'une fois par vraie
+    // action de deverrouillage, pas a chaque rechargement de page.
+    function unlockAvecCelebration() {
+        const lockIcon = document.querySelector(".lock-icon");
+        const reduitMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!lockIcon || reduitMotion) {
+            unlock();
+            return;
+        }
+        lockIcon.textContent = "🔓";
+        lockIcon.classList.add("lock-icon-success");
+        setTimeout(unlock, 380);
+    }
+
     function lock() {
         if (lockScreen) lockScreen.style.display = "flex";
         if (container) container.classList.add("blurred");
@@ -155,6 +173,11 @@
         if (bottomNav) bottomNav.classList.remove("visible");
         if (errorEl) errorEl.style.display = "none";
         if (input) input.value = "";
+        const lockIcon = document.querySelector(".lock-icon");
+        if (lockIcon) {
+            lockIcon.textContent = "🔒";
+            lockIcon.classList.remove("lock-icon-success");
+        }
         sessionStorage.removeItem(SESSION_KEY);
     }
 
@@ -198,8 +221,8 @@
             });
             const data = await res.json().catch(() => ({ ok: false }));
             if (data && data.ok) {
-                unlock();
-                maybeOfferFaceId();
+                unlockAvecCelebration();
+                setTimeout(maybeOfferFaceId, 380);
             } else {
                 showError("Code incorrect");
             }
