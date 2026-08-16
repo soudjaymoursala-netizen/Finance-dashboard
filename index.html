@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=16">
+    <link rel="stylesheet" href="css/style.css?v=17">
     <link rel="stylesheet" href="css/alerts.css">
-    <link rel="stylesheet" href="css/historique.css?v=5">
+    <link rel="stylesheet" href="css/historique.css?v=6">
 </head>
 <body>
     <div id="lockScreen" class="lock-screen">
@@ -208,6 +208,32 @@
                 </div>
             </section>
 
+            <section class="investissements-section" id="navInvestissements" style="display:none">
+                <h2>💼 Mes investissements</h2>
+                <div class="invest-filters" id="investFiltersBar">
+                    <input type="search" id="investSearch" class="invest-search" placeholder="🔍 Rechercher un ticker, une société…" aria-label="Rechercher un investissement">
+                    <div class="invest-chip-group" role="group" aria-label="Filtrer par compte">
+                        <button type="button" class="invest-chip active" data-filter="compte" data-value="TOUS" aria-pressed="true">Tous</button>
+                        <button type="button" class="invest-chip" data-filter="compte" data-value="PEA" aria-pressed="false">PEA</button>
+                        <button type="button" class="invest-chip" data-filter="compte" data-value="CTO" aria-pressed="false">CTO</button>
+                    </div>
+                    <div class="invest-chip-group" role="group" aria-label="Filtrer par statut">
+                        <button type="button" class="invest-chip active" data-filter="statut" data-value="TOUS" aria-pressed="true">Tous</button>
+                        <button type="button" class="invest-chip positive" data-filter="statut" data-value="GAGNANT" aria-pressed="false">📈 Gagnants</button>
+                        <button type="button" class="invest-chip negative" data-filter="statut" data-value="PERDANT" aria-pressed="false">📉 Perdants</button>
+                    </div>
+                    <select id="investSort" class="invest-sort" aria-label="Trier par">
+                        <option value="perf_desc">Performance ↓</option>
+                        <option value="perf_asc">Performance ↑</option>
+                        <option value="gain_desc">Gain € ↓</option>
+                        <option value="valeur_desc">Valeur ↓</option>
+                        <option value="nom_asc">Nom A→Z</option>
+                    </select>
+                </div>
+                <div id="investissementsSummary" class="invest-summary"></div>
+                <div id="investissementsContainer" class="historique-positions"></div>
+            </section>
+
             <section class="charts-section" id="navHistorique">
                 <h2>📊 Graphiques</h2>
                 <div class="toggle-card" id="chartsToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="chartsContent">
@@ -219,7 +245,17 @@
                     <div class="collapsible-inner">
                     <div class="chart-grid">
                         <div class="card chart-card">
-                            <h3><span class="icon-badge emerald">📈</span>Évolution du patrimoine</h3>
+                            <div class="chart-card-header">
+                                <h3><span class="icon-badge emerald">📈</span>Évolution du patrimoine</h3>
+                                <div class="period-selector" id="patrimoinePeriodSelector" role="group" aria-label="Période affichée">
+                                    <button type="button" data-period="3M" aria-pressed="false">3M</button>
+                                    <button type="button" data-period="6M" aria-pressed="false">6M</button>
+                                    <button type="button" data-period="1A" aria-pressed="false">1A</button>
+                                    <button type="button" data-period="YTD" aria-pressed="false">YTD</button>
+                                    <button type="button" data-period="ALL" aria-pressed="true" class="active">Tout</button>
+                                </div>
+                            </div>
+                            <div id="patrimoinePeriodVariation" class="period-variation"></div>
                             <div id="patrimoineChart" class="chart"></div>
                         </div>
                         <div class="card chart-card">
@@ -334,15 +370,16 @@
     <script src="js/config.js?v=3"></script>
     <script src="js/lock.js?v=10"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="js/charts.js?v=5"></script>
+    <script src="js/charts.js?v=6"></script>
     <script src="js/errorHandler.js?v=1"></script>
     <script src="js/parsing.js?v=1"></script>
     <script src="js/dataCache.js?v=1"></script>
     <script src="js/mouvements.js?v=3"></script>
     <script src="js/suiviAnnuel.js?v=3"></script>
-    <script src="js/historiqueAchats.js?v=5"></script>
+    <script src="js/historiqueAchats.js?v=6"></script>
+    <script src="js/investissements.js?v=1"></script>
     <script src="js/celebration.js?v=1"></script>
-    <script src="js/googleSheets.js?v=18"></script>
+    <script src="js/googleSheets.js?v=19"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=5"></script>

@@ -131,6 +131,11 @@ async function chargerHistoriqueAchats() {
         if (historiqueComptesGroupes.CTO) {
             rendrePositionsDansConteneur("ctoHistoriqueContainer", historiqueComptesGroupes.CTO);
         }
+
+        // Vue unifiee filtrable (section "Mes investissements", cf.
+        // investissements.js) : optionnelle, reste masquee si le script
+        // n'est pas charge ou si aucune position n'est disponible.
+        if (typeof rendreInvestissements === "function") rendreInvestissements();
     } catch (e) {
         console.warn("Performance par achat non disponible:", e);
     }

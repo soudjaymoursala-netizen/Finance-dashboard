@@ -12,6 +12,15 @@ let lastCtoComposition = { actions: 0, etf: 0, crypto: 0 };
 let lastPeaSeries = { valeurs: [] };
 let lastCtoSeries = { valeurs: [] };
 
+// Historique COMPLET du patrimoine (jamais tronqué), separe de lastPatrimoine
+// qui contient lui la tranche actuellement AFFICHEE dans le graphique (selon
+// la periode choisie ci-dessous). La sparkline du hero reste toujours basee
+// sur l'historique complet, independamment de la periode selectionnee ici.
+let patrimoineHistoryFull = { labels: [], valeurs: [], objectif: 250000 };
+let currentPatrimoinePeriod = (function () {
+    try { return localStorage.getItem("patrimoinePeriod") || "ALL"; } catch (e) { return "ALL"; }
+})();
+
 function getThemeMode() {
   return document && document.body && document.body.classList.contains("light") ? "light" : "dark";
 }
@@ -138,6 +147,139 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
     patrimoineChart = new ApexCharts(chartElement, options);
     patrimoineChart.render();
 }
+
+/* ==================================================
+   SELECTEUR DE PERIODE — graphique Evolution du patrimoine
+   Les points du Sheet Evolution sont poses au rythme des mises
+   a jour de l'utilisateur (typiquement mensuel), pas au jour le
+   jour : les periodes courtes (3M/6M/1A) filtrent donc par NOMBRE
+   DE POINTS (les N derniers releves), pas par duree calendaire
+   exacte - plus honnete que de pretendre une granularite
+   journaliere que la donnee source n'a pas. YTD et Tout, eux,
+   s'appuient sur la vraie date quand elle est reconnaissable.
+   ================================================== */
+
+const MOIS_FR_INDEX = {
+    "janvier": 0, "février": 1, "fevrier": 1, "mars": 2, "avril": 3, "mai": 4, "juin": 5,
+    "juillet": 6, "août": 7, "aout": 7, "septembre": 8, "octobre": 9, "novembre": 10, "décembre": 11, "decembre": 11
+};
+
+/* Essaie plusieurs formats couramment utilises dans les Sheets (label texte
+   "Mars 2026", "03/2026", "2026-03", date complete...). Retourne un objet
+   Date ou null si aucun format reconnu - les appelants degradent alors
+   proprement (bouton masque / repli sur l'historique complet). */
+function parseLabelDate(label) {
+    if (!label) return null;
+    const s = label.toString().trim().toLowerCase();
+
+    let m = s.match(/^([a-zàâéèêëîïôûù]+)\s+(\d{4})$/i);
+    if (m && MOIS_FR_INDEX[m[1]] !== undefined) {
+        return new Date(parseInt(m[2], 10), MOIS_FR_INDEX[m[1]], 1);
+    }
+
+    m = s.match(/^(\d{1,2})[\/\-](\d{4})$/);
+    if (m) return new Date(parseInt(m[2], 10), parseInt(m[1], 10) - 1, 1);
+
+    m = s.match(/^(\d{4})[\/\-](\d{1,2})$/);
+    if (m) return new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, 1);
+
+    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (m) return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+
+    const parsed = Date.parse(label);
+    return isNaN(parsed) ? null : new Date(parsed);
+}
+
+/* Remplace l'historique complet (appele une fois par chargement de donnees)
+   et redessine avec la periode actuellement selectionnee. */
+function setPatrimoineHistory(labels, valeurs, objectifCible) {
+    patrimoineHistoryFull.labels = labels || [];
+    patrimoineHistoryFull.valeurs = valeurs || [];
+    if (typeof objectifCible === "number" && objectifCible > 0) {
+        patrimoineHistoryFull.objectif = objectifCible;
+    }
+    applyPatrimoinePeriod(currentPatrimoinePeriod);
+}
+window.setPatrimoineHistory = setPatrimoineHistory;
+
+/* Met a jour uniquement l'objectif (connu plus tard, apres parsing de la
+   Sheet Objectif) sans re-fetcher/re-trancher l'historique. */
+function updatePatrimoineObjectif(objectifCible) {
+    if (typeof objectifCible === "number" && objectifCible > 0) {
+        patrimoineHistoryFull.objectif = objectifCible;
+    }
+    applyPatrimoinePeriod(currentPatrimoinePeriod);
+}
+window.updatePatrimoineObjectif = updatePatrimoineObjectif;
+
+const PATRIMOINE_PERIODES_POINTS = { "3M": 3, "6M": 6, "1A": 12 };
+
+function applyPatrimoinePeriod(periode) {
+    const { labels, valeurs, objectif } = patrimoineHistoryFull;
+    if (!labels || !labels.length) return;
+
+    currentPatrimoinePeriod = periode;
+    try { localStorage.setItem("patrimoinePeriod", periode); } catch (e) { /* stockage indisponible, pas bloquant */ }
+
+    let startIndex = 0;
+    if (periode === "YTD") {
+        const anneeActuelle = new Date().getFullYear();
+        const idx = labels.findIndex((lbl) => {
+            const d = parseLabelDate(lbl);
+            return d && d.getFullYear() === anneeActuelle;
+        });
+        startIndex = idx >= 0 ? idx : 0;
+    } else if (PATRIMOINE_PERIODES_POINTS[periode]) {
+        startIndex = Math.max(0, labels.length - PATRIMOINE_PERIODES_POINTS[periode]);
+    }
+
+    const labelsSlice = labels.slice(startIndex);
+    const valeursSlice = valeurs.slice(startIndex);
+
+    updatePatrimoineChart(labelsSlice, valeursSlice, objectif);
+    afficherVariationPeriode(labelsSlice, valeursSlice);
+
+    document.querySelectorAll("#patrimoinePeriodSelector [data-period]").forEach((btn) => {
+        const actif = btn.getAttribute("data-period") === periode;
+        btn.classList.toggle("active", actif);
+        btn.setAttribute("aria-pressed", actif ? "true" : "false");
+    });
+}
+window.applyPatrimoinePeriod = applyPatrimoinePeriod;
+
+function afficherVariationPeriode(labels, valeurs) {
+    const el = document.getElementById("patrimoinePeriodVariation");
+    if (!el) return;
+
+    const pointsValides = [];
+    for (let i = 0; i < valeurs.length; i++) {
+        if (valeurs[i] && valeurs[i] > 0) pointsValides.push({ valeur: valeurs[i], label: labels[i] });
+    }
+    if (pointsValides.length < 2) {
+        el.textContent = "";
+        return;
+    }
+
+    const premier = pointsValides[0];
+    const dernier = pointsValides[pointsValides.length - 1];
+    const deltaAbs = dernier.valeur - premier.valeur;
+    const deltaPct = premier.valeur > 0 ? (deltaAbs / premier.valeur) * 100 : 0;
+    const signe = deltaPct >= 0 ? "+" : "";
+
+    el.className = "period-variation " + (deltaPct >= 0 ? "up" : "down");
+    el.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe +
+        Math.round(deltaAbs).toLocaleString("fr-FR") + " €) depuis " + premier.label;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const selecteur = document.getElementById("patrimoinePeriodSelector");
+    if (!selecteur) return;
+    selecteur.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-period]");
+        if (!btn) return;
+        applyPatrimoinePeriod(btn.getAttribute("data-period"));
+    });
+});
 
 function updateAllocationChart(cash, pea, cto, patrimoineTotal) {
 
@@ -486,7 +628,13 @@ function updateCtoSparkline(valeurs) {
 
 /* Refresh charts using cached data (appelable après un changement de thème) */
 function refreshCharts() {
-  if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
+  if (patrimoineHistoryFull.labels && patrimoineHistoryFull.labels.length) {
+    // redessine le graphique dans la periode actuellement selectionnee
+    // (pas toujours l'historique complet), la sparkline du hero reste
+    // elle basee sur l'historique complet quelle que soit la periode.
+    applyPatrimoinePeriod(currentPatrimoinePeriod);
+    updateHeroSparkline(patrimoineHistoryFull.valeurs, patrimoineHistoryFull.labels);
+  } else if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
     updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, lastPatrimoine.objectif);
     updateHeroSparkline(lastPatrimoine.valeurs);
   }

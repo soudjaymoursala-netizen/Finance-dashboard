@@ -355,7 +355,7 @@ async function chargerDashboard() {
             if (valeurs.length > 0 && DATA.patrimoine > 0) {
                 valeurs[valeurs.length - 1] = DATA.patrimoine;
             }
-            if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
+            if (typeof setPatrimoineHistory === "function") setPatrimoineHistory(labels, valeurs, DATA.objectif250k);
             if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs, labels);
             if (typeof updatePeaSparkline === "function") updatePeaSparkline(peaSeries);
             if (typeof updateCtoSparkline === "function") updateCtoSparkline(ctoSeries);
@@ -459,8 +459,8 @@ async function chargerDashboard() {
                 // redessine le graphique patrimoine avec la cible reelle (il avait ete
                 // dessine plus haut avec la valeur par defaut, avant que l'objectif
                 // dynamique ne soit connu)
-                if (typeof updatePatrimoineChart === "function") {
-                    updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, DATA.objectif250k);
+                if (typeof updatePatrimoineObjectif === "function") {
+                    updatePatrimoineObjectif(DATA.objectif250k);
                 }
             }
 

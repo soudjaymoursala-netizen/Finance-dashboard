@@ -286,6 +286,12 @@
   border: 1px solid rgba(78, 197, 207, 0.3);
 }
 
+.historique-badge.emerald {
+  background: rgba(45, 212, 167, 0.18);
+  color: var(--accent-text);
+  border: 1px solid rgba(45, 212, 167, 0.3);
+}
+
 .historique-positif {
   color: var(--positive-color);
 }
@@ -359,5 +365,149 @@
   .historique-tx-investi,
   .historique-tx-valeur {
     text-align: left;
+  }
+}
+
+/* ==================================================
+   MES INVESTISSEMENTS — barre de filtres (section
+   investissements-section, cf. investissements.js)
+   ================================================== */
+.invest-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.invest-search {
+  flex: 1 1 220px;
+  box-sizing: border-box;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--primary-color);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.invest-search:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 1px;
+}
+
+.invest-chip-group {
+  display: inline-flex;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  padding: 0.2rem;
+}
+
+.invest-chip {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary-color);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.invest-chip:hover {
+  color: var(--text-color);
+}
+
+.invest-chip.active {
+  background: rgba(45, 212, 167, 0.16);
+  color: var(--accent-text);
+}
+
+.invest-chip.positive.active {
+  background: rgba(45, 212, 167, 0.18);
+  color: var(--positive-color);
+}
+
+.invest-chip.negative.active {
+  background: rgba(240, 87, 107, 0.18);
+  color: var(--negative-color);
+}
+
+.invest-sort {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--primary-color);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.invest-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.invest-summary-stat {
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.invest-summary-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary-color);
+}
+
+.invest-summary-value {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.invest-summary-value.historique-positif {
+  color: var(--positive-color);
+}
+
+.invest-summary-value.historique-negatif {
+  color: var(--negative-color);
+}
+
+.invest-summary-empty {
+  color: var(--text-secondary-color);
+  font-size: 0.85rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .invest-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .invest-chip-group {
+    justify-content: center;
+  }
+
+  .invest-sort {
+    width: 100%;
   }
 }
