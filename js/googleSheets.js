@@ -356,7 +356,7 @@ async function chargerDashboard() {
                 valeurs[valeurs.length - 1] = DATA.patrimoine;
             }
             if (typeof updatePatrimoineChart === "function") updatePatrimoineChart(labels, valeurs, DATA.objectif250k);
-            if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs);
+            if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs, labels);
             if (typeof updatePeaSparkline === "function") updatePeaSparkline(peaSeries);
             if (typeof updateCtoSparkline === "function") updateCtoSparkline(ctoSeries);
 
@@ -383,6 +383,13 @@ async function chargerDashboard() {
                         const signe = deltaPct >= 0 ? "+" : "";
                         trendEl.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe + formatEUR(deltaAbs) + ") depuis " + precedentPoint.label;
                         trendEl.title = "Variation par rapport au point précédent du suivi (" + precedentPoint.label + ")";
+
+                        // Le halo ambiant de la carte reagit a la vraie
+                        // tendance : teal en croissance, ambre discret
+                        // en repli - signal honnete plutot que purement
+                        // decoratif (voir heroGlowBreathe dans style.css).
+                        const heroCardEl = document.getElementById("heroCard");
+                        if (heroCardEl) heroCardEl.classList.toggle("hero-card-down", deltaPct < 0);
                     }
                 }
             } catch (e) {
@@ -568,11 +575,48 @@ async function chargerDashboard() {
                 if (window.refreshCharts) window.refreshCharts();
             }
             themeButton.addEventListener("click", () => {
-                document.body.classList.toggle("light");
-                const isLight = document.body.classList.contains("light");
-                themeButton.textContent = isLight ? "☀️" : "🌙";
-                localStorage.setItem("theme", isLight ? "light" : "dark");
-                if (window.refreshCharts) window.refreshCharts();
+                const appliquerTheme = () => {
+                    document.body.classList.toggle("light");
+                    const isLight = document.body.classList.contains("light");
+                    themeButton.textContent = isLight ? "☀️" : "🌙";
+                    localStorage.setItem("theme", isLight ? "light" : "dark");
+                    if (window.refreshCharts) window.refreshCharts();
+                };
+
+                // Transition en cercle qui s'etend depuis le bouton
+                // (View Transitions API), si le navigateur la supporte -
+                // sinon repli instantane classique, sans aucune
+                // regression pour les navigateurs plus anciens.
+                const reduitMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                if (!document.startViewTransition || reduitMotion) {
+                    appliquerTheme();
+                    return;
+                }
+
+                const rect = themeButton.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                const maxRadius = Math.hypot(
+                    Math.max(x, window.innerWidth - x),
+                    Math.max(y, window.innerHeight - y)
+                );
+
+                const transition = document.startViewTransition(appliquerTheme);
+                transition.ready.then(() => {
+                    document.documentElement.animate(
+                        {
+                            clipPath: [
+                                `circle(0px at ${x}px ${y}px)`,
+                                `circle(${maxRadius}px at ${x}px ${y}px)`
+                            ]
+                        },
+                        {
+                            duration: 550,
+                            easing: "ease-in-out",
+                            pseudoElement: "::view-transition-new(root)"
+                        }
+                    );
+                }).catch(() => { /* transition annulee/non supportee : appliquerTheme() a deja tourne via startViewTransition */ });
             });
         }
 

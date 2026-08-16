@@ -255,6 +255,14 @@ main > section > h2 {
   background: radial-gradient(circle, rgba(45,212,167,0.32), transparent 70%);
   pointer-events: none;
   animation: heroGlowBreathe 7s ease-in-out infinite;
+  transition: background 900ms ease;
+}
+
+/* Repli mensuel : le halo vire vers un ambre discret plutot que de
+   rester teal quoi qu'il arrive - signal honnete sur la tendance
+   reelle, pas juste decoratif. */
+.hero-card.hero-card-down::after {
+  background: radial-gradient(circle, rgba(217, 164, 65, 0.28), transparent 70%);
 }
 
 @keyframes heroGlowBreathe {
@@ -1472,4 +1480,24 @@ body.light .bottom-nav {
   .confetti-container {
     display: none;
   }
+}
+
+/* ==================================================
+   TRANSITION EN CERCLE — changement de theme
+   Desactive le fondu par defaut de la View Transitions
+   API : le cercle personnalise (anime en JS) prend le
+   relais a la place (voir googleSheets.js).
+   ================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+::view-transition-old(root) {
+  z-index: 2;
 }

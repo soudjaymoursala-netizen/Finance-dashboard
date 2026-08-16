@@ -379,7 +379,7 @@ function updateMonthlyBudgetChart(labels, revenus, depenses, containerId = "mont
 /* Sparkline dans la carte héros : tendance récente du patrimoine */
 let heroSparklineChart = null;
 
-function updateHeroSparkline(valeurs) {
+function updateHeroSparkline(valeurs, labels) {
     const chartElement = document.querySelector("#heroSparkline");
     if (!chartElement || !valeurs || !valeurs.length) return;
     if (heroSparklineChart) heroSparklineChart.destroy();
@@ -410,8 +410,14 @@ function updateHeroSparkline(valeurs) {
             gradient: { shadeIntensity: 0.6, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] }
         },
         yaxis: { min: valMin - marge, max: valMax + marge },
+        xaxis: { categories: labels || [] },
+        // Suivre le doigt/curseur plutot que de se figer sur le point le
+        // plus proche : sensation de "glisser sur la courbe" comme dans
+        // Apple Stocks/Robinhood, plutot qu'un simple survol statique.
         tooltip: {
             theme: getThemeMode(),
+            followCursor: true,
+            x: { show: true },
             y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
         }
     };

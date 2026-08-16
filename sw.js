@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v11"; // v11 : effets wow - confettis paliers, reflet ambiant, retour tactile, deverrouillage anime
+const CACHE_VERSION = "shell-v12"; // v12 : sparkline scrubable, transition cercle theme, halo reactif a la tendance
 
 const PRECACHE_URLS = [
     "./",
