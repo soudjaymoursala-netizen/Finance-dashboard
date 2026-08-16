@@ -25,3 +25,20 @@ There are no automated tests, no linter, and no build/dev-server tooling in this
 **Service worker (`sw.js`)** caches only the static app shell (network-first, falls back to cache when offline) — it deliberately does not intercept calls to the Cloudflare Worker or Google Sheets. **`CACHE_VERSION` in `sw.js` must be bumped manually whenever any precached file's content changes**, otherwise already-installed users won't get the update. Script tags in `index.html` use a `?v=N` query string per file for the same cache-busting purpose — bump it when editing a given file.
 
 **Secrets:** actual Google Sheets URLs and `LOCK_CODE` live only as Cloudflare Worker secrets (`SHEET_*`, `LOCK_CODE`, set in the Cloudflare dashboard), never committed. `.env.example` documents the two supported setups (Worker proxy vs. directly public sheet URLs via `VITE_URL_*`).
+
+## Working conventions
+
+- **Discuss layout/placement before writing code for a new UI feature.** Past feature work ("Performance par achat") had to be rebuilt three times because the structure wasn't agreed upfront — align on where/how something renders before implementing it.
+- **Read the actual current files before suggesting changes or critiquing existing code.** Don't rely on assumptions or stale docs/memory of a previous state — this repo has moved fast (currently `sw.js` `CACHE_VERSION` shell-v12) and out-of-date mental models lead to wrong suggestions.
+- **Give complete file rewrites when editing a file, not partial snippets.**
+- See `docs/project-context/` for the fuller history of how the dashboard evolved (imported from prior Claude Desktop project memory) — useful background, but the code is always the source of truth for current state.
+
+## Domain-specific correctness rules
+
+- **CHF ⇄ EUR conversion direction:** divide an EUR amount by the EUR/CHF rate to get CHF; multiply a CHF amount by the EUR/CHF rate to get EUR. Sign/direction errors here have caused real bugs before (the CTO account is CHF-denominated at a Swiss broker; the YUH cash account is also CHF).
+- **`VENTE` (sale) rows in the transaction journal are intentional historical records**, not duplicates — never deduplicate or filter them out.
+- **iOS PWA vs Safari:** `localStorage` is isolated between Safari and the installed PWA (separate storage contexts), but the system keychain is shared — this is why `js/lock.js` uses WebAuthn/Face ID (works consistently across both) rather than `localStorage`-based auth state.
+
+## Relevant skills
+
+When changing anything about the charts, KPI cards, or overall dashboard visual design, consult the `dataviz` skill for color/accessibility/layout guidance before implementing.
