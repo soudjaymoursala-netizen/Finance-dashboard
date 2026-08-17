@@ -212,14 +212,117 @@ function updatePatrimoineObjectif(objectifCible) {
 }
 window.updatePatrimoineObjectif = updatePatrimoineObjectif;
 
-const PATRIMOINE_PERIODES_POINTS = { "3M": 3, "6M": 6, "1A": 12 };
+// N+1 points par periode (et pas N) : une periode "X mois" doit comparer
+// le point d'il y a X mois AU point actuel, donc inclure les 2 bornes -
+// avec seulement N points, "1M" par exemple n'aurait que le point actuel
+// et rien a comparer (badge de variation vide).
+const PATRIMOINE_PERIODES_POINTS = { "1M": 2, "2M": 3, "3M": 4, "6M": 7, "1A": 13 };
 
-function applyPatrimoinePeriod(periode) {
-    const { labels, valeurs, objectif } = patrimoineHistoryFull;
-    if (!labels || !labels.length) return;
+/* ==================================================
+   HISTORIQUE QUOTIDIEN LOCAL — pour les periodes courtes (1J/5J)
+   Le Sheet Evolution n'a qu'un point par mise a jour manuelle
+   (typiquement mensuelle) : impossible d'en tirer un vrai "hier" ou
+   "il y a 5 jours" honnete. On construit donc ici un historique
+   JOUR PAR JOUR reel, cote client, en enregistrant le Patrimoine
+   Total a chaque chargement du dashboard (1 point par jour, ecrase si
+   rechargement le meme jour). Consequence assumee : 1J/5J restent
+   pauvres les tout premiers jours d'usage et s'etoffent ensuite tout
+   seuls - preferable a une fausse precision basee sur des donnees
+   mensuelles.
+   ================================================== */
+const DAILY_HISTORY_KEY = "financeDashboard_dailyHistory";
+const DAILY_HISTORY_MAX = 90;
 
+function dateLocaleISO(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + d;
+}
+
+function chargerHistoriqueJournalier() {
+    try {
+        const raw = localStorage.getItem(DAILY_HISTORY_KEY);
+        const historique = raw ? JSON.parse(raw) : [];
+        return Array.isArray(historique) ? historique : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function enregistrerSnapshotJournalier(valeur) {
+    if (!valeur || valeur <= 0) return;
+    const aujourdhui = dateLocaleISO(new Date());
+    let historique = chargerHistoriqueJournalier();
+    const idx = historique.findIndex((p) => p.date === aujourdhui);
+    if (idx >= 0) {
+        historique[idx].valeur = valeur;
+    } else {
+        historique.push({ date: aujourdhui, valeur: valeur });
+    }
+    historique.sort((a, b) => a.date.localeCompare(b.date));
+    if (historique.length > DAILY_HISTORY_MAX) {
+        historique = historique.slice(historique.length - DAILY_HISTORY_MAX);
+    }
+    try { localStorage.setItem(DAILY_HISTORY_KEY, JSON.stringify(historique)); } catch (e) { /* quota depasse, pas bloquant */ }
+}
+window.enregistrerSnapshotJournalier = enregistrerSnapshotJournalier;
+
+function formatDateCourteFr(isoDate) {
+    const d = new Date(isoDate + "T00:00:00");
+    return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
+}
+
+/* Redessine chart + sparkline + badge de variation + halo + etat actif
+   des boutons pour une tranche (labels, valeurs) donnee - factorise les
+   deux sources possibles (historique mensuel du Sheet vs historique
+   quotidien local). */
+function renderPatrimoinePeriodSlice(labels, valeurs, objectif, periode, historiqueInsuffisant) {
     currentPatrimoinePeriod = periode;
     try { localStorage.setItem("patrimoinePeriod", periode); } catch (e) { /* stockage indisponible, pas bloquant */ }
+
+    updatePatrimoineChart(labels, valeurs, objectif);
+    updateHeroSparkline(valeurs, labels);
+
+    if (historiqueInsuffisant) {
+        const el = document.getElementById("patrimoinePeriodVariation");
+        if (el) {
+            el.className = "period-variation";
+            el.textContent = "Historique quotidien encore limité — reviens dans quelques jours pour voir cette période.";
+        }
+        const heroCardEl = document.getElementById("heroCard");
+        if (heroCardEl) heroCardEl.classList.remove("hero-card-down");
+    } else {
+        afficherVariationPeriode(labels, valeurs);
+    }
+
+    // querySelectorAll("[data-period]") plutot qu'un id precis : le
+    // controle existe une seule fois dans le DOM (hero-card), mais
+    // cette ecriture generique evite une re-casse silencieuse si un
+    // second selecteur est reintroduit plus tard ailleurs.
+    document.querySelectorAll(".period-selector [data-period]").forEach((btn) => {
+        const actif = btn.getAttribute("data-period") === periode;
+        btn.classList.toggle("active", actif);
+        btn.setAttribute("aria-pressed", actif ? "true" : "false");
+    });
+}
+
+function applyPeriodeJournaliere(periode) {
+    const nbPoints = periode === "1J" ? 2 : 6; // 1J = aujourd'hui vs hier, 5J = 6 points (J-5 -> J)
+    const historique = chargerHistoriqueJournalier().slice(-nbPoints);
+    const labels = historique.map((p) => formatDateCourteFr(p.date));
+    const valeurs = historique.map((p) => p.valeur);
+    renderPatrimoinePeriodSlice(labels, valeurs, patrimoineHistoryFull.objectif, periode, historique.length < 2);
+}
+
+function applyPatrimoinePeriod(periode) {
+    if (periode === "1J" || periode === "5J") {
+        applyPeriodeJournaliere(periode);
+        return;
+    }
+
+    const { labels, valeurs, objectif } = patrimoineHistoryFull;
+    if (!labels || !labels.length) return;
 
     let startIndex = 0;
     if (periode === "YTD") {
@@ -241,19 +344,7 @@ function applyPatrimoinePeriod(periode) {
     // patrimoine (visible une fois Graphiques deplie) refletent
     // desormais la meme periode selectionnee, au lieu de la sparkline
     // hero figee sur l'historique complet.
-    updatePatrimoineChart(labelsSlice, valeursSlice, objectif);
-    updateHeroSparkline(valeursSlice, labelsSlice);
-    afficherVariationPeriode(labelsSlice, valeursSlice);
-
-    // querySelectorAll("[data-period]") plutot qu'un id precis : le
-    // controle existe une seule fois dans le DOM (hero-card), mais
-    // cette ecriture generique evite une re-casse silencieuse si un
-    // second selecteur est reintroduit plus tard ailleurs.
-    document.querySelectorAll(".period-selector [data-period]").forEach((btn) => {
-        const actif = btn.getAttribute("data-period") === periode;
-        btn.classList.toggle("active", actif);
-        btn.setAttribute("aria-pressed", actif ? "true" : "false");
-    });
+    renderPatrimoinePeriodSlice(labelsSlice, valeursSlice, objectif, periode);
 }
 window.applyPatrimoinePeriod = applyPatrimoinePeriod;
 
