@@ -276,11 +276,11 @@ async function chargerDashboard() {
         if (DOM.valeurInvestie) DOM.valeurInvestie.textContent = formatEUR(DATA.valeurInvestie);
 
         if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
-        if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
+        if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
         if (DOM.fireDetails) DOM.fireDetails.innerHTML =
-                    '<div class="fire-stat"><span class="fire-stat-label">💸 Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
-                    '<div class="fire-stat"><span class="fire-stat-label">🏦 Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
-                    '<div class="fire-stat"><span class="fire-stat-label">🚀 Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
+                    '<div class="fire-stat"><span class="fire-stat-label">Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
         if (DOM.fireBar) {
             const pct = Math.max(0, Math.min(DATA.progression250k, 100));
             DOM.fireBar.style.width = pct + "%";
@@ -355,8 +355,11 @@ async function chargerDashboard() {
             if (valeurs.length > 0 && DATA.patrimoine > 0) {
                 valeurs[valeurs.length - 1] = DATA.patrimoine;
             }
+            // setPatrimoineHistory() applique aussitot la periode courante
+            // (3M/6M/1A/YTD/Tout) et redessine a la fois la sparkline hero
+            // et le graphique Evolution - plus besoin d'appeler
+            // updateHeroSparkline() separement avec l'historique complet.
             if (typeof setPatrimoineHistory === "function") setPatrimoineHistory(labels, valeurs, DATA.objectif250k);
-            if (typeof updateHeroSparkline === "function") updateHeroSparkline(valeurs, labels);
             if (typeof updatePeaSparkline === "function") updatePeaSparkline(peaSeries);
             if (typeof updateCtoSparkline === "function") updateCtoSparkline(ctoSeries);
 
@@ -445,11 +448,11 @@ async function chargerDashboard() {
                 DATA.projectionAnnee = new Date().getFullYear() + Math.ceil(DATA.anneesRestantes);
                 // re-synchroniser l'affichage deja fait plus haut avec la cible dynamique
                 if (DOM.fireProgress) DOM.fireProgress.textContent = DATA.progression250k.toFixed(1) + " %";
-                if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = "🎯 " + DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
+                if (DOM.mainGoalProgress) DOM.mainGoalProgress.textContent = DATA.progression250k.toFixed(1) + "% vers " + Math.round(DATA.objectif250k / 1000) + "k";
                 if (DOM.fireDetails) DOM.fireDetails.innerHTML =
-                    '<div class="fire-stat"><span class="fire-stat-label">💸 Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
-                    '<div class="fire-stat"><span class="fire-stat-label">🏦 Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
-                    '<div class="fire-stat"><span class="fire-stat-label">🚀 Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
+                    '<div class="fire-stat"><span class="fire-stat-label">Reste à atteindre</span><span class="fire-stat-value">' + formatEUR(DATA.restant250k) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">Épargne annuelle</span><span class="fire-stat-value">' + formatEUR(DATA.epargneAnnuelle) + '</span></div>' +
+                    '<div class="fire-stat"><span class="fire-stat-label">Horizon</span><span class="fire-stat-value">' + DATA.projectionAnnee + ' (~' + DATA.anneesRestantes.toFixed(1) + ' ans)</span></div>';
                 if (DOM.fireBar) {
             const pct = Math.max(0, Math.min(DATA.progression250k, 100));
             DOM.fireBar.style.width = pct + "%";
@@ -489,15 +492,15 @@ async function chargerDashboard() {
 
             // Métriques annuelles (nouveau) : rendu dynamique dans #objectifsAnnuelsContainer
             const ANNUELS = [
-                { key: "revenue_annuel", label: "💰 Revenus", lowerIsBetter: false },
-                { key: "depense_annuel", label: "💸 Dépenses", lowerIsBetter: true },
-                { key: "epargne_annuel", label: "🏦 Épargne", lowerIsBetter: false },
-                { key: "investis_annuel", label: "📈 Investissements", lowerIsBetter: false },
+                { key: "revenue_annuel", label: "Revenus", icon: "wallet", variant: "emerald", lowerIsBetter: false },
+                { key: "depense_annuel", label: "Dépenses", icon: "cash", variant: "gold", lowerIsBetter: true },
+                { key: "epargne_annuel", label: "Épargne", icon: "bank", variant: "blue", lowerIsBetter: false },
+                { key: "investis_annuel", label: "Investissements", icon: "trending-up", variant: "violet", lowerIsBetter: false },
             ];
             const container = document.getElementById("objectifsAnnuelsContainer");
             if (container) {
                 container.innerHTML = "";
-                ANNUELS.forEach(({ key, label, lowerIsBetter }) => {
+                ANNUELS.forEach(({ key, label, icon, variant, lowerIsBetter }) => {
                     const o = OBJECTIFS[key];
                     if (!o || o.cible <= 0) return;
                     const pourcentage = Math.max(0, (o.actuel / o.cible) * 100);
@@ -515,7 +518,7 @@ async function chargerDashboard() {
                     card.style.borderLeftColor = couleur;
                     card.innerHTML = `
                         <div class="goal-header">
-                            <span>${label}</span>
+                            <span><span class="icon-badge ${variant}"><svg class="icon" width="16" height="16"><use href="#icon-${icon}"></use></svg></span>${label}</span>
                             <span style="color:${couleur}">${Math.round(o.actuel).toLocaleString("fr-FR")} € / ${Math.round(o.cible).toLocaleString("fr-FR")} €</span>
                         </div>
                         <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(Math.min(pourcentage, 100))}" aria-label="${label}">
@@ -568,17 +571,21 @@ async function chargerDashboard() {
         }
         // theme handling unchanged
         const themeButton = document.getElementById("themeToggle");
+        const themeIconUse = document.getElementById("themeIcon");
+        const setThemeIcon = (isLight) => {
+            if (themeIconUse) themeIconUse.setAttribute("href", isLight ? "#icon-sun" : "#icon-moon");
+        };
         if (themeButton) {
             if (localStorage.getItem("theme") === "light") {
                 document.body.classList.add("light");
-                themeButton.textContent = "☀️";
+                setThemeIcon(true);
                 if (window.refreshCharts) window.refreshCharts();
             }
             themeButton.addEventListener("click", () => {
                 const appliquerTheme = () => {
                     document.body.classList.toggle("light");
                     const isLight = document.body.classList.contains("light");
-                    themeButton.textContent = isLight ? "☀️" : "🌙";
+                    setThemeIcon(isLight);
                     localStorage.setItem("theme", isLight ? "light" : "dark");
                     if (window.refreshCharts) window.refreshCharts();
                 };

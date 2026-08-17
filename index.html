@@ -26,11 +26,130 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=17">
+    <link rel="stylesheet" href="css/style.css?v=18">
     <link rel="stylesheet" href="css/alerts.css">
-    <link rel="stylesheet" href="css/historique.css?v=6">
+    <link rel="stylesheet" href="css/historique.css?v=7">
 </head>
 <body>
+    <!-- Sprite d'icones SVG inline (aucune requete externe, coherent avec
+         la promesse hors-ligne du PWA) - voir css/style.css pour la regle
+         de dimensionnement (svg.icon, en em) et les couleurs par variante
+         (.icon-badge.emerald/gold/violet/blue/warn). -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+        <symbol id="icon-gem" viewBox="0 0 24 24">
+            <path d="M6 3h12l3 5-9 13L3 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M3 8h18M9 3l3 5 3-5M9 8l3 13 3-13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </symbol>
+        <symbol id="icon-cash" viewBox="0 0 24 24">
+            <rect x="2.5" y="6" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        </symbol>
+        <symbol id="icon-wallet" viewBox="0 0 24 24">
+            <path d="M3 7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M15 13.5h3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </symbol>
+        <symbol id="icon-bar-chart" viewBox="0 0 24 24">
+            <path d="M4 20V10M11 20V4M18 20v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M2.5 20.5h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </symbol>
+        <symbol id="icon-pie-chart" viewBox="0 0 24 24">
+            <path d="M12 2v10l8.5 5A10 10 0 0 0 12 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M12 2A10 10 0 1 0 20.5 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </symbol>
+        <symbol id="icon-trending-up" viewBox="0 0 24 24">
+            <path d="M3 17l6-6 4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M15 6h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </symbol>
+        <symbol id="icon-target" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+        </symbol>
+        <symbol id="icon-flame" viewBox="0 0 24 24">
+            <path d="M12 21c-4.4 0-7-2.8-7-6.5C5 10 8 7.5 8.7 4c.2 2 1.6 3 2.6 3.6C13 3.8 12 2 12 2s5 2.7 5 8.5c0 1-.3 2-.8 2.8.6-.3 1.2-.9 1.6-1.6.8 1.2 1.2 2.6 1.2 3.8 0 3.7-3.2 5.5-7 5.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </symbol>
+        <symbol id="icon-bank" viewBox="0 0 24 24">
+            <path d="M3 9.5 12 4l9 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M4 9.5h16V20H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M7 13v4M12 13v4M17 13v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M2.5 20.5h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </symbol>
+        <symbol id="icon-card" viewBox="0 0 24 24">
+            <rect x="2.5" y="5" width="19" height="14" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M2.5 9.5h19" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M6 14.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </symbol>
+        <symbol id="icon-box" viewBox="0 0 24 24">
+            <path d="M12 3 21 7.5 12 12 3 7.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M3 7.5V17l9 4.5 9-4.5V7.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M12 12v9.5" stroke="currentColor" stroke-width="1.6"/>
+        </symbol>
+        <symbol id="icon-scale" viewBox="0 0 24 24">
+            <path d="M12 2.5v19M6 6.5h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M3 6.5 6 6.5 4.5 11a2.2 2.2 0 0 0 4.4 0zM18 6.5l3 0-1.5 4.5a2.2 2.2 0 0 0 4.4 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M8 21.5h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </symbol>
+        <symbol id="icon-hash" viewBox="0 0 24 24">
+            <path d="M9 3 7 21M17 3l-2 18M4 8.5h16M3.3 15.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </symbol>
+        <symbol id="icon-coin" viewBox="0 0 24 24">
+            <path d="M12 2 20.5 7v10L12 22 3.5 17V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M12 8v8M9.6 10.2c0-1 .9-1.7 2.4-1.7s2.4.6 2.4 1.4-.9 1.2-2.4 1.6-2.4.6-2.4 1.6.9 1.4 2.4 1.4 2.4-.5 2.4-1.4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+        </symbol>
+        <symbol id="icon-swap" viewBox="0 0 24 24">
+            <path d="M4 8h13M14 4l3 4-3 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M20 16H7M10 12l-3 4 3 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </symbol>
+        <symbol id="icon-home" viewBox="0 0 24 24">
+            <path d="M4 11 12 4l8 7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M6 9.5V20h12V9.5" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" fill="none"/>
+            <path d="M10 20v-6h4v6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" fill="none"/>
+        </symbol>
+        <symbol id="icon-car" viewBox="0 0 24 24">
+            <path d="M4 16v-3.5l2-4.5h12l2 4.5V16" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" fill="none"/>
+            <path d="M2.8 16h18.4v2.5a1 1 0 0 1-1 1H17a1 1 0 0 1-1-1V18H8v.5a1 1 0 0 1-1 1H3.8a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+            <circle cx="7.5" cy="16" r="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <circle cx="16.5" cy="16" r="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        </symbol>
+        <symbol id="icon-plane" viewBox="0 0 24 24">
+            <path d="M11 2.5 2.5 12l4 1 1.5 4 3-3.2 3 6.7 2-1-1-9L21 3.5c.7-.7.4-2-1-1.7L11 6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </symbol>
+        <symbol id="icon-shield" viewBox="0 0 24 24">
+            <path d="M12 2.5 20 6v6c0 5-3.5 8.3-8 9.5C7.5 20.3 4 17 4 12V6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M8.5 12l2.3 2.3L15.5 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </symbol>
+        <symbol id="icon-briefcase" viewBox="0 0 24 24">
+            <rect x="2.5" y="7.5" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 7.5V5.5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M2.5 13h19" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M10.5 13h3v2h-3z" fill="currentColor" stroke="none"/>
+        </symbol>
+        <symbol id="icon-refresh" viewBox="0 0 24 24">
+            <path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"/>
+            <path d="M20 4v4.5h-4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M20 12a8 8 0 0 1-13.7 5.7L4 15.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"/>
+            <path d="M4 20v-4.5h4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </symbol>
+        <symbol id="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4.3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M12 2.5v2.3M12 19.2v2.3M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.5 12h2.3M19.2 12h2.3M4.4 19.6 6 18M18 6l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </symbol>
+        <symbol id="icon-moon" viewBox="0 0 24 24">
+            <path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a7 7 0 0 0 10.2 10.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </symbol>
+        <symbol id="icon-calendar" viewBox="0 0 24 24">
+            <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M3 9.5h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <circle cx="8" cy="14" r="1.1" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="14" r="1.1" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="14" r="1.1" fill="currentColor" stroke="none"/>
+        </symbol>
+        <symbol id="icon-lifebuoy" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M5.6 5.6l3 3M18.4 5.6l-3 3M5.6 18.4l3-3M18.4 18.4l-3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </symbol>
+    </svg>
     <div id="lockScreen" class="lock-screen">
         <div class="lock-box">
             <button type="button" id="lockFaceId" class="lock-faceid-icon" style="display:none" aria-label="Déverrouiller avec Face ID / Touch ID">✨</button>
@@ -54,18 +173,18 @@
     </div>
     <div class="container blurred" id="mainContainer">
         <div id="pullToRefreshIndicator" class="ptr-indicator" aria-hidden="true">
-            <span class="ptr-icon">🔄</span>
+            <span class="ptr-icon"><svg class="icon" width="16" height="16"><use href="#icon-refresh"></use></svg></span>
         </div>
         <header class="header">
             <div>
-                <h1>💰 Finance Dashboard</h1>
+                <h1><svg class="icon" width="20" height="20"><use href="#icon-gem"></use></svg> Finance Dashboard</h1>
                 <div id="lastUpdate" class="last-update">
                     Dernière synchronisation : --
                 </div>
             </div>
             <div class="header-actions">
-                <button id="refreshBtn" class="theme-btn" aria-label="Rafraîchir les données">🔄</button>
-                <button id="themeToggle" class="theme-btn" aria-label="Changer de thème">🌙</button>
+                <button id="refreshBtn" class="theme-btn" aria-label="Rafraîchir les données"><svg class="icon" width="16" height="16"><use href="#icon-refresh"></use></svg></button>
+                <button id="themeToggle" class="theme-btn" aria-label="Changer de thème"><svg class="icon" width="16" height="16"><use id="themeIcon" href="#icon-moon"></use></svg></button>
                 <span class="status">Live</span>
             </div>
         </header>
@@ -77,7 +196,7 @@
                 <h2>Vue d'ensemble</h2>
                 <div class="hero-card expandable" id="heroCard" role="button" tabindex="0" aria-expanded="false" aria-controls="heroChipRow">
                     <div class="hero-top-row">
-                        <div class="hero-label"><span class="icon-badge hero-icon">💎</span>Patrimoine Total</div>
+                        <div class="hero-label"><span class="icon-badge hero-icon"><svg class="icon" width="16" height="16"><use href="#icon-gem"></use></svg></span>Patrimoine Total</div>
                         <div class="hero-top-right">
                             <span class="toggle-chevron" id="heroChevron" style="position:static">▾</span>
                         </div>
@@ -85,21 +204,29 @@
                     <div class="hero-value skeleton" id="networth">...</div>
                     <span id="heroTrend" class="hero-trend" style="display:none"></span>
                     <div id="patrimoineMouvement" class="account-mouvements"></div>
-                    <div class="hero-sub" id="mainGoalProgress">🎯 Chargement...</div>
+                    <div class="hero-sub" id="mainGoalProgress">Chargement...</div>
+                    <div class="period-selector hero-period-selector" id="patrimoinePeriodSelector" role="group" aria-label="Période affichée">
+                        <button type="button" data-period="3M" aria-pressed="false">3M</button>
+                        <button type="button" data-period="6M" aria-pressed="false">6M</button>
+                        <button type="button" data-period="1A" aria-pressed="false">1A</button>
+                        <button type="button" data-period="YTD" aria-pressed="false">YTD</button>
+                        <button type="button" data-period="ALL" aria-pressed="true" class="active">Tout</button>
+                    </div>
+                    <div id="patrimoinePeriodVariation" class="period-variation"></div>
                     <div id="heroSparkline" class="hero-sparkline"></div>
                 </div>
                 <div class="collapsible-content" id="heroChipRow">
                     <div class="chip-row collapsible-inner">
                     <div class="chip">
-                        <span class="chip-label"><span class="icon-badge blue">💵</span>Cash disponible</span>
+                        <span class="chip-label"><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-cash"></use></svg></span>Cash disponible</span>
                         <span class="chip-value skeleton" id="heroCash">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label"><span class="icon-badge violet">📊</span>Valeur des placements</span>
+                        <span class="chip-label"><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>Valeur des placements</span>
                         <span class="chip-value skeleton" id="investments">...</span>
                     </div>
                     <div class="chip">
-                        <span class="chip-label"><span class="icon-badge emerald">🎯</span>Taux d'épargne</span>
+                        <span class="chip-label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-target"></use></svg></span>Taux d'épargne</span>
                         <span class="chip-value skeleton" id="performance">...</span>
                     </div>
                     </div>
@@ -109,7 +236,7 @@
             <section class="fire-section" id="navAccueilFire">
                 <h2>Objectif indépendance financière</h2>
                 <div class="fire-tracker" id="fireCard">
-                    <div class="fire-label"><span class="icon-badge emerald">🔥</span>Route vers l'indépendance financière</div>
+                    <div class="fire-label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-flame"></use></svg></span>Route vers l'indépendance financière</div>
                     <div id="fireProgress" class="fire-percentage skeleton">...</div>
                     <div id="fireDetails" class="fire-details skeleton">...</div>
                     <div class="fire-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
@@ -123,7 +250,7 @@
                 <div class="comptes-grid">
                     <div class="compte-group">
                         <div class="card account-card expandable" id="cashAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="cashDetailSection">
-                            <div class="label"><span class="icon-badge blue">💵</span>Cash disponible<span class="toggle-chevron" id="cashChevron" style="position:static">▾</span></div>
+                            <div class="label"><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-cash"></use></svg></span>Cash disponible<span class="toggle-chevron" id="cashChevron" style="position:static">▾</span></div>
                             <div class="value skeleton" id="cashMain">...</div>
                             <div id="cashMouvements" class="account-mouvements"></div>
                         </div>
@@ -131,19 +258,19 @@
                             <div class="compte-detail collapsible-inner">
                             <div class="goals-grid">
                                 <div class="goal-card">
-                                    <div class="goal-header"><span><span class="icon-badge blue">🏦</span>Livret A</span></div>
+                                    <div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-bank"></use></svg></span>Livret A</span></div>
                                     <div class="fire-stat-value" id="cashLivretA">...</div>
                                 </div>
                                 <div class="goal-card">
-                                    <div class="goal-header"><span><span class="icon-badge blue">🏦</span>LDDS</span></div>
+                                    <div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-bank"></use></svg></span>LDDS</span></div>
                                     <div class="fire-stat-value" id="cashLdds">...</div>
                                 </div>
                                 <div class="goal-card">
-                                    <div class="goal-header"><span><span class="icon-badge blue">💳</span>Nickel</span></div>
+                                    <div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-card"></use></svg></span>Nickel</span></div>
                                     <div class="fire-stat-value" id="cashNickel">...</div>
                                 </div>
                                 <div class="goal-card">
-                                    <div class="goal-header"><span><span class="icon-badge blue">🏦</span>Livret YUH</span></div>
+                                    <div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-bank"></use></svg></span>Livret YUH</span></div>
                                     <div class="fire-stat-value" id="cashYuh">...</div>
                                 </div>
                             </div>
@@ -153,7 +280,7 @@
 
                     <div class="compte-group">
                         <div class="card account-card expandable" id="peaAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="peaDetailSection">
-                            <div class="label"><span class="icon-badge emerald">📈</span>PEA — Trade Republic<span class="toggle-chevron" id="peaChevron" style="position:static">▾</span></div>
+                            <div class="label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>PEA — Trade Republic<span class="toggle-chevron" id="peaChevron" style="position:static">▾</span></div>
                             <div class="value skeleton" id="peaMain">...</div>
                             <span id="peaVarJour" class="account-trend" style="display:none"></span>
                             <div id="peaSparkline" class="account-sparkline" style="display:none"></div>
@@ -162,15 +289,15 @@
                         <div class="collapsible-block" id="peaDetailSection">
                             <div class="compte-detail collapsible-inner">
                             <div class="goals-grid">
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💎</span>Valeur totale</span></div><div class="fire-stat-value" id="peaDetailValeur">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💰</span>Investi</span></div><div class="fire-stat-value" id="peaDetailInvesti">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">💹</span>Plus-value</span></div><div class="fire-stat-value" id="peaDetailPlusvalue">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald">📈</span>Performance</span></div><div class="fire-stat-value" id="peaDetailPerformance">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📊</span>Actions</span></div><div class="fire-stat-value" id="peaDetailAction">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">📦</span>ETF</span></div><div class="fire-stat-value" id="peaDetailEtf">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">⚖️</span>Part actions</span></div><div class="fire-stat-value" id="peaDetailPartAction">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">⚖️</span>Part ETF</span></div><div class="fire-stat-value" id="peaDetailPartEtf">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">🔢</span>Positions</span></div><div class="fire-stat-value" id="peaDetailPositions">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-gem"></use></svg></span>Valeur totale</span></div><div class="fire-stat-value" id="peaDetailValeur">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-wallet"></use></svg></span>Investi</span></div><div class="fire-stat-value" id="peaDetailInvesti">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Plus-value</span></div><div class="fire-stat-value" id="peaDetailPlusvalue">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Performance</span></div><div class="fire-stat-value" id="peaDetailPerformance">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>Actions</span></div><div class="fire-stat-value" id="peaDetailAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-box"></use></svg></span>ETF</span></div><div class="fire-stat-value" id="peaDetailEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-scale"></use></svg></span>Part actions</span></div><div class="fire-stat-value" id="peaDetailPartAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-scale"></use></svg></span>Part ETF</span></div><div class="fire-stat-value" id="peaDetailPartEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-hash"></use></svg></span>Positions</span></div><div class="fire-stat-value" id="peaDetailPositions">...</div></div>
                             </div>
                             <div id="peaHistoriqueContainer" class="historique-inline" style="display:none"></div>
                             </div>
@@ -179,7 +306,7 @@
 
                     <div class="compte-group">
                         <div class="card account-card expandable" id="ctoAccountCard" role="button" tabindex="0" aria-expanded="false" aria-controls="ctoDetailSection">
-                            <div class="label"><span class="icon-badge gold">🏦</span>CTO — YUH<span class="toggle-chevron" id="ctoChevron" style="position:static">▾</span></div>
+                            <div class="label"><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-bank"></use></svg></span>CTO — YUH<span class="toggle-chevron" id="ctoChevron" style="position:static">▾</span></div>
                             <div class="value skeleton" id="ctoMain">...</div>
                             <div class="account-fx-note skeleton" id="ctoFxNote">...</div>
                             <span id="ctoVarJour" class="account-trend" style="display:none"></span>
@@ -189,17 +316,17 @@
                         <div class="collapsible-block" id="ctoDetailSection">
                             <div class="compte-detail collapsible-inner">
                             <div class="goals-grid">
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💰</span>Investi</span></div><div class="fire-stat-value" id="ctoDetailInvesti">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">💹</span>Plus-value</span></div><div class="fire-stat-value" id="ctoDetailPlusvalue">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📈</span>Performance</span></div><div class="fire-stat-value" id="ctoDetailPerformance">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">📊</span>Actions</span></div><div class="fire-stat-value" id="ctoDetailAction">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">📦</span>ETF</span></div><div class="fire-stat-value" id="ctoDetailEtf">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">🪙</span>Crypto</span></div><div class="fire-stat-value" id="ctoDetailCrypto">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">⚖️</span>Part actions</span></div><div class="fire-stat-value" id="ctoDetailPartAction">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">⚖️</span>Part ETF</span></div><div class="fire-stat-value" id="ctoDetailPartEtf">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet">⚖️</span>Part crypto</span></div><div class="fire-stat-value" id="ctoDetailPartCrypto">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold">🔢</span>Positions</span></div><div class="fire-stat-value" id="ctoDetailPositions">...</div></div>
-                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue">💱</span>Taux EUR/CHF</span></div><div class="fire-stat-value" id="ctoDetailEurChf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-wallet"></use></svg></span>Investi</span></div><div class="fire-stat-value" id="ctoDetailInvesti">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Plus-value</span></div><div class="fire-stat-value" id="ctoDetailPlusvalue">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>Performance</span></div><div class="fire-stat-value" id="ctoDetailPerformance">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>Actions</span></div><div class="fire-stat-value" id="ctoDetailAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-box"></use></svg></span>ETF</span></div><div class="fire-stat-value" id="ctoDetailEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-coin"></use></svg></span>Crypto</span></div><div class="fire-stat-value" id="ctoDetailCrypto">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-scale"></use></svg></span>Part actions</span></div><div class="fire-stat-value" id="ctoDetailPartAction">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-scale"></use></svg></span>Part ETF</span></div><div class="fire-stat-value" id="ctoDetailPartEtf">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-scale"></use></svg></span>Part crypto</span></div><div class="fire-stat-value" id="ctoDetailPartCrypto">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-hash"></use></svg></span>Positions</span></div><div class="fire-stat-value" id="ctoDetailPositions">...</div></div>
+                                <div class="goal-card"><div class="goal-header"><span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-swap"></use></svg></span>Taux EUR/CHF</span></div><div class="fire-stat-value" id="ctoDetailEurChf">...</div></div>
                             </div>
                             <div id="ctoHistoriqueContainer" class="historique-inline" style="display:none"></div>
                             </div>
@@ -209,35 +336,44 @@
             </section>
 
             <section class="investissements-section" id="navInvestissements" style="display:none">
-                <h2>💼 Mes investissements</h2>
-                <div class="invest-filters" id="investFiltersBar">
-                    <input type="search" id="investSearch" class="invest-search" placeholder="🔍 Rechercher un ticker, une société…" aria-label="Rechercher un investissement">
-                    <div class="invest-chip-group" role="group" aria-label="Filtrer par compte">
-                        <button type="button" class="invest-chip active" data-filter="compte" data-value="TOUS" aria-pressed="true">Tous</button>
-                        <button type="button" class="invest-chip" data-filter="compte" data-value="PEA" aria-pressed="false">PEA</button>
-                        <button type="button" class="invest-chip" data-filter="compte" data-value="CTO" aria-pressed="false">CTO</button>
-                    </div>
-                    <div class="invest-chip-group" role="group" aria-label="Filtrer par statut">
-                        <button type="button" class="invest-chip active" data-filter="statut" data-value="TOUS" aria-pressed="true">Tous</button>
-                        <button type="button" class="invest-chip positive" data-filter="statut" data-value="GAGNANT" aria-pressed="false">📈 Gagnants</button>
-                        <button type="button" class="invest-chip negative" data-filter="statut" data-value="PERDANT" aria-pressed="false">📉 Perdants</button>
-                    </div>
-                    <select id="investSort" class="invest-sort" aria-label="Trier par">
-                        <option value="perf_desc">Performance ↓</option>
-                        <option value="perf_asc">Performance ↑</option>
-                        <option value="gain_desc">Gain € ↓</option>
-                        <option value="valeur_desc">Valeur ↓</option>
-                        <option value="nom_asc">Nom A→Z</option>
-                    </select>
+                <h2>Mes investissements</h2>
+                <div class="toggle-card" id="investToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="investContent">
+                    <span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-briefcase"></use></svg></span>
+                    <span class="toggle-card-label">Voir mes positions (PEA, CTO, filtres, recherche)</span>
+                    <span class="toggle-chevron" id="investChevron" style="position:static">▾</span>
                 </div>
-                <div id="investissementsSummary" class="invest-summary"></div>
-                <div id="investissementsContainer" class="historique-positions"></div>
+                <div class="collapsible-block" id="investContent">
+                    <div class="collapsible-inner">
+                    <div class="invest-filters" id="investFiltersBar">
+                        <input type="search" id="investSearch" class="invest-search" placeholder="Rechercher un ticker, une société…" aria-label="Rechercher un investissement">
+                        <div class="invest-chip-group" role="group" aria-label="Filtrer par compte">
+                            <button type="button" class="invest-chip active" data-filter="compte" data-value="TOUS" aria-pressed="true">Tous</button>
+                            <button type="button" class="invest-chip" data-filter="compte" data-value="PEA" aria-pressed="false">PEA</button>
+                            <button type="button" class="invest-chip" data-filter="compte" data-value="CTO" aria-pressed="false">CTO</button>
+                        </div>
+                        <div class="invest-chip-group" role="group" aria-label="Filtrer par statut">
+                            <button type="button" class="invest-chip active" data-filter="statut" data-value="TOUS" aria-pressed="true">Tous</button>
+                            <button type="button" class="invest-chip positive" data-filter="statut" data-value="GAGNANT" aria-pressed="false">Gagnants</button>
+                            <button type="button" class="invest-chip negative" data-filter="statut" data-value="PERDANT" aria-pressed="false">Perdants</button>
+                        </div>
+                        <select id="investSort" class="invest-sort" aria-label="Trier par">
+                            <option value="perf_desc">Performance ↓</option>
+                            <option value="perf_asc">Performance ↑</option>
+                            <option value="gain_desc">Gain € ↓</option>
+                            <option value="valeur_desc">Valeur ↓</option>
+                            <option value="nom_asc">Nom A→Z</option>
+                        </select>
+                    </div>
+                    <div id="investissementsSummary" class="invest-summary"></div>
+                    <div id="investissementsContainer" class="historique-positions"></div>
+                    </div>
+                </div>
             </section>
 
             <section class="charts-section" id="navHistorique">
                 <h2>📊 Graphiques</h2>
                 <div class="toggle-card" id="chartsToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="chartsContent">
-                    <span class="icon-badge violet">📊</span>
+                    <span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>
                     <span class="toggle-card-label">Voir les graphiques (évolution, allocation, composition)</span>
                     <span class="toggle-chevron" id="chartsChevron" style="position:static">▾</span>
                 </div>
@@ -245,31 +381,22 @@
                     <div class="collapsible-inner">
                     <div class="chart-grid">
                         <div class="card chart-card">
-                            <div class="chart-card-header">
-                                <h3><span class="icon-badge emerald">📈</span>Évolution du patrimoine</h3>
-                                <div class="period-selector" id="patrimoinePeriodSelector" role="group" aria-label="Période affichée">
-                                    <button type="button" data-period="3M" aria-pressed="false">3M</button>
-                                    <button type="button" data-period="6M" aria-pressed="false">6M</button>
-                                    <button type="button" data-period="1A" aria-pressed="false">1A</button>
-                                    <button type="button" data-period="YTD" aria-pressed="false">YTD</button>
-                                    <button type="button" data-period="ALL" aria-pressed="true" class="active">Tout</button>
-                                </div>
-                            </div>
-                            <div id="patrimoinePeriodVariation" class="period-variation"></div>
+                            <h3><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Évolution du patrimoine</h3>
+                            <p class="chart-card-hint">Période pilotée depuis le sélecteur de la carte Patrimoine Total, en haut de page.</p>
                             <div id="patrimoineChart" class="chart"></div>
                         </div>
                         <div class="card chart-card">
-                            <h3><span class="icon-badge violet">🥧</span>Allocation du patrimoine</h3>
+                            <h3><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-pie-chart"></use></svg></span>Allocation du patrimoine</h3>
                             <div id="allocationChart" class="chart"></div>
                         </div>
                     </div>
                     <div class="chart-grid chart-grid-small">
                         <div class="card chart-card">
-                            <h3><span class="icon-badge emerald">📈</span>Composition PEA</h3>
+                            <h3><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Composition PEA</h3>
                             <div id="peaCompositionChart" class="chart chart-small"></div>
                         </div>
                         <div class="card chart-card">
-                            <h3><span class="icon-badge gold">🏦</span>Composition CTO</h3>
+                            <h3><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-bank"></use></svg></span>Composition CTO</h3>
                             <div id="ctoCompositionChart" class="chart chart-small"></div>
                         </div>
                     </div>
@@ -292,7 +419,7 @@
                 <div id="goalsContainer" class="goals-grid">
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span><span class="icon-badge gold">🏠</span>Appartement</span>
+                            <span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-home"></use></svg></span>Appartement</span>
                             <span id="goal-appartement" class="skeleton">0%</span>
                         </div>
                         <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -301,7 +428,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span><span class="icon-badge blue">🚗</span>Voiture</span>
+                            <span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-car"></use></svg></span>Voiture</span>
                             <span id="goal-voiture" class="skeleton">0%</span>
                         </div>
                         <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -310,7 +437,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span><span class="icon-badge violet">✈️</span>Vacances</span>
+                            <span><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-plane"></use></svg></span>Vacances</span>
                             <span id="goal-vacances" class="skeleton">0%</span>
                         </div>
                         <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -319,7 +446,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span><span class="icon-badge warn">🛟</span>Fonds d'urgence</span>
+                            <span><span class="icon-badge warn"><svg class="icon" width="16" height="16"><use href="#icon-lifebuoy"></use></svg></span>Fonds d'urgence</span>
                             <span id="goal-fonds_urgence" class="skeleton">0%</span>
                         </div>
                         <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -328,7 +455,7 @@
                     </div>
                     <div class="goal-card">
                         <div class="goal-header">
-                            <span><span class="icon-badge emerald">🎯</span>Patrimoine</span>
+                            <span><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-target"></use></svg></span>Patrimoine</span>
                             <span id="goal-patrimoine_total" class="skeleton">0%</span>
                         </div>
                         <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -347,19 +474,19 @@
          casserait son ancrage a l'ecran pendant le flou de verrouillage. -->
     <nav id="bottomNav" class="bottom-nav" aria-label="Navigation principale">
         <button type="button" class="bottom-nav-item" data-target="navAccueil" aria-label="Accueil">
-            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-home"></use></svg></span>
             <span class="bottom-nav-label">Accueil</span>
         </button>
         <button type="button" class="bottom-nav-item" data-target="navComptes" aria-label="Comptes">
-            <span class="bottom-nav-icon">💳</span>
+            <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-card"></use></svg></span>
             <span class="bottom-nav-label">Comptes</span>
         </button>
         <button type="button" class="bottom-nav-item" data-target="navHistorique" aria-label="Historique">
-            <span class="bottom-nav-icon">📊</span>
+            <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>
             <span class="bottom-nav-label">Historique</span>
         </button>
         <button type="button" class="bottom-nav-item" data-target="navObjectifs" aria-label="Objectifs">
-            <span class="bottom-nav-icon">🎯</span>
+            <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-target"></use></svg></span>
             <span class="bottom-nav-label">Objectifs</span>
         </button>
     </nav>
@@ -370,19 +497,19 @@
     <script src="js/config.js?v=3"></script>
     <script src="js/lock.js?v=10"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="js/charts.js?v=6"></script>
+    <script src="js/charts.js?v=7"></script>
     <script src="js/errorHandler.js?v=1"></script>
     <script src="js/parsing.js?v=1"></script>
     <script src="js/dataCache.js?v=1"></script>
     <script src="js/mouvements.js?v=3"></script>
-    <script src="js/suiviAnnuel.js?v=3"></script>
-    <script src="js/historiqueAchats.js?v=6"></script>
-    <script src="js/investissements.js?v=1"></script>
+    <script src="js/suiviAnnuel.js?v=4"></script>
+    <script src="js/historiqueAchats.js?v=7"></script>
+    <script src="js/investissements.js?v=2"></script>
     <script src="js/celebration.js?v=1"></script>
-    <script src="js/googleSheets.js?v=19"></script>
+    <script src="js/googleSheets.js?v=20"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
-    <script src="js/collapsibleSections.js?v=5"></script>
+    <script src="js/collapsibleSections.js?v=6"></script>
     <script src="js/bottomNav.js?v=1"></script>
     <script src="js/pullToRefresh.js?v=1"></script>
 

@@ -229,7 +229,7 @@ function rendrePositionsDansConteneur(containerId, compteData) {
 
     let html = `
         <div class="historique-inline-header ${estOuvert ? 'open' : ''}" role="button" tabindex="0" aria-expanded="${estOuvert}">
-            <span class="icon-badge violet">🎯</span>
+            <span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-target"></use></svg></span>
             <span>Performance par achat</span>
             <span class="historique-inline-count">${positions.length} actif${positions.length > 1 ? 's' : ''}</span>
             <span class="historique-chevron ${estOuvert ? 'open' : ''}">▼</span>

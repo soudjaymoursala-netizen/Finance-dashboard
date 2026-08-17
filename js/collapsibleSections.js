@@ -138,4 +138,13 @@
             window.dispatchEvent(new Event("resize"));
         }
     );
+
+    // Section "Mes investissements" : repliee par defaut, comme Graphiques
+    // (1er niveau de pliage sur 3 - voir investissements.js pour les
+    // groupes par compte et les positions individuelles).
+    bindToggle(
+        document.getElementById("investToggle"),
+        document.getElementById("investContent"),
+        document.getElementById("investChevron")
+    );
 })();

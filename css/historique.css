@@ -497,6 +497,62 @@
   text-align: center;
 }
 
+/* Niveau 2 : groupe par compte (PEA/CTO), repliable independamment -
+   n'apparait que quand le filtre compte est sur "Tous". */
+.invest-group {
+  margin-bottom: 0.85rem;
+}
+
+.invest-group:last-child {
+  margin-bottom: 0;
+}
+
+.invest-group-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1.1rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-color);
+  transition: background-color 150ms ease;
+}
+
+.invest-group-header:hover {
+  background: var(--surface-hover);
+}
+
+.invest-group-header.historique-positif {
+  border-left: 3px solid var(--positive-color);
+}
+
+.invest-group-header.historique-negatif {
+  border-left: 3px solid var(--negative-color);
+}
+
+.invest-group-name {
+  flex: 1;
+  min-width: 120px;
+}
+
+.invest-group-gain {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.invest-group-positions {
+  margin-top: 0.75rem;
+  padding-left: 0.4rem;
+  border-left: 2px solid var(--border-color);
+}
+
 @media (max-width: 768px) {
   .invest-filters {
     flex-direction: column;

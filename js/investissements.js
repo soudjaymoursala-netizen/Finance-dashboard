@@ -9,6 +9,9 @@
 
 let investFiltres = { compte: "TOUS", statut: "TOUS", recherche: "", tri: "perf_desc" };
 let investExpandedPositions = new Set();
+let investExpandedGroups = new Set(); // "PEA" / "CTO" - vide = tout replie par defaut
+
+const COMPTE_LABELS = { PEA: "PEA — Trade Republic", CTO: "CTO — YUH" };
 
 function construirePositionsUnifiees() {
     const positions = [];
@@ -135,6 +138,44 @@ function rendreLignePositionUnifiee(pos) {
     return html;
 }
 
+/* Niveau 2 (groupe par compte) : n'a de sens que quand le filtre compte
+   est sur "Tous" - sinon un seul compte est deja affiche, un groupe
+   serait redondant avec le filtre lui-meme. Replie par defaut, comme
+   la section elle-meme et chaque position - rien ne s'affiche "tout
+   d'un coup" - SAUF pendant une recherche texte active : la ou les
+   groupes contenant un resultat s'ouvrent automatiquement, pour ne pas
+   forcer un clic supplementaire sur un resultat qu'on vient de taper.
+   Cet auto-ouverture ne modifie pas investExpandedGroups : effacer la
+   recherche revient exactement a l'etat de pliage precedent. */
+function rendreGroupeCompte(compte, positions) {
+    const rechercheActive = !!investFiltres.recherche.trim();
+    const isOpen = investExpandedGroups.has(compte) || rechercheActive;
+    const badgeClasse = compte === "PEA" ? "emerald" : "gold";
+    const gainTotal = positions.reduce((s, p) => s + p.totalGain, 0);
+    const cls = classeGainPerte(gainTotal);
+    const devise = positions[0].devise;
+
+    let html = `
+        <div class="invest-group" data-group="${compte}">
+            <div class="invest-group-header ${cls}" role="button" tabindex="0" aria-expanded="${isOpen}">
+                <span class="historique-badge ${badgeClasse}">${compte}</span>
+                <span class="invest-group-name">${COMPTE_LABELS[compte] || compte}</span>
+                <span class="historique-inline-count">${positions.length} position${positions.length > 1 ? 's' : ''}</span>
+                <span class="invest-group-gain ${cls}">${gainTotal >= 0 ? "+" : ""}${formatMontantDevise(gainTotal, devise)}</span>
+                <span class="historique-chevron ${isOpen ? 'open' : ''}">▼</span>
+            </div>
+    `;
+
+    if (isOpen) {
+        html += '<div class="historique-positions invest-group-positions">';
+        positions.forEach((p) => { html += rendreLignePositionUnifiee(p); });
+        html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
 function rendreInvestissements() {
     const section = document.getElementById("navInvestissements");
     const container = document.getElementById("investissementsContainer");
@@ -150,9 +191,37 @@ function rendreInvestissements() {
     const positions = filtrerEtTrierPositions(toutes);
     rendreResumeInvestissements(positions);
 
-    container.innerHTML = positions.length
-        ? positions.map(rendreLignePositionUnifiee).join("")
-        : '<div class="invest-summary-empty">Aucune position ne correspond aux filtres.</div>';
+    if (!positions.length) {
+        container.innerHTML = '<div class="invest-summary-empty">Aucune position ne correspond aux filtres.</div>';
+    } else if (investFiltres.compte === "TOUS") {
+        // Groupe par compte (PEA/CTO), chacun repliable independamment
+        const parCompte = {};
+        positions.forEach((p) => { (parCompte[p.compte] = parCompte[p.compte] || []).push(p); });
+        container.innerHTML = ["PEA", "CTO"]
+            .filter((compte) => parCompte[compte] && parCompte[compte].length)
+            .map((compte) => rendreGroupeCompte(compte, parCompte[compte]))
+            .join("");
+    } else {
+        // Un seul compte deja selectionne via le filtre : pas de niveau
+        // groupe redondant, juste la liste des positions de ce compte.
+        container.innerHTML = positions.map(rendreLignePositionUnifiee).join("");
+    }
+
+    container.querySelectorAll(".invest-group-header").forEach((header) => {
+        const activer = () => {
+            const compte = header.closest(".invest-group").getAttribute("data-group");
+            if (investExpandedGroups.has(compte)) {
+                investExpandedGroups.delete(compte);
+            } else {
+                investExpandedGroups.add(compte);
+            }
+            rendreInvestissements();
+        };
+        header.addEventListener("click", activer);
+        header.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activer(); }
+        });
+    });
 
     container.querySelectorAll(".historique-position-header").forEach((header) => {
         const activer = (e) => {

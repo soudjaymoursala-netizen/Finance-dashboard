@@ -87,22 +87,22 @@ async function chargerSuiviAnnuel() {
                 card.className = "suivi-annee-card";
                 card.innerHTML = `
                     <div class="toggle-card" id="${toggleId}" role="button" tabindex="0"${ouvertAttrs} aria-controls="${contentId}">
-                        <span class="icon-badge blue">📅</span>
+                        <span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-calendar"></use></svg></span>
                         <span class="toggle-card-label">${annee} — Résumé</span>
                         <span class="toggle-chevron${chevronOuvertClass}" id="${chevronId}" style="position:static">▾</span>
                     </div>
                     <div class="collapsible-content${ouvertClass}" id="${contentId}">
                     <div class="chip-row collapsible-inner">
                         <div class="chip">
-                            <span class="chip-label"><span class="icon-badge emerald">💰</span>Revenus totaux</span>
+                            <span class="chip-label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-wallet"></use></svg></span>Revenus totaux</span>
                             <span class="chip-value">${formatEUR(totalRev)}</span>
                         </div>
                         <div class="chip">
-                            <span class="chip-label"><span class="icon-badge gold">💸</span>Dépenses totales</span>
+                            <span class="chip-label"><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-cash"></use></svg></span>Dépenses totales</span>
                             <span class="chip-value">${formatEUR(totalDep)}</span>
                         </div>
                         <div class="chip">
-                            <span class="chip-label"><span class="icon-badge blue">🏦</span>Épargne</span>
+                            <span class="chip-label"><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-bank"></use></svg></span>Épargne</span>
                             <span class="chip-value">${formatEUR(epargne)}</span>
                         </div>
                     </div>
@@ -125,7 +125,7 @@ async function chargerSuiviAnnuel() {
                 card.className = "suivi-annee-card";
                 card.innerHTML = `
                     <div class="toggle-card" id="${toggleId}" role="button" tabindex="0"${ouvertAttrs} aria-controls="${contentId}">
-                        <span class="icon-badge emerald">📅</span>
+                        <span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-calendar"></use></svg></span>
                         <span class="toggle-card-label">${annee} — Suivi mensuel</span>
                         <span class="toggle-chevron${chevronOuvertClass}" id="${chevronId}" style="position:static">▾</span>
                     </div>

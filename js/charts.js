@@ -236,10 +236,20 @@ function applyPatrimoinePeriod(periode) {
     const labelsSlice = labels.slice(startIndex);
     const valeursSlice = valeurs.slice(startIndex);
 
+    // Un seul controle pilote les deux vues : la sparkline compacte du
+    // hero (toujours visible) et le graphique complet d'Evolution du
+    // patrimoine (visible une fois Graphiques deplie) refletent
+    // desormais la meme periode selectionnee, au lieu de la sparkline
+    // hero figee sur l'historique complet.
     updatePatrimoineChart(labelsSlice, valeursSlice, objectif);
+    updateHeroSparkline(valeursSlice, labelsSlice);
     afficherVariationPeriode(labelsSlice, valeursSlice);
 
-    document.querySelectorAll("#patrimoinePeriodSelector [data-period]").forEach((btn) => {
+    // querySelectorAll("[data-period]") plutot qu'un id precis : le
+    // controle existe une seule fois dans le DOM (hero-card), mais
+    // cette ecriture generique evite une re-casse silencieuse si un
+    // second selecteur est reintroduit plus tard ailleurs.
+    document.querySelectorAll(".period-selector [data-period]").forEach((btn) => {
         const actif = btn.getAttribute("data-period") === periode;
         btn.classList.toggle("active", actif);
         btn.setAttribute("aria-pressed", actif ? "true" : "false");
@@ -274,10 +284,19 @@ function afficherVariationPeriode(labels, valeurs) {
 document.addEventListener("DOMContentLoaded", function () {
     const selecteur = document.getElementById("patrimoinePeriodSelector");
     if (!selecteur) return;
+    // Le selecteur vit dans la hero-card, elle-meme cliquable (ouvre/
+    // ferme le detail Cash/PEA/CTO) - sans stopPropagation sur le clic
+    // ET la touche Entree/Espace, choisir une periode ouvrirait/
+    // fermerait aussi ce panneau (les deux evenements bubblent
+    // independamment jusqu'a la hero-card).
     selecteur.addEventListener("click", function (e) {
         const btn = e.target.closest("[data-period]");
         if (!btn) return;
+        e.stopPropagation();
         applyPatrimoinePeriod(btn.getAttribute("data-period"));
+    });
+    selecteur.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") e.stopPropagation();
     });
 });
 
@@ -629,11 +648,10 @@ function updateCtoSparkline(valeurs) {
 /* Refresh charts using cached data (appelable après un changement de thème) */
 function refreshCharts() {
   if (patrimoineHistoryFull.labels && patrimoineHistoryFull.labels.length) {
-    // redessine le graphique dans la periode actuellement selectionnee
-    // (pas toujours l'historique complet), la sparkline du hero reste
-    // elle basee sur l'historique complet quelle que soit la periode.
+    // redessine le graphique ET la sparkline hero dans la periode
+    // actuellement selectionnee (applyPatrimoinePeriod met a jour les
+    // deux en une fois, cf. plus haut dans ce fichier).
     applyPatrimoinePeriod(currentPatrimoinePeriod);
-    updateHeroSparkline(patrimoineHistoryFull.valeurs, patrimoineHistoryFull.labels);
   } else if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
     updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, lastPatrimoine.objectif);
     updateHeroSparkline(lastPatrimoine.valeurs);
