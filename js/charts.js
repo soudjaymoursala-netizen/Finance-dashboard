@@ -259,14 +259,15 @@ window.applyPatrimoinePeriod = applyPatrimoinePeriod;
 
 function afficherVariationPeriode(labels, valeurs) {
     const el = document.getElementById("patrimoinePeriodVariation");
-    if (!el) return;
+    const heroCardEl = document.getElementById("heroCard");
 
     const pointsValides = [];
     for (let i = 0; i < valeurs.length; i++) {
         if (valeurs[i] && valeurs[i] > 0) pointsValides.push({ valeur: valeurs[i], label: labels[i] });
     }
     if (pointsValides.length < 2) {
-        el.textContent = "";
+        if (el) el.textContent = "";
+        if (heroCardEl) heroCardEl.classList.remove("hero-card-down");
         return;
     }
 
@@ -276,9 +277,18 @@ function afficherVariationPeriode(labels, valeurs) {
     const deltaPct = premier.valeur > 0 ? (deltaAbs / premier.valeur) * 100 : 0;
     const signe = deltaPct >= 0 ? "+" : "";
 
-    el.className = "period-variation " + (deltaPct >= 0 ? "up" : "down");
-    el.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe +
-        Math.round(deltaAbs).toLocaleString("fr-FR") + " €) depuis " + premier.label;
+    if (el) {
+        el.className = "period-variation " + (deltaPct >= 0 ? "up" : "down");
+        el.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe +
+            Math.round(deltaAbs).toLocaleString("fr-FR") + " €) depuis " + premier.label;
+    }
+
+    // Le halo ambiant de la hero-card reagit a la tendance de la periode
+    // AFFICHEE (teal en croissance, ambre discret en repli) - signal
+    // honnete plutot que purement decoratif (voir heroGlowBreathe dans
+    // style.css). Suit desormais le meme badge que celui affiche, plutot
+    // qu'un calcul separe fige sur les 2 derniers points du Sheet.
+    if (heroCardEl) heroCardEl.classList.toggle("hero-card-down", deltaPct < 0);
 }
 
 document.addEventListener("DOMContentLoaded", function () {

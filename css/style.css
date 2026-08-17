@@ -307,6 +307,24 @@ main > section > h2 {
   margin-top: 0.9rem;
 }
 
+/* Legende du badge "Investissements" (variation du jour, cf.
+   googleSheets.js) : distingue clairement ce signal temps-reel (PEA+CTO
+   uniquement, seuls comptes qui bougent au jour le jour) du badge de
+   variation par periode juste au-dessus, qui lui porte sur le
+   Patrimoine Total (Cash inclus) sur la fenetre choisie. Deux signaux
+   differents, donc chacun sa legende plutot que superposes sans
+   contexte. Visibilite pilotee en JS (afficherVarJour), en meme temps
+   que le badge associe. */
+.hero-invest-caption {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary-color);
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+}
+
 .account-sparkline {
   height: 40px;
   margin-top: 0.6rem;
@@ -878,26 +896,6 @@ svg.icon {
   cursor: pointer;
 }
 
-.hero-trend {
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 0.3rem 0.7rem;
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin: 0.5rem 0 0.1rem;
-}
-
-.hero-trend.up {
-  color: var(--accent-text);
-  background: rgba(45, 212, 167, 0.14);
-}
-
-.hero-trend.down {
-  color: var(--negative-color);
-  background: rgba(240, 87, 107, 0.14);
-}
 
 .account-trend {
   font-size: 0.78rem;

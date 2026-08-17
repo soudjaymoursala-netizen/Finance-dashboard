@@ -184,7 +184,6 @@ async function chargerDashboard() {
 
         // Update DOM values
         animerValeur(DOM.networth, DATA.patrimoine, " €");
-        if (typeof suivreMouvement === "function") suivreMouvement("patrimoine", DATA.patrimoine, "€", "patrimoineMouvement");
         animerValeur(DOM.cash, DATA.budget.cash_dispo_total || 0, " €");
         if (typeof suivreMouvement === "function") suivreMouvement("cash", DATA.budget.cash_dispo_total, "€", "cashMouvements");
         animerValeur(DOM.investments, DATA.valeurInvestie || 0, " €"); // valeur actuelle : PEA + CTO converti au même taux
@@ -202,16 +201,25 @@ async function chargerDashboard() {
         // Nécessite les clés pea_valeur_hier / cto_valeur_chf_hier côté
         // Sheet (calculées avec GOOGLEFINANCE(ticker, "closeyest")). Si ces
         // clés n'existent pas encore, le badge reste simplement masqué.
-        function afficherVarJour(elementId, valeurActuelle, valeurHier, deviseSuffixe) {
+        // captionId optionnel : masque/affiche une légende associée en
+        // même temps que le badge (utilisé pour le badge agrégé du hero,
+        // où le badge seul ne suffit pas à expliquer ce qu'il mesure).
+        function afficherVarJour(elementId, valeurActuelle, valeurHier, deviseSuffixe, captionId) {
             const el = document.getElementById(elementId);
-            if (!el || !valeurHier || valeurHier <= 0 || !valeurActuelle) return;
+            const caption = captionId ? document.getElementById(captionId) : null;
+            if (!el || !valeurHier || valeurHier <= 0 || !valeurActuelle) {
+                if (caption) caption.style.display = "none";
+                return;
+            }
             const deltaPct = ((valeurActuelle - valeurHier) / valeurHier) * 100;
             const deltaAbs = valeurActuelle - valeurHier;
             if (Math.abs(deltaPct) < 0.01) {
                 el.style.display = "none";
+                if (caption) caption.style.display = "none";
                 return;
             }
             el.style.display = "";
+            if (caption) caption.style.display = "";
             el.className = "account-trend " + (deltaPct >= 0 ? "up" : "down");
             const signe = deltaPct >= 0 ? "+" : "";
             el.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(2) + "% (" + signe + Math.round(deltaAbs).toLocaleString("fr-FR") + " " + deviseSuffixe + ") aujourd'hui";
@@ -220,6 +228,25 @@ async function chargerDashboard() {
         try {
             afficherVarJour("peaVarJour", DATA.pea.pea_valeur, DATA.pea.pea_valeur_hier, "€");
             afficherVarJour("ctoVarJour", DATA.cto.cto_valeur_chf, DATA.cto.cto_valeur_chf_hier, "CHF");
+
+            // Badge agrégé "Investissements" (PEA + CTO convertis en EUR)
+            // sur la carte hero : seuls PEA et CTO varient réellement au
+            // jour le jour (cours de marché via GOOGLEFINANCE) - le Cash
+            // (et donc le Patrimoine Total) ne bouge lui qu'au rythme des
+            // mises à jour manuelles du budget, généralement mensuelles.
+            // Nécessite les DEUX clôtures-veille pour être fiable ; sinon
+            // reste masqué plutôt que d'afficher une variation partielle
+            // silencieusement fausse.
+            if (DATA.pea.pea_valeur_hier > 0 && DATA.cto.cto_valeur_chf_hier > 0) {
+                const investAujourdhui = (DATA.pea.pea_valeur || 0) + (DATA.ctoValeurEUR || 0);
+                const investHierEUR = (DATA.pea.pea_valeur_hier || 0) + ((DATA.cto.cto_valeur_chf_hier || 0) / tauxChange);
+                afficherVarJour("heroInvestVarJour", investAujourdhui, investHierEUR, "€", "heroInvestCaption");
+            } else {
+                const captionEl = document.getElementById("heroInvestCaption");
+                const badgeEl = document.getElementById("heroInvestVarJour");
+                if (captionEl) captionEl.style.display = "none";
+                if (badgeEl) badgeEl.style.display = "none";
+            }
         } catch (e) {
             console.warn("Variation jour non calculable:", e);
         }
@@ -359,45 +386,16 @@ async function chargerDashboard() {
             // (3M/6M/1A/YTD/Tout) et redessine a la fois la sparkline hero
             // et le graphique Evolution - plus besoin d'appeler
             // updateHeroSparkline() separement avec l'historique complet.
+            // setPatrimoineHistory() calcule et affiche desormais lui-meme
+            // le badge de variation (pour la periode choisie dans le
+            // selecteur du hero) et ajuste le halo ambiant de la carte en
+            // consequence (teal en croissance, ambre en repli) - voir
+            // afficherVariationPeriode() dans charts.js. Un seul badge de
+            // tendance au lieu de deux superposes (l'ancien "depuis le
+            // dernier point" duplique desormais avec "Tout").
             if (typeof setPatrimoineHistory === "function") setPatrimoineHistory(labels, valeurs, DATA.objectif250k);
             if (typeof updatePeaSparkline === "function") updatePeaSparkline(peaSeries);
             if (typeof updateCtoSparkline === "function") updateCtoSparkline(ctoSeries);
-
-            // Badge de tendance : variation entre les 2 derniers points connus
-            // (indicateur unique et bien visible, avec % ET montant en €).
-            // On affiche la vraie date du point de comparaison plutôt que
-            // "ce mois" en dur, car les points du Sheet ne sont pas toujours
-            // espacés d'exactement un mois.
-            try {
-                const pointsValides = [];
-                for (let k = 0; k < valeurs.length; k++) {
-                    if (valeurs[k] && valeurs[k] > 0) pointsValides.push({ valeur: valeurs[k], label: labels[k] });
-                }
-                if (pointsValides.length >= 2) {
-                    const dernier = pointsValides[pointsValides.length - 1].valeur;
-                    const precedentPoint = pointsValides[pointsValides.length - 2];
-                    const precedent = precedentPoint.valeur;
-                    const deltaPct = precedent > 0 ? ((dernier - precedent) / precedent) * 100 : 0;
-                    const deltaAbs = dernier - precedent;
-                    const trendEl = document.getElementById("heroTrend");
-                    if (trendEl && Math.abs(deltaPct) > 0.05) {
-                        trendEl.style.display = "";
-                        trendEl.className = "hero-trend " + (deltaPct >= 0 ? "up" : "down");
-                        const signe = deltaPct >= 0 ? "+" : "";
-                        trendEl.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe + formatEUR(deltaAbs) + ") depuis " + precedentPoint.label;
-                        trendEl.title = "Variation par rapport au point précédent du suivi (" + precedentPoint.label + ")";
-
-                        // Le halo ambiant de la carte reagit a la vraie
-                        // tendance : teal en croissance, ambre discret
-                        // en repli - signal honnete plutot que purement
-                        // decoratif (voir heroGlowBreathe dans style.css).
-                        const heroCardEl = document.getElementById("heroCard");
-                        if (heroCardEl) heroCardEl.classList.toggle("hero-card-down", deltaPct < 0);
-                    }
-                }
-            } catch (e) {
-                console.warn("Tendance héros non calculable:", e);
-            }
         } catch (e) {
             console.warn("Erreur parsing evolution chart:", e);
         }
