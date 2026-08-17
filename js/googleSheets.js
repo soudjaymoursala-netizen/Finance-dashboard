@@ -161,12 +161,14 @@ async function chargerDashboard() {
         // (pas investies), donc ce calcul inclut naturellement les gains.
         DATA.patrimoine = (DATA.budget.cash_dispo_total || 0) + (DATA.pea.pea_valeur || 0) + (DATA.ctoValeurEUR || 0);
 
-        // Historique quotidien local (periodes 1J/5J du selecteur hero,
-        // cf. charts.js) : 1 point par jour, ecrase si rechargement le
-        // meme jour - construit reellement au fil des visites, faute de
-        // pouvoir tirer un vrai "hier"/"il y a 5 jours" du Sheet Evolution
-        // (mis a jour manuellement, pas au jour le jour).
-        if (typeof enregistrerSnapshotJournalier === "function") enregistrerSnapshotJournalier(DATA.patrimoine);
+        // Periode "1J" du selecteur hero (cf. charts.js) : compare a la
+        // valeur de la PRECEDENTE visite (peu importe il y a combien de
+        // temps), faute de pouvoir tirer un vrai "hier" du Sheet Evolution
+        // (mis a jour manuellement, pas au jour le jour). Doit tourner
+        // avant setPatrimoineHistory()/applyPatrimoinePeriod() plus bas,
+        // pour que la comparaison soit prete si "1J" est deja la periode
+        // active au chargement.
+        if (typeof enregistrerVisitePatrimoine === "function") enregistrerVisitePatrimoine(DATA.patrimoine);
 
         DATA.progression250k = DATA.patrimoine > 0 ? (DATA.patrimoine / DATA.objectif250k) * 100 : 0;
         DATA.restant250k = Math.max(0, DATA.objectif250k - DATA.patrimoine);

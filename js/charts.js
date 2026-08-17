@@ -219,64 +219,38 @@ window.updatePatrimoineObjectif = updatePatrimoineObjectif;
 const PATRIMOINE_PERIODES_POINTS = { "1M": 2, "2M": 3, "3M": 4, "6M": 7, "1A": 13 };
 
 /* ==================================================
-   HISTORIQUE QUOTIDIEN LOCAL — pour les periodes courtes (1J/5J)
+   DERNIERE VISITE — periode "1J"
    Le Sheet Evolution n'a qu'un point par mise a jour manuelle
-   (typiquement mensuelle) : impossible d'en tirer un vrai "hier" ou
-   "il y a 5 jours" honnete. On construit donc ici un historique
-   JOUR PAR JOUR reel, cote client, en enregistrant le Patrimoine
-   Total a chaque chargement du dashboard (1 point par jour, ecrase si
-   rechargement le meme jour). Consequence assumee : 1J/5J restent
-   pauvres les tout premiers jours d'usage et s'etoffent ensuite tout
-   seuls - preferable a une fausse precision basee sur des donnees
-   mensuelles.
+   (typiquement mensuelle) : impossible d'en tirer un vrai "hier"
+   honnete. "1J" compare donc simplement la valeur du Patrimoine Total
+   lors de la PRECEDENTE fois ou le dashboard a ete ouvert a la valeur
+   actuelle - peu importe si c'etait il y a 2h ou 3 jours, c'est ce qui
+   est reellement mesurable cote client. derniereVisitePatrimoine est
+   lu une fois au chargement (avant d'etre ecrase par
+   enregistrerVisitePatrimoine, appelee depuis googleSheets.js) puis
+   reste stable pour le reste de la session.
    ================================================== */
-const DAILY_HISTORY_KEY = "financeDashboard_dailyHistory";
-const DAILY_HISTORY_MAX = 90;
+const LAST_VISIT_KEY = "financeDashboard_lastVisitPatrimoine";
+let derniereVisitePatrimoine = null;
 
-function dateLocaleISO(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return y + "-" + m + "-" + d;
-}
-
-function chargerHistoriqueJournalier() {
+function enregistrerVisitePatrimoine(valeurActuelle) {
+    if (!valeurActuelle || valeurActuelle <= 0) return;
     try {
-        const raw = localStorage.getItem(DAILY_HISTORY_KEY);
-        const historique = raw ? JSON.parse(raw) : [];
-        return Array.isArray(historique) ? historique : [];
+        const raw = localStorage.getItem(LAST_VISIT_KEY);
+        derniereVisitePatrimoine = raw ? JSON.parse(raw) : null;
     } catch (e) {
-        return [];
+        derniereVisitePatrimoine = null;
     }
+    try {
+        localStorage.setItem(LAST_VISIT_KEY, JSON.stringify({ valeur: valeurActuelle, date: new Date().toISOString() }));
+    } catch (e) { /* quota depasse, pas bloquant */ }
 }
-
-function enregistrerSnapshotJournalier(valeur) {
-    if (!valeur || valeur <= 0) return;
-    const aujourdhui = dateLocaleISO(new Date());
-    let historique = chargerHistoriqueJournalier();
-    const idx = historique.findIndex((p) => p.date === aujourdhui);
-    if (idx >= 0) {
-        historique[idx].valeur = valeur;
-    } else {
-        historique.push({ date: aujourdhui, valeur: valeur });
-    }
-    historique.sort((a, b) => a.date.localeCompare(b.date));
-    if (historique.length > DAILY_HISTORY_MAX) {
-        historique = historique.slice(historique.length - DAILY_HISTORY_MAX);
-    }
-    try { localStorage.setItem(DAILY_HISTORY_KEY, JSON.stringify(historique)); } catch (e) { /* quota depasse, pas bloquant */ }
-}
-window.enregistrerSnapshotJournalier = enregistrerSnapshotJournalier;
-
-function formatDateCourteFr(isoDate) {
-    const d = new Date(isoDate + "T00:00:00");
-    return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
-}
+window.enregistrerVisitePatrimoine = enregistrerVisitePatrimoine;
 
 /* Redessine chart + sparkline + badge de variation + halo + etat actif
    des boutons pour une tranche (labels, valeurs) donnee - factorise les
-   deux sources possibles (historique mensuel du Sheet vs historique
-   quotidien local). */
+   deux sources possibles (historique mensuel du Sheet vs comparaison
+   "derniere visite" pour 1J). */
 function renderPatrimoinePeriodSlice(labels, valeurs, objectif, periode, historiqueInsuffisant) {
     currentPatrimoinePeriod = periode;
     try { localStorage.setItem("patrimoinePeriod", periode); } catch (e) { /* stockage indisponible, pas bloquant */ }
@@ -288,7 +262,7 @@ function renderPatrimoinePeriodSlice(labels, valeurs, objectif, periode, histori
         const el = document.getElementById("patrimoinePeriodVariation");
         if (el) {
             el.className = "period-variation";
-            el.textContent = "Historique quotidien encore limité — reviens dans quelques jours pour voir cette période.";
+            el.textContent = "Pas encore de visite précédente enregistrée pour comparer.";
         }
         const heroCardEl = document.getElementById("heroCard");
         if (heroCardEl) heroCardEl.classList.remove("hero-card-down");
@@ -307,17 +281,30 @@ function renderPatrimoinePeriodSlice(labels, valeurs, objectif, periode, histori
     });
 }
 
-function applyPeriodeJournaliere(periode) {
-    const nbPoints = periode === "1J" ? 2 : 6; // 1J = aujourd'hui vs hier, 5J = 6 points (J-5 -> J)
-    const historique = chargerHistoriqueJournalier().slice(-nbPoints);
-    const labels = historique.map((p) => formatDateCourteFr(p.date));
-    const valeurs = historique.map((p) => p.valeur);
-    renderPatrimoinePeriodSlice(labels, valeurs, patrimoineHistoryFull.objectif, periode, historique.length < 2);
+function applyPeriode1J() {
+    const objectif = patrimoineHistoryFull.objectif;
+    const valeursConnues = patrimoineHistoryFull.valeurs || [];
+    // Le dernier point de l'historique Evolution est deja ecrase par la
+    // vraie valeur DATA.patrimoine en temps reel (cf. googleSheets.js) -
+    // fiable a reutiliser ici comme "valeur actuelle" sans dupliquer de
+    // variable globale supplementaire.
+    const valeurActuelle = valeursConnues.length ? valeursConnues[valeursConnues.length - 1] : null;
+
+    if (!derniereVisitePatrimoine || !derniereVisitePatrimoine.valeur || !valeurActuelle) {
+        renderPatrimoinePeriodSlice([], [], objectif, "1J", true);
+        return;
+    }
+
+    const dateVisite = new Date(derniereVisitePatrimoine.date);
+    const labelVisite = dateVisite.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) +
+        " " + dateVisite.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+
+    renderPatrimoinePeriodSlice([labelVisite, "Maintenant"], [derniereVisitePatrimoine.valeur, valeurActuelle], objectif, "1J");
 }
 
 function applyPatrimoinePeriod(periode) {
-    if (periode === "1J" || periode === "5J") {
-        applyPeriodeJournaliere(periode);
+    if (periode === "1J") {
+        applyPeriode1J();
         return;
     }
 
