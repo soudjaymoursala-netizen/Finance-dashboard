@@ -26,7 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=21">
+    <link rel="stylesheet" href="css/style.css?v=22">
     <link rel="stylesheet" href="css/alerts.css">
     <link rel="stylesheet" href="css/historique.css?v=7">
 </head>
@@ -118,6 +118,15 @@
             <path d="M12 2.5 20 6v6c0 5-3.5 8.3-8 9.5C7.5 20.3 4 17 4 12V6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
             <path d="M8.5 12l2.3 2.3L15.5 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </symbol>
+        <symbol id="icon-eye" viewBox="0 0 24 24">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+        </symbol>
+        <symbol id="icon-eye-off" viewBox="0 0 24 24">
+            <path d="M3 3l18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10.6 5.2A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a15.6 15.6 0 0 1-3.3 4.2M6.8 6.8C4.2 8.4 2 12 2 12s3.5 7 10 7c1.4 0 2.6-.3 3.7-.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.5 10.2a3.2 3.2 0 0 0 4.3 4.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </symbol>
         <symbol id="icon-briefcase" viewBox="0 0 24 24">
             <rect x="2.5" y="7.5" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
             <path d="M8 7.5V5.5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
@@ -183,6 +192,7 @@
                 </div>
             </div>
             <div class="header-actions">
+                <button id="toggleAmountsBtn" class="theme-btn" aria-label="Masquer les montants" aria-pressed="false"><svg class="icon" width="16" height="16"><use id="toggleAmountsIcon" href="#icon-eye"></use></svg></button>
                 <button id="refreshBtn" class="theme-btn" aria-label="Rafraîchir les données"><svg class="icon" width="16" height="16"><use href="#icon-refresh"></use></svg></button>
                 <button id="themeToggle" class="theme-btn" aria-label="Changer de thème"><svg class="icon" width="16" height="16"><use id="themeIcon" href="#icon-moon"></use></svg></button>
                 <span class="status">Live</span>
@@ -509,7 +519,7 @@
     <script src="js/historiqueAchats.js?v=7"></script>
     <script src="js/investissements.js?v=2"></script>
     <script src="js/celebration.js?v=1"></script>
-    <script src="js/googleSheets.js?v=24"></script>
+    <script src="js/googleSheets.js?v=25"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=6"></script>

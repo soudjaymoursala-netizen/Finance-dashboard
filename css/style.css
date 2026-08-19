@@ -1579,3 +1579,43 @@ body.light .bottom-nav {
 ::view-transition-old(root) {
   z-index: 2;
 }
+
+/* ==================================================
+   MASQUAGE DES MONTANTS (confidentialite)
+   Inspire des apps bancaires (icone oeil) - floute les
+   montants les plus visibles sans repliquer les couleurs/
+   la marque d'une banque en particulier.
+   ================================================== */
+body.amounts-hidden .hero-value,
+body.amounts-hidden .value,
+body.amounts-hidden .chip-value,
+body.amounts-hidden .fire-percentage,
+body.amounts-hidden .fire-stat-value,
+body.amounts-hidden .period-variation,
+body.amounts-hidden .account-mouvements,
+body.amounts-hidden .historique-stat-value,
+body.amounts-hidden .goal-header span[id^="goal-"] {
+  filter: blur(7px);
+  user-select: none;
+  transition: filter 200ms ease;
+}
+
+/* Au survol/tap, un decouvre temporaire discret - pratique pour
+   verifier un chiffre precis sans devoir tout redemasquer. */
+body.amounts-hidden .hero-value:active,
+body.amounts-hidden .value:active {
+  filter: blur(0);
+}
+
+#toggleAmountsBtn[aria-pressed="true"] {
+  color: var(--accent-color);
+  border-color: rgba(45, 212, 167, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.amounts-hidden .hero-value,
+  body.amounts-hidden .value,
+  body.amounts-hidden .chip-value {
+    transition: none;
+  }
+}

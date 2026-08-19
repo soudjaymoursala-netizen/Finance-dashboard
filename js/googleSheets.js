@@ -583,7 +583,13 @@ async function chargerDashboard() {
         const setThemeIcon = (isLight) => {
             if (themeIconUse) themeIconUse.setAttribute("href", isLight ? "#icon-sun" : "#icon-moon");
         };
-        if (themeButton) {
+        // Garde-fou : chargerDashboard() tourne a chaque rafraichissement
+        // (bouton 🔄, pull-to-refresh, etc.) - sans ce flag, un nouveau
+        // listener de clic s'ajoutait a CHAQUE rechargement sans jamais
+        // retirer l'ancien, causant des bascules multiples cumulees a
+        // chaque clic apres quelques rafraichissements.
+        if (themeButton && !themeButton.dataset.bound) {
+            themeButton.dataset.bound = "1";
             if (localStorage.getItem("theme") === "light") {
                 document.body.classList.add("light");
                 setThemeIcon(true);
@@ -632,6 +638,28 @@ async function chargerDashboard() {
                         }
                     );
                 }).catch(() => { /* transition annulee/non supportee : appliquerTheme() a deja tourne via startViewTransition */ });
+            });
+        }
+
+        // Masquage des montants (confidentialite) - meme garde-fou que
+        // le bouton theme ci-dessus, pour la meme raison.
+        const toggleAmountsBtn = document.getElementById("toggleAmountsBtn");
+        const toggleAmountsIcon = document.getElementById("toggleAmountsIcon");
+        if (toggleAmountsBtn && !toggleAmountsBtn.dataset.bound) {
+            toggleAmountsBtn.dataset.bound = "1";
+            const appliquerMasquage = (masque) => {
+                document.body.classList.toggle("amounts-hidden", masque);
+                toggleAmountsBtn.setAttribute("aria-pressed", masque ? "true" : "false");
+                toggleAmountsBtn.setAttribute("aria-label", masque ? "Afficher les montants" : "Masquer les montants");
+                if (toggleAmountsIcon) toggleAmountsIcon.setAttribute("href", masque ? "#icon-eye-off" : "#icon-eye");
+            };
+            if (localStorage.getItem("financeDashboard_montantsMasques") === "1") {
+                appliquerMasquage(true);
+            }
+            toggleAmountsBtn.addEventListener("click", () => {
+                const masqueActuel = document.body.classList.contains("amounts-hidden");
+                appliquerMasquage(!masqueActuel);
+                localStorage.setItem("financeDashboard_montantsMasques", !masqueActuel ? "1" : "0");
             });
         }
 

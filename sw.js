@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v12"; // v12 : sparkline scrubable, transition cercle theme, halo reactif a la tendance
+const CACHE_VERSION = "shell-v13"; // v13 : masquage des montants, fix re-attachement listener theme, resync precache
 
 const PRECACHE_URLS = [
     "./",
@@ -34,6 +34,7 @@ const PRECACHE_URLS = [
     "./js/mouvements.js",
     "./js/suiviAnnuel.js",
     "./js/historiqueAchats.js",
+    "./js/investissements.js",
     "./js/celebration.js",
     "./js/googleSheets.js",
     "./js/runtimeConfigUI.js",
