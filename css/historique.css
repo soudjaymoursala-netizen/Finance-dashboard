@@ -54,11 +54,25 @@
 }
 
 .historique-position-row {
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   overflow: hidden;
   box-shadow: var(--shadow-card);
+  animation: fadeInUp 260ms ease both;
+}
+
+.historique-positions .historique-position-row:nth-child(1) { animation-delay: 20ms; }
+.historique-positions .historique-position-row:nth-child(2) { animation-delay: 45ms; }
+.historique-positions .historique-position-row:nth-child(3) { animation-delay: 70ms; }
+.historique-positions .historique-position-row:nth-child(4) { animation-delay: 95ms; }
+.historique-positions .historique-position-row:nth-child(5) { animation-delay: 120ms; }
+.historique-positions .historique-position-row:nth-child(n+6) { animation-delay: 140ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .historique-position-row {
+    animation: none;
+  }
 }
 
 .historique-position-header {
@@ -139,9 +153,9 @@
 }
 
 .historique-stat-value {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-color);
 }
 
@@ -274,22 +288,21 @@
   flex-shrink: 0;
 }
 
-.historique-badge.gold {
-  background: rgba(240, 180, 41, 0.2);
-  color: var(--accent-gold);
-  border: 1px solid rgba(240, 180, 41, 0.3);
-}
-
-.historique-badge.blue {
-  background: rgba(78, 197, 207, 0.2);
-  color: var(--accent-blue);
-  border: 1px solid rgba(78, 197, 207, 0.3);
-}
-
+/* Tags de compte (PEA/CTO) : neutralises en gris - ce sont des
+   categories, pas un signal financier (le vrai signal, gain/perte,
+   reste porte par .historique-positif/.historique-negatif). */
+.historique-badge.gold,
+.historique-badge.blue,
 .historique-badge.emerald {
-  background: rgba(45, 212, 167, 0.18);
-  color: var(--accent-text);
-  border: 1px solid rgba(45, 212, 167, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary-color);
+  border: 1px solid var(--border-color);
+}
+
+body.light .historique-badge.gold,
+body.light .historique-badge.blue,
+body.light .historique-badge.emerald {
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .historique-positif {
@@ -424,6 +437,11 @@
   color: var(--text-color);
 }
 
+.invest-chip:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
 .invest-chip.active {
   background: rgba(45, 212, 167, 0.16);
   color: var(--accent-text);
@@ -458,7 +476,7 @@
 }
 
 .invest-summary-stat {
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.75rem 1rem;
@@ -476,9 +494,9 @@
 }
 
 .invest-summary-value {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-color);
 }
 
@@ -512,7 +530,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.65rem;
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.85rem 1.1rem;
@@ -542,8 +560,8 @@
 }
 
 .invest-group-gain {
-  font-family: 'Sora', sans-serif;
-  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
   font-size: 0.9rem;
 }
 

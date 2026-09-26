@@ -406,9 +406,8 @@ async function chargerDashboard() {
                 valeurs[valeurs.length - 1] = DATA.patrimoine;
             }
             // setPatrimoineHistory() applique aussitot la periode courante
-            // (3M/6M/1A/YTD/Tout) et redessine a la fois la sparkline hero
-            // et le graphique Evolution - plus besoin d'appeler
-            // updateHeroSparkline() separement avec l'historique complet.
+            // (3M/6M/1A/YTD/Tout) et redessine le graphique Evolution,
+            // integre directement dans la hero-card.
             // setPatrimoineHistory() calcule et affiche desormais lui-meme
             // le badge de variation (pour la periode choisie dans le
             // selecteur du hero) et ajuste le halo ambiant de la carte en

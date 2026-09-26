@@ -21,7 +21,7 @@
 
 async function chargerSuiviAnnuel() {
     try {
-        const monthlySection = document.getElementById("monthlyBudgetSection");
+        const monthlyTabBtn = document.getElementById("budgetTabMensuel");
         if (!window.CONFIG.URL_BUDGET_MENSUEL) return;
 
         let monthlyTxt = "";
@@ -158,7 +158,7 @@ async function chargerSuiviAnnuel() {
             }
         });
 
-        if (monthlySection) monthlySection.style.display = "";
+        if (monthlyTabBtn) monthlyTabBtn.style.display = "";
     } catch (e) {
         console.warn("Suivi annuel non disponible:", e);
     }

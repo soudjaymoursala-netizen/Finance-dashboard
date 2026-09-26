@@ -1,18 +1,18 @@
-/* Enregistrement des variables de degrade en tant que couleurs typees :
-   sans ca, un changement de theme fait "sauter" instantanement les
-   degrades des cartes (les gradients bases sur des variables CSS ne
-   s'interpolent pas nativement), alors que le fond de page (couleur
-   unie) transitionnait deja en douceur - incoherence corrigee ici. */
+/* Enregistrement des variables de couleur des cartes en tant que
+   couleurs typees : sans ca, un changement de theme fait "sauter"
+   instantanement le fond des cartes au lieu de transitionner en
+   douceur comme le reste de la page (voir la transition combinee sur
+   .card/.chip/... plus bas, qui inclut background-color). */
 @property --secondary-color {
   syntax: '<color>';
   inherits: true;
-  initial-value: #141B2E;
+  initial-value: #12161F;
 }
 
 @property --surface-alt {
   syntax: '<color>';
   inherits: true;
-  initial-value: #1C2740;
+  initial-value: #171B26;
 }
 
 /* ==================================================
@@ -21,52 +21,55 @@
    ================================================== */
 :root {
   /* Surfaces */
-  --primary-color: #0B1120;      /* fond de page (encre) */
-  --secondary-color: #141B2E;    /* cartes */
-  --surface-hover: #1A2338;
-  --surface-alt: #1C2740;        /* dégradé cartes "héros" */
-  --border-color: rgba(255, 255, 255, 0.07);
+  --primary-color: #0A0E17;      /* fond de page (encre neutre) */
+  --secondary-color: #12161F;    /* cartes — plates, sans degrade */
+  --surface-hover: #171B26;
+  --surface-alt: #171B26;
+  --border-color: rgba(255, 255, 255, 0.06);
 
   /* Texte */
-  --text-color: #F1F5F9;
-  --text-secondary-color: #8A94A6;
+  --text-color: #F4F6F8;
+  --text-secondary-color: #8B93A1;
 
-  /* Accents */
-  --accent-color: #2DD4A7;       /* émeraude — croissance / positif */
-  --accent-text: #2DD4A7;        /* variante texte, conforme WCAG AA sur petit texte */
-  --accent-gold: #F0B429;        /* or — investissement */
-  --accent-violet: #9F7AEA;      /* violet — crypto / tertiaire */
-  --accent-blue: #4EC5CF;        /* cyan — cash / info */
-  --positive-color: #2DD4A7;
-  --negative-color: #F0576B;
-  --warning-color: #F5A623;
+  /* Accents — un seul accent de marque (emeraude), reserve au signal
+     positif ; le reste (categories de comptes, badges) reste neutre.
+     accent-gold/violet/blue subsistent comme alias neutres (voir
+     .icon-badge plus bas) pour ne pas casser les classes existantes. */
+  --accent-color: #34D399;       /* émeraude — croissance / positif */
+  --accent-text: #34D399;        /* variante texte, conforme WCAG AA sur petit texte */
+  --accent-gold: #8B93A1;
+  --accent-violet: #8B93A1;
+  --accent-blue: #8B93A1;
+  --positive-color: #34D399;
+  --negative-color: #F87171;
+  --warning-color: #FBBF24;
 
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.12), 0 6px 18px rgba(0,0,0,0.16);
+  --radius: 16px;
+  --radius-sm: 12px;
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* Mode clair (classe .light sur body) */
 body.light {
-  --primary-color: #F3F5F9;
+  --primary-color: #FAFAFA;
   --secondary-color: #FFFFFF;
-  --surface-hover: #F0F3F8;
-  --surface-alt: #E9EEF5;
-  --border-color: rgba(15, 23, 42, 0.08);
+  --surface-hover: #F2F3F5;
+  --surface-alt: #F2F3F5;
+  --border-color: rgba(15, 23, 42, 0.07);
 
-  --text-color: #0F172A;
-  --text-secondary-color: #5B6472;
+  --text-color: #12161F;
+  --text-secondary-color: #667085;
 
-  --accent-color: #0EA588;
-  --accent-text: #0A8563;        /* 4.62:1 sur blanc — conforme WCAG AA */
-  --accent-gold: #C98A15;
-  --accent-violet: #7C5CD1;
-  --accent-blue: #0891A8;
-  --positive-color: #16A34A;
+  --accent-color: #059669;
+  --accent-text: #047857;        /* conforme WCAG AA sur blanc */
+  --accent-gold: #667085;
+  --accent-violet: #667085;
+  --accent-blue: #667085;
+  --positive-color: #059669;
   --negative-color: #DC2626;
-  --warning-color: #9C5F00;  /* 5.18:1 sur blanc, conforme WCAG AA */
+  --warning-color: #9C5F00;  /* conforme WCAG AA sur blanc */
 
-  --shadow-card: 0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06);
+  --shadow-card: 0 1px 2px rgba(15,23,42,0.06);
 }
 
 /* ==================================================
@@ -221,7 +224,7 @@ main > section {
 }
 
 main > section > h2 {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -232,10 +235,35 @@ main > section > h2 {
 }
 
 /* ==================================================
+   MODULE BUDGET — onglets Mensuel / Annuel / Épargne
+   Fusionne 3 sections auparavant separees (voir index.html
+   #navBudget) : un seul panneau visible a la fois, pilote
+   par js/budgetTabs.js.
+   ================================================== */
+.budget-tabs {
+  margin-bottom: 1.5rem;
+}
+
+.budget-tab-panel {
+  display: none;
+}
+
+.budget-tab-panel.active {
+  display: block;
+  animation: fadeInUp 260ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .budget-tab-panel.active {
+    animation: none;
+  }
+}
+
+/* ==================================================
    HERO — Patrimoine Total
    ================================================== */
 .hero-card {
-  background: linear-gradient(135deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 2rem;
@@ -285,8 +313,8 @@ main > section > h2 {
 
 .hero-value {
   font-family: 'Sora', sans-serif;
-  font-size: clamp(2.25rem, 5vw, 3.25rem);
-  font-weight: 800;
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 700;
   line-height: 1.05;
   color: var(--text-color);
 }
@@ -298,9 +326,9 @@ main > section > h2 {
   margin-top: 0.6rem;
 }
 
-.hero-sparkline {
-  height: 60px;
-  margin-top: 1rem;
+.hero-evolution-chart {
+  height: 260px;
+  margin-top: 1.25rem;
 }
 
 .hero-period-selector {
@@ -376,7 +404,7 @@ main > section > h2 {
 }
 
 .chip {
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.9rem 1.1rem;
@@ -401,32 +429,21 @@ main > section > h2 {
 
 .chip-value {
   font-family: 'Sora', sans-serif;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 /* ==================================================
    CARTES génériques
    ================================================== */
 .card {
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 1.75rem;
   box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
-}
-
-.card::after {
-  content: "";
-  position: absolute;
-  top: -35%;
-  right: -12%;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(45,212,167,0.07), transparent 70%);
-  pointer-events: none;
 }
 
 .card .label {
@@ -440,8 +457,8 @@ main > section > h2 {
 
 .card .value {
   font-family: 'Sora', sans-serif;
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .account-fx-note {
@@ -467,6 +484,10 @@ main > section > h2 {
   margin-top: 1.5rem;
 }
 
+.chart-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .chart-card h3 {
   font-size: 1rem;
   font-weight: 600;
@@ -474,18 +495,6 @@ main > section > h2 {
   color: var(--text-color);
 }
 
-/* ==================================================
-   SELECTEUR DE PERIODE — vit dans la hero-card (carte
-   Patrimoine Total) : un seul controle global, qui pilote
-   a la fois la sparkline hero et le graphique Evolution du
-   patrimoine dans Graphiques, plutot que de dupliquer la
-   commande a plusieurs endroits.
-   ================================================== */
-.chart-card-hint {
-  font-size: 0.78rem;
-  color: var(--text-secondary-color);
-  margin: -0.6rem 0 1rem;
-}
 
 .period-selector {
   display: inline-flex;
@@ -538,7 +547,7 @@ main > section > h2 {
    FIRE Tracker
    ================================================== */
 .fire-tracker {
-  background: linear-gradient(135deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 2.25rem 2rem;
@@ -546,18 +555,6 @@ main > section > h2 {
   box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
-}
-
-.fire-tracker::after {
-  content: "";
-  position: absolute;
-  top: -30%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 340px;
-  height: 340px;
-  background: radial-gradient(circle, rgba(45,212,167,0.10), transparent 70%);
-  pointer-events: none;
 }
 
 .fire-label {
@@ -572,8 +569,8 @@ main > section > h2 {
 
 .fire-percentage {
   font-family: 'Sora', sans-serif;
-  font-size: 3.25rem;
-  font-weight: 800;
+  font-size: clamp(2.5rem, 6vw, 3.25rem);
+  font-weight: 700;
   color: var(--accent-color);
   margin-bottom: 0.6rem;
   position: relative;
@@ -605,8 +602,8 @@ main > section > h2 {
 }
 
 .fire-stat-value {
-  font-family: 'Sora', sans-serif;
-  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
   font-size: 1rem;
   color: var(--text-color);
 }
@@ -699,9 +696,9 @@ main > section > h2 {
 }
 
 .goal-card, .objectif-annuel-card {
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
-  border-left: 4px solid var(--accent-color);
+  border-left: 3px solid var(--accent-color);
   border-radius: var(--radius-sm);
   padding: 1.1rem 1.25rem;
   box-shadow: var(--shadow-card);
@@ -757,6 +754,10 @@ main > section > h2 {
   height: 300px;
 }
 
+.chart-mini {
+  height: 180px;
+}
+
 /* ==================================================
    Alertes
    ================================================== */
@@ -780,11 +781,27 @@ main > section > h2 {
   flex-shrink: 0;
 }
 
-.icon-badge.emerald { background: rgba(23, 140, 110, 0.30); border: 1px solid rgba(23, 140, 110, 0.4); color: var(--accent-text); }
-.icon-badge.gold    { background: rgba(185, 133, 39, 0.30); border: 1px solid rgba(185, 133, 39, 0.4); color: var(--accent-gold); }
-.icon-badge.violet  { background: rgba(108, 92, 224, 0.30); border: 1px solid rgba(108, 92, 224, 0.4); color: var(--accent-violet); }
-.icon-badge.blue    { background: rgba(29, 143, 166, 0.30); border: 1px solid rgba(29, 143, 166, 0.4); color: var(--accent-blue); }
-.icon-badge.warn    { background: rgba(245, 166, 35, 0.26); border: 1px solid rgba(245, 166, 35, 0.4); color: var(--warning-color); }
+.icon-badge.emerald { background: rgba(52, 211, 153, 0.14); border: 1px solid rgba(52, 211, 153, 0.28); color: var(--accent-text); }
+/* gold/violet/blue/warn : neutralises en gris - ce sont des marqueurs
+   de categorie (compte, type d'actif...), pas un signal financier. Un
+   seul accent de marque (emerald) reste utilise dans tout le systeme,
+   la couleur ailleurs est reservee au vrai signal positif/negatif
+   (texte de gain/perte, badges de tendance, halo hero). */
+.icon-badge.gold,
+.icon-badge.violet,
+.icon-badge.blue,
+.icon-badge.warn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary-color);
+}
+
+body.light .icon-badge.gold,
+body.light .icon-badge.violet,
+body.light .icon-badge.blue,
+body.light .icon-badge.warn {
+  background: rgba(15, 23, 42, 0.04);
+}
 
 .hero-label .icon-badge { width: 2.4rem; height: 2.4rem; font-size: 1.25rem; border-radius: 11px; }
 .icon-badge.hero-icon { background: rgba(45, 212, 167, 0.16); color: var(--accent-text); }
@@ -814,9 +831,12 @@ svg.icon {
 }
 
 .card:hover, .chip:hover, .goal-card:hover, .objectif-annuel-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(45, 212, 167, 0.35);
-  box-shadow: var(--shadow-card), 0 0 0 1px rgba(45, 212, 167, 0.12), 0 12px 28px rgba(45, 212, 167, 0.08);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.light .card:hover, body.light .chip:hover, body.light .goal-card:hover, body.light .objectif-annuel-card:hover {
+  border-color: rgba(15, 23, 42, 0.14);
 }
 
 /* Retour tactile : leger "enfoncement" au clic/tap sur tout ce qui est
@@ -842,18 +862,7 @@ svg.icon {
 }
 
 .hero-card {
-  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 60px rgba(45, 212, 167, 0.06);
-}
-
-.hero-card::before {
-  content: "";
-  position: absolute;
-  bottom: -30%;
-  left: -8%;
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, rgba(240,180,41,0.22), transparent 70%);
-  pointer-events: none;
+  box-shadow: var(--shadow-card);
 }
 
 /* ==================================================
@@ -1034,7 +1043,7 @@ svg.icon {
 .toggle-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.9rem 1.1rem;
@@ -1128,7 +1137,9 @@ svg.icon {
 /* Focus clavier visible, indispensable pour les elements role="button"
    sur des div/h3 (pas de style de focus natif comme sur un <button>) */
 [role="button"]:focus-visible,
-.theme-btn:focus-visible {
+.theme-btn:focus-visible,
+.period-selector button:focus-visible,
+.chip:focus-visible {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
@@ -1258,9 +1269,13 @@ svg.icon {
   background: none;
   border: none;
   cursor: pointer;
+  color: var(--text-secondary-color);
   font-size: 1.05rem;
   padding: 0.35rem;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0.75;
 }
 
@@ -1325,7 +1340,7 @@ svg.icon {
   transform: translateX(-50%);
   z-index: 10000;
   width: min(92vw, 380px);
-  background: linear-gradient(150deg, var(--secondary-color), var(--surface-alt));
+  background: var(--secondary-color);
   border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 1rem 1.1rem;

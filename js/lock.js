@@ -245,10 +245,11 @@
         });
     }
     if (toggleBtn && input) {
+        const toggleIcon = document.getElementById("lockEyeIcon");
         toggleBtn.addEventListener("click", function () {
             const isHidden = input.type === "password";
             input.type = isHidden ? "text" : "password";
-            toggleBtn.textContent = isHidden ? "🙈" : "👁️";
+            if (toggleIcon) toggleIcon.setAttribute("href", isHidden ? "#icon-eye-off" : "#icon-eye");
             toggleBtn.setAttribute("aria-label", isHidden ? "Masquer le code" : "Afficher le code");
             input.focus();
         });

@@ -18,6 +18,12 @@
 
     items.forEach((item) => {
         item.addEventListener("click", () => {
+            // Certains items ciblent une section a onglets (ex: Budget) -
+            // data-tab indique lequel activer avant de faire defiler,
+            // sinon on atterrirait potentiellement sur un panneau cache.
+            const tab = item.getAttribute("data-tab");
+            if (tab && typeof window.activerOngletBudget === "function") window.activerOngletBudget(tab);
+
             const targetId = item.getAttribute("data-target");
             const target = document.getElementById(targetId);
             if (!target) return;

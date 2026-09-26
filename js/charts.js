@@ -1,7 +1,7 @@
 let patrimoineChart = null;
 let allocationChart = null;
-let peaCompositionChart = null;
-let ctoCompositionChart = null;
+let peaCompositionCharts = {}; // { [containerId]: ApexCharts instance } - graphique Graphiques + mini dans la carte compte
+let ctoCompositionCharts = {};
 let monthlyBudgetCharts = {}; // { [containerId]: ApexCharts instance }
 let lastMonthlyBudgetByYear = {}; // { [containerId]: { labels, revenus, depenses } } - pour refreshCharts (changement de theme)
 
@@ -25,11 +25,26 @@ function getThemeMode() {
   return document && document.body && document.body.classList.contains("light") ? "light" : "dark";
 }
 
-/* Couleur de texte pour les légendes/labels ApexCharts, adaptée au thème
-   (les couleurs de graphiques sont des hex litteraux, pas des variables CSS,
-   donc il faut les recalculer manuellement selon le mode actif) */
+/* Lit une variable CSS calculee (fallback hex si le DOM n'est pas encore
+   pret) - les graphiques ApexCharts ne comprennent pas var(--xxx)
+   directement, il faut leur passer un hex resolu, mais on evite de le
+   dupliquer en dur pour rester coherent si la palette change. */
+function getCssVar(nom, repliDark, repliLight) {
+  try {
+    const val = getComputedStyle(document.body).getPropertyValue(nom).trim();
+    if (val) return val;
+  } catch (e) { /* DOM pas pret, on utilise le repli */ }
+  return getThemeMode() === "light" ? repliLight : repliDark;
+}
+
+/* Couleur de texte pour les légendes/labels ApexCharts, adaptée au thème */
 function getChartTextColor() {
-  return getThemeMode() === "light" ? "#0F172A" : "#F1F5F9";
+  return getCssVar("--text-color", "#F4F6F8", "#12161F");
+}
+
+/* Couleur de texte secondaire (axes, labels discrets) */
+function getChartMutedColor() {
+  return getCssVar("--text-secondary-color", "#8B93A1", "#667085");
 }
 
 /* Couleurs de statut (positif/attention/info/negatif) adaptees au theme.
@@ -39,10 +54,10 @@ function getChartTextColor() {
 function getStatusColor(status) {
   const light = getThemeMode() === "light";
   const map = {
-    positive: light ? "#0A8563" : "#2DD4A7",
-    warning:  light ? "#9C5F00" : "#F5A623",
-    info:     light ? "#0E7C8F" : "#4EC5CF",
-    negative: light ? "#D6304A" : "#F0576B"
+    positive: light ? "#059669" : "#34D399",
+    warning:  light ? "#9C5F00" : "#FBBF24",
+    info:     light ? "#667085" : "#8B93A1",
+    negative: light ? "#DC2626" : "#F87171"
   };
   return map[status] || map.info;
 }
@@ -51,7 +66,20 @@ window.getStatusColor = getStatusColor;
 /* Couleur de contour des segments de donut : doit se fondre avec le fond
    de carte pour un rendu plus net (au lieu du blanc par defaut d'ApexCharts) */
 function getChartStrokeColor() {
-  return getThemeMode() === "light" ? "#FFFFFF" : "#141B2E";
+  return getCssVar("--secondary-color", "#12161F", "#FFFFFF");
+}
+
+/* Palette pour les donuts de REPARTITION (categorie : Cash/PEA/CTO,
+   Actions/ETF/Crypto...) : un seul degrade de l'accent de marque plutot
+   que plusieurs teintes non liees entre elles - ce n'est pas un signal
+   positif/negatif, juste une proportion, donc pas besoin de plusieurs
+   couleurs distinctes qui suggereraient (a tort) plusieurs categories
+   de valeur. */
+function getMonoPalette(n) {
+  const dark = ["#059669", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5"];
+  const light = ["#047857", "#059669", "#10B981", "#6EE7B7", "#A7F3D0"];
+  const palette = getThemeMode() === "light" ? light : dark;
+  return palette.slice(0, n);
 }
 
 function updatePatrimoineChart(labels, valeurs, objectifCible) {
@@ -62,7 +90,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
         lastPatrimoine.objectif = objectifCible;
     }
 
-    const chartElement = document.querySelector("#patrimoineChart");
+    const chartElement = document.querySelector("#heroSparkline");
     if (!chartElement) return;
     if (patrimoineChart) patrimoineChart.destroy();
     // La ligne "Objectif" (250k) a ete retiree du trace : elle forcait
@@ -70,10 +98,24 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
     // dans le tiers bas du graphique. L'objectif reste visible ailleurs
     // (FIRE Tracker, carte objectif Patrimoine) ; ici l'axe s'auto-adapte
     // aux vraies valeurs pour mieux voir la progression mois par mois.
+
+    // Couleur de la courbe alignee sur la vraie tendance (1er vs dernier
+    // point valide de la tranche affichee), pas fixe - coherent avec le
+    // badge de variation et le halo du hero qui suivent deja cette meme
+    // logique (cf. afficherVariationPeriode plus bas).
+    const pointsValides = (valeurs || []).filter((v) => v && v > 0);
+    const enHausse = pointsValides.length < 2 || pointsValides[pointsValides.length - 1] >= pointsValides[0];
+    const couleurTendance = enHausse ? getStatusColor("positive") : getStatusColor("negative");
+
+    // Peu de points (periodes courtes 1J/1M) : une courbe lissee sur 2-3
+    // points invente une inflexion qui n'existe pas - lignes droites
+    // plus honnetes que "smooth" dans ce cas.
+    const courbe = (valeurs || []).length <= 3 ? "straight" : "smooth";
+
     const options = {
         chart: {
             type: "area",
-            height: 380,
+            height: 260,
             background: "transparent",
             toolbar: { show: false },
             animations: {
@@ -87,47 +129,51 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
             { name: "Patrimoine", data: valeurs }
         ],
 
-        colors: ["#2DD4A7"],
+        colors: [couleurTendance],
 
         stroke: {
-            curve: "smooth",
-            width: 4
+            curve: courbe,
+            width: 2.5
         },
 
         fill: {
             type: "gradient",
             gradient: {
                 shade: "dark",
-                shadeIntensity: 0.5,
-                opacityFrom: 0.45,
-                opacityTo: 0.03,
+                shadeIntensity: 0.3,
+                opacityFrom: 0.22,
+                opacityTo: 0.02,
                 stops: [0, 100]
             }
         },
 
         markers: {
-            size: 5,
+            size: 0,
             strokeWidth: 2,
-            hover: { size: 8 }
+            hover: { size: 6 }
         },
 
         dataLabels: { enabled: false },
 
         grid: {
-            borderColor: "#334155",
-            strokeDashArray: 4
+            borderColor: getCssVar("--border-color", "rgba(255,255,255,0.06)", "rgba(15,23,42,0.07)"),
+            strokeDashArray: 0,
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: true } }
         },
 
         xaxis: {
             categories: labels,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
             labels: {
-                style: { colors: "#94a3b8" }
+                style: { colors: getChartMutedColor() }
             }
         },
 
         yaxis: {
             labels: {
-                style: { colors: "#94a3b8" },
+                style: { colors: getChartMutedColor() },
                 formatter: value =>
                     Math.round(value).toLocaleString("fr-FR") + " €"
             }
@@ -256,7 +302,6 @@ function renderPatrimoinePeriodSlice(labels, valeurs, objectif, periode, histori
     try { localStorage.setItem("patrimoinePeriod", periode); } catch (e) { /* stockage indisponible, pas bloquant */ }
 
     updatePatrimoineChart(labels, valeurs, objectif);
-    updateHeroSparkline(valeurs, labels);
 
     if (historiqueInsuffisant) {
         const el = document.getElementById("patrimoinePeriodVariation");
@@ -426,17 +471,13 @@ function updateAllocationChart(cash, pea, cto, patrimoineTotal) {
 
         labels: ["Cash", "PEA", "CTO"],
 
-        colors: [
-            "#1D8FA6", // Cash — teal profond
-            "#178C6E", // PEA — émeraude profond
-            "#B98527"  // CTO — bronze/or profond
-        ],
+        colors: getMonoPalette(3),
 
         stroke: { colors: [getChartStrokeColor()], width: 2 },
 
         fill: {
             type: "gradient",
-            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.35, opacityFrom: 1, opacityTo: 0.88 }
+            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.15, opacityFrom: 1, opacityTo: 0.92 }
         },
 
         legend: {
@@ -454,19 +495,19 @@ function updateAllocationChart(cash, pea, cto, patrimoineTotal) {
 
                         name: {
                             show: true,
-                            color: "#8A94A6"
+                            color: getChartMutedColor()
                         },
 
                         value: {
                             show: true,
-                            color: "#1D8FA6",
+                            color: getChartTextColor(),
                             fontWeight: 700
                         },
 
                         total: {
                             show: true,
                             label: "Patrimoine",
-                            color: "#1D8FA6",
+                            color: getChartMutedColor(),
                             formatter: () =>
                                 Math.round(total).toLocaleString("fr-FR") + " €"
                         }
@@ -509,32 +550,46 @@ function updatePeaCompositionChart(actions, etf) {
     lastPeaComposition.actions = actions || 0;
     lastPeaComposition.etf = etf || 0;
 
-    const chartElement = document.querySelector("#peaCompositionChart");
+    updatePeaCompositionInto(actions, etf, "peaCompositionChart");
+    updatePeaCompositionInto(actions, etf, "peaCompositionMiniChart");
+}
+
+/* Rendu effectif d'un donut PEA dans un conteneur donne - factorise entre
+   le graphique complet (section Graphiques) et le mini-donut integre
+   directement dans la carte compte PEA (moins de details, pas de legende,
+   pour rester compact dans l'espace deja dense de la carte). */
+function updatePeaCompositionInto(actions, etf, containerId) {
+    const chartElement = document.querySelector("#" + containerId);
     if (!chartElement) return;
-    if (peaCompositionChart) peaCompositionChart.destroy();
+    if (peaCompositionCharts[containerId]) peaCompositionCharts[containerId].destroy();
+
+    const mini = containerId !== "peaCompositionChart";
 
     const options = {
-        chart: { type: "donut", height: 280, background: "transparent" },
+        chart: { type: "donut", height: mini ? 180 : 280, background: "transparent" },
         series: [actions, etf],
         labels: ["Actions", "ETF"],
-        colors: ["#B98527", "#1D8FA6"],
+        colors: getMonoPalette(2),
         stroke: { colors: [getChartStrokeColor()], width: 2 },
         fill: {
             type: "gradient",
-            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.35, opacityFrom: 1, opacityTo: 0.88 }
+            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.15, opacityFrom: 1, opacityTo: 0.92 }
         },
-        legend: { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
+        legend: mini ? { show: false } : { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
         plotOptions: {
-            pie: { donut: { size: "58%", labels: { show: true, total: { show: true, label: "PEA", color: "#1D8FA6",
+            pie: { donut: { size: "58%", labels: { show: true,
+                name: { color: getChartMutedColor(), fontSize: mini ? "11px" : "14px" },
+                value: { color: getChartTextColor(), fontSize: mini ? "14px" : "22px" },
+                total: { show: true, label: "PEA", color: getChartMutedColor(),
                 formatter: () => Math.round(actions + etf).toLocaleString("fr-FR") + " €" } } } }
         },
-        dataLabels: { enabled: true, formatter: v => v.toFixed(0) + "%" },
+        dataLabels: { enabled: !mini, formatter: v => v.toFixed(0) + "%" },
         tooltip: { theme: getThemeMode(), y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" } },
         theme: { mode: getThemeMode() }
     };
 
-    peaCompositionChart = new ApexCharts(chartElement, options);
-    peaCompositionChart.render();
+    peaCompositionCharts[containerId] = new ApexCharts(chartElement, options);
+    peaCompositionCharts[containerId].render();
 }
 
 /* Composition CTO : Actions vs ETF vs Crypto */
@@ -544,32 +599,42 @@ function updateCtoCompositionChart(actions, etf, crypto) {
     lastCtoComposition.etf = etf || 0;
     lastCtoComposition.crypto = crypto || 0;
 
-    const chartElement = document.querySelector("#ctoCompositionChart");
+    updateCtoCompositionInto(actions, etf, crypto, "ctoCompositionChart");
+    updateCtoCompositionInto(actions, etf, crypto, "ctoCompositionMiniChart");
+}
+
+function updateCtoCompositionInto(actions, etf, crypto, containerId) {
+    const chartElement = document.querySelector("#" + containerId);
     if (!chartElement) return;
-    if (ctoCompositionChart) ctoCompositionChart.destroy();
+    if (ctoCompositionCharts[containerId]) ctoCompositionCharts[containerId].destroy();
+
+    const mini = containerId !== "ctoCompositionChart";
 
     const options = {
-        chart: { type: "donut", height: 280, background: "transparent" },
+        chart: { type: "donut", height: mini ? 180 : 280, background: "transparent" },
         series: [actions, etf, crypto],
         labels: ["Actions", "ETF", "Crypto"],
-        colors: ["#B98527", "#1D8FA6", "#6C5CE0"],
+        colors: getMonoPalette(3),
         stroke: { colors: [getChartStrokeColor()], width: 2 },
         fill: {
             type: "gradient",
-            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.35, opacityFrom: 1, opacityTo: 0.88 }
+            gradient: { shade: "dark", type: "diagonal1", shadeIntensity: 0.15, opacityFrom: 1, opacityTo: 0.92 }
         },
-        legend: { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
+        legend: mini ? { show: false } : { position: "bottom", fontSize: "13px", labels: { colors: getChartTextColor() } },
         plotOptions: {
-            pie: { donut: { size: "58%", labels: { show: true, total: { show: true, label: "CTO", color: "#1D8FA6",
+            pie: { donut: { size: "58%", labels: { show: true,
+                name: { color: getChartMutedColor(), fontSize: mini ? "11px" : "14px" },
+                value: { color: getChartTextColor(), fontSize: mini ? "14px" : "22px" },
+                total: { show: true, label: "CTO", color: getChartMutedColor(),
                 formatter: () => Math.round(actions + etf + crypto).toLocaleString("fr-FR") + " CHF" } } } }
         },
-        dataLabels: { enabled: true, formatter: v => v.toFixed(0) + "%" },
+        dataLabels: { enabled: !mini, formatter: v => v.toFixed(0) + "%" },
         tooltip: { theme: getThemeMode(), y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " CHF" } },
         theme: { mode: getThemeMode() }
     };
 
-    ctoCompositionChart = new ApexCharts(chartElement, options);
-    ctoCompositionChart.render();
+    ctoCompositionCharts[containerId] = new ApexCharts(chartElement, options);
+    ctoCompositionCharts[containerId].render();
 }
 
 /* Suivi mensuel : Revenus vs Dépenses (optionnel, API_BUDGET_MENSUEL) */
@@ -604,15 +669,21 @@ function updateMonthlyBudgetChart(labels, revenus, depenses, containerId = "mont
             { name: "Revenus", data: revenus },
             { name: "Dépenses", data: depenses }
         ],
-        colors: ["#2DD4A7", "#F0576B"],
-        plotOptions: { bar: { columnWidth: "55%", borderRadius: 4 } },
-        dataLabels: { enabled: false },
-        grid: { borderColor: "#334155", strokeDashArray: 4 },
+        colors: [getStatusColor("positive"), getStatusColor("negative")],
+        plotOptions: { bar: { columnWidth: "55%", borderRadius: 4, dataLabels: { position: "top" } } },
+        dataLabels: {
+            enabled: true,
+            offsetY: -18,
+            style: { fontSize: "11px", colors: [getChartMutedColor()] },
+            background: { enabled: false },
+            formatter: v => v ? Math.round(v / 1000).toLocaleString("fr-FR") + "k" : ""
+        },
+        grid: { borderColor: getCssVar("--border-color", "rgba(255,255,255,0.06)", "rgba(15,23,42,0.07)"), strokeDashArray: 4, xaxis: { lines: { show: false } } },
         legend: { position: "top", labels: { colors: getChartTextColor() } },
-        xaxis: { categories: labels, labels: { style: { colors: "#94a3b8" } } },
+        xaxis: { categories: labels, labels: { style: { colors: getChartMutedColor() } } },
         yaxis: {
             max: yaxisMax,
-            labels: { style: { colors: "#94a3b8" }, formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
+            labels: { style: { colors: getChartMutedColor() }, formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
         },
         tooltip: {
             theme: getThemeMode(),
@@ -623,56 +694,6 @@ function updateMonthlyBudgetChart(labels, revenus, depenses, containerId = "mont
 
     monthlyBudgetCharts[containerId] = new ApexCharts(chartElement, options);
     monthlyBudgetCharts[containerId].render();
-}
-
-/* Sparkline dans la carte héros : tendance récente du patrimoine */
-let heroSparklineChart = null;
-
-function updateHeroSparkline(valeurs, labels) {
-    const chartElement = document.querySelector("#heroSparkline");
-    if (!chartElement || !valeurs || !valeurs.length) return;
-    if (heroSparklineChart) heroSparklineChart.destroy();
-
-    const positive = valeurs[valeurs.length - 1] >= valeurs[0];
-
-    // Recalage de l'axe Y sur la plage reelle des valeurs (+ marge de
-    // 15% de chaque cote) : sans ca, ApexCharts choisit une echelle qui
-    // ecrase souvent une variation de quelques % en une ligne quasi
-    // plate collee en bas du sparkline. Fallback si toutes les valeurs
-    // sont identiques (plage nulle) pour eviter min === max.
-    const valMin = Math.min(...valeurs);
-    const valMax = Math.max(...valeurs);
-    const marge = (valMax - valMin) * 0.15 || Math.abs(valMax) * 0.05 || 1;
-
-    const options = {
-        chart: {
-            type: "area",
-            height: 60,
-            sparkline: { enabled: true },
-            animations: { enabled: true, speed: 800 }
-        },
-        series: [{ name: "Patrimoine", data: valeurs }],
-        colors: [positive ? "#2DD4A7" : "#F0576B"],
-        stroke: { curve: "smooth", width: 2.5 },
-        fill: {
-            type: "gradient",
-            gradient: { shadeIntensity: 0.6, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] }
-        },
-        yaxis: { min: valMin - marge, max: valMax + marge },
-        xaxis: { categories: labels || [] },
-        // Suivre le doigt/curseur plutot que de se figer sur le point le
-        // plus proche : sensation de "glisser sur la courbe" comme dans
-        // Apple Stocks/Robinhood, plutot qu'un simple survol statique.
-        tooltip: {
-            theme: getThemeMode(),
-            followCursor: true,
-            x: { show: true },
-            y: { formatter: v => Math.round(v).toLocaleString("fr-FR") + " €" }
-        }
-    };
-
-    heroSparklineChart = new ApexCharts(chartElement, options);
-    heroSparklineChart.render();
 }
 
 /* Sparklines des cartes PEA / CTO : même logique que le hero, mais
@@ -742,7 +763,6 @@ function refreshCharts() {
     applyPatrimoinePeriod(currentPatrimoinePeriod);
   } else if (lastPatrimoine.labels && lastPatrimoine.labels.length) {
     updatePatrimoineChart(lastPatrimoine.labels, lastPatrimoine.valeurs, lastPatrimoine.objectif);
-    updateHeroSparkline(lastPatrimoine.valeurs);
   }
   if (lastPeaSeries.valeurs && lastPeaSeries.valeurs.length) updatePeaSparkline(lastPeaSeries.valeurs);
   if (lastCtoSeries.valeurs && lastCtoSeries.valeurs.length) updateCtoSparkline(lastCtoSeries.valeurs);

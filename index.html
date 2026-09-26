@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=22">
+    <link rel="stylesheet" href="css/style.css?v=26">
     <link rel="stylesheet" href="css/alerts.css">
-    <link rel="stylesheet" href="css/historique.css?v=7">
+    <link rel="stylesheet" href="css/historique.css?v=8">
 </head>
 <body>
     <!-- Sprite d'icones SVG inline (aucune requete externe, coherent avec
@@ -167,7 +167,7 @@
             <p>Entrez le code d'accès</p>
             <div class="lock-input-wrap">
                 <input type="password" id="lockInput" class="lock-input" placeholder="Code" autocomplete="off">
-                <button type="button" id="lockToggleVisibility" class="lock-eye" aria-label="Afficher le code">👁️</button>
+                <button type="button" id="lockToggleVisibility" class="lock-eye" aria-label="Afficher le code"><svg class="icon" width="18" height="18"><use id="lockEyeIcon" href="#icon-eye"></use></svg></button>
             </div>
             <button id="lockSubmit" class="lock-submit">Déverrouiller</button>
             <p id="lockError" class="lock-error" style="display:none">Code incorrect</p>
@@ -223,7 +223,7 @@
                         <button type="button" data-period="ALL" aria-pressed="true" class="active">Tout</button>
                     </div>
                     <div id="patrimoinePeriodVariation" class="period-variation"></div>
-                    <div id="heroSparkline" class="hero-sparkline"></div>
+                    <div id="heroSparkline" class="hero-evolution-chart"></div>
                     <div class="hero-invest-caption" id="heroInvestCaption" style="display:none">Investissements (PEA + CTO) — variation du jour</div>
                     <span id="heroInvestVarJour" class="account-trend" style="display:none"></span>
                 </div>
@@ -241,18 +241,6 @@
                         <span class="chip-label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-target"></use></svg></span>Taux d'épargne</span>
                         <span class="chip-value skeleton" id="performance">...</span>
                     </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="fire-section" id="navAccueilFire">
-                <h2>Objectif indépendance financière</h2>
-                <div class="fire-tracker" id="fireCard">
-                    <div class="fire-label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-flame"></use></svg></span>Route vers l'indépendance financière</div>
-                    <div id="fireProgress" class="fire-percentage skeleton">...</div>
-                    <div id="fireDetails" class="fire-details skeleton">...</div>
-                    <div class="fire-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <div id="fireBar" class="fire-progress-fill"></div>
                     </div>
                 </div>
             </section>
@@ -300,6 +288,7 @@
                         </div>
                         <div class="collapsible-block" id="peaDetailSection">
                             <div class="compte-detail collapsible-inner">
+                            <div id="peaCompositionMiniChart" class="chart chart-mini"></div>
                             <div class="goals-grid">
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-gem"></use></svg></span>Valeur totale</span></div><div class="fire-stat-value" id="peaDetailValeur">...</div></div>
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-wallet"></use></svg></span>Investi</span></div><div class="fire-stat-value" id="peaDetailInvesti">...</div></div>
@@ -327,6 +316,7 @@
                         </div>
                         <div class="collapsible-block" id="ctoDetailSection">
                             <div class="compte-detail collapsible-inner">
+                            <div id="ctoCompositionMiniChart" class="chart chart-mini"></div>
                             <div class="goals-grid">
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-wallet"></use></svg></span>Investi</span></div><div class="fire-stat-value" id="ctoDetailInvesti">...</div></div>
                                 <div class="goal-card"><div class="goal-header"><span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Plus-value</span></div><div class="fire-stat-value" id="ctoDetailPlusvalue">...</div></div>
@@ -343,6 +333,18 @@
                             <div id="ctoHistoriqueContainer" class="historique-inline" style="display:none"></div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="fire-section" id="navAccueilFire">
+                <h2>Objectif indépendance financière</h2>
+                <div class="fire-tracker" id="fireCard">
+                    <div class="fire-label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-flame"></use></svg></span>Route vers l'indépendance financière</div>
+                    <div id="fireProgress" class="fire-percentage skeleton">...</div>
+                    <div id="fireDetails" class="fire-details skeleton">...</div>
+                    <div class="fire-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div id="fireBar" class="fire-progress-fill"></div>
                     </div>
                 </div>
             </section>
@@ -382,27 +384,20 @@
                 </div>
             </section>
 
-            <section class="charts-section" id="navHistorique">
-                <h2>📊 Graphiques</h2>
+            <section class="charts-section" id="navGraphiques">
+                <h2>Graphiques</h2>
                 <div class="toggle-card" id="chartsToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="chartsContent">
-                    <span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>
-                    <span class="toggle-card-label">Voir les graphiques (évolution, allocation, composition)</span>
+                    <span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-pie-chart"></use></svg></span>
+                    <span class="toggle-card-label">Voir la répartition (allocation, composition)</span>
                     <span class="toggle-chevron" id="chartsChevron" style="position:static">▾</span>
                 </div>
                 <div class="collapsible-block" id="chartsContent">
                     <div class="collapsible-inner">
-                    <div class="chart-grid">
-                        <div class="card chart-card">
-                            <h3><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Évolution du patrimoine</h3>
-                            <p class="chart-card-hint">Période pilotée depuis le sélecteur de la carte Patrimoine Total, en haut de page.</p>
-                            <div id="patrimoineChart" class="chart"></div>
-                        </div>
+                    <div class="chart-grid chart-grid-3">
                         <div class="card chart-card">
                             <h3><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-pie-chart"></use></svg></span>Allocation du patrimoine</h3>
-                            <div id="allocationChart" class="chart"></div>
+                            <div id="allocationChart" class="chart chart-small"></div>
                         </div>
-                    </div>
-                    <div class="chart-grid chart-grid-small">
                         <div class="card chart-card">
                             <h3><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-trending-up"></use></svg></span>Composition PEA</h3>
                             <div id="peaCompositionChart" class="chart chart-small"></div>
@@ -416,53 +411,59 @@
                 </div>
             </section>
 
-            <section id="monthlyBudgetSection" class="monthly-budget-section" style="display:none">
-                <h2>Suivi annuel</h2>
-                <div id="suiviAnnuelContainer"></div>
-            </section>
+            <section class="budget-section" id="navBudget">
+                <h2>Budget</h2>
+                <div class="period-selector budget-tabs" id="budgetTabs" role="tablist" aria-label="Sections du budget">
+                    <button type="button" data-tab="mensuel" role="tab" aria-selected="false" id="budgetTabMensuel" style="display:none">Mensuel</button>
+                    <button type="button" data-tab="annuel" role="tab" aria-selected="true" class="active" id="budgetTabAnnuel">Annuel</button>
+                    <button type="button" data-tab="epargne" role="tab" aria-selected="false" id="budgetTabEpargne">Épargne</button>
+                </div>
 
-            <section class="objectifs-annuels-section" id="navObjectifs">
-                <h2>Budget de l'année</h2>
-                <div class="goals-grid" id="objectifsAnnuelsContainer"></div>
-            </section>
+                <div class="budget-tab-panel" data-panel="mensuel" id="monthlyBudgetSection">
+                    <div id="suiviAnnuelContainer"></div>
+                </div>
 
-            <section class="goals-section">
-                <h2>Objectifs d'épargne</h2>
-                <div id="goalsContainer" class="goals-grid">
-                    <div class="goal-card">
-                        <div class="goal-header">
-                            <span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-home"></use></svg></span>Appartement</span>
-                            <span id="goal-appartement" class="skeleton">0%</span>
+                <div class="budget-tab-panel active" data-panel="annuel" id="budgetAnnuelSection">
+                    <div class="goals-grid" id="objectifsAnnuelsContainer"></div>
+                </div>
+
+                <div class="budget-tab-panel" data-panel="epargne" id="budgetEpargnePanel">
+                    <div id="goalsContainer" class="goals-grid">
+                        <div class="goal-card">
+                            <div class="goal-header">
+                                <span><span class="icon-badge gold"><svg class="icon" width="16" height="16"><use href="#icon-home"></use></svg></span>Appartement</span>
+                                <span id="goal-appartement" class="skeleton">0%</span>
+                            </div>
+                            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div id="bar-appartement" class="progress-fill"></div>
+                            </div>
                         </div>
-                        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <div id="bar-appartement" class="progress-fill"></div>
+                        <div class="goal-card">
+                            <div class="goal-header">
+                                <span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-car"></use></svg></span>Voiture</span>
+                                <span id="goal-voiture" class="skeleton">0%</span>
+                            </div>
+                            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div id="bar-voiture" class="progress-fill"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="goal-card">
-                        <div class="goal-header">
-                            <span><span class="icon-badge blue"><svg class="icon" width="16" height="16"><use href="#icon-car"></use></svg></span>Voiture</span>
-                            <span id="goal-voiture" class="skeleton">0%</span>
+                        <div class="goal-card">
+                            <div class="goal-header">
+                                <span><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-plane"></use></svg></span>Vacances</span>
+                                <span id="goal-vacances" class="skeleton">0%</span>
+                            </div>
+                            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div id="bar-vacances" class="progress-fill"></div>
+                            </div>
                         </div>
-                        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <div id="bar-voiture" class="progress-fill"></div>
-                        </div>
-                    </div>
-                    <div class="goal-card">
-                        <div class="goal-header">
-                            <span><span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-plane"></use></svg></span>Vacances</span>
-                            <span id="goal-vacances" class="skeleton">0%</span>
-                        </div>
-                        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <div id="bar-vacances" class="progress-fill"></div>
-                        </div>
-                    </div>
-                    <div class="goal-card">
-                        <div class="goal-header">
-                            <span><span class="icon-badge warn"><svg class="icon" width="16" height="16"><use href="#icon-lifebuoy"></use></svg></span>Fonds d'urgence</span>
-                            <span id="goal-fonds_urgence" class="skeleton">0%</span>
-                        </div>
-                        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <div id="bar-fonds_urgence" class="progress-fill"></div>
+                        <div class="goal-card">
+                            <div class="goal-header">
+                                <span><span class="icon-badge warn"><svg class="icon" width="16" height="16"><use href="#icon-lifebuoy"></use></svg></span>Fonds d'urgence</span>
+                                <span id="goal-fonds_urgence" class="skeleton">0%</span>
+                            </div>
+                            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div id="bar-fonds_urgence" class="progress-fill"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -484,11 +485,15 @@
             <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-card"></use></svg></span>
             <span class="bottom-nav-label">Comptes</span>
         </button>
-        <button type="button" class="bottom-nav-item" data-target="navHistorique" aria-label="Historique">
-            <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-bar-chart"></use></svg></span>
-            <span class="bottom-nav-label">Historique</span>
+        <button type="button" class="bottom-nav-item" data-target="navInvestissements" aria-label="Investissements">
+            <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-briefcase"></use></svg></span>
+            <span class="bottom-nav-label">Invest.</span>
         </button>
-        <button type="button" class="bottom-nav-item" data-target="navObjectifs" aria-label="Objectifs">
+        <button type="button" class="bottom-nav-item" data-target="navGraphiques" aria-label="Graphiques">
+            <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-pie-chart"></use></svg></span>
+            <span class="bottom-nav-label">Graphiques</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-target="navBudget" data-tab="epargne" aria-label="Objectifs">
             <span class="bottom-nav-icon"><svg class="icon" width="16" height="16"><use href="#icon-target"></use></svg></span>
             <span class="bottom-nav-label">Objectifs</span>
         </button>
@@ -498,22 +503,23 @@
     <!-- ApexCharts chargé ici (pas dans le head) pour ne pas bloquer
          l'affichage initial de la page -->
     <script src="js/config.js?v=3"></script>
-    <script src="js/lock.js?v=10"></script>
+    <script src="js/lock.js?v=11"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="js/charts.js?v=10"></script>
+    <script src="js/charts.js?v=12"></script>
     <script src="js/errorHandler.js?v=1"></script>
     <script src="js/parsing.js?v=2"></script>
     <script src="js/dataCache.js?v=1"></script>
     <script src="js/mouvements.js?v=3"></script>
-    <script src="js/suiviAnnuel.js?v=4"></script>
+    <script src="js/suiviAnnuel.js?v=5"></script>
     <script src="js/historiqueAchats.js?v=8"></script>
     <script src="js/investissements.js?v=2"></script>
     <script src="js/celebration.js?v=1"></script>
-    <script src="js/googleSheets.js?v=26"></script>
+    <script src="js/googleSheets.js?v=27"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=6"></script>
-    <script src="js/bottomNav.js?v=1"></script>
+    <script src="js/budgetTabs.js?v=1"></script>
+    <script src="js/bottomNav.js?v=2"></script>
     <script src="js/pullToRefresh.js?v=1"></script>
 
     <!-- Enregistrement du service worker PWA (voir sw.js). Silencieux si
