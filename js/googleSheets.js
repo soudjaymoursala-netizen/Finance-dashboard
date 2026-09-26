@@ -127,6 +127,19 @@ async function chargerDashboard() {
         DATA.cto = lireCSVKPI(ctoTxt);
         DATA.pea = lireCSVKPI(peaTxt);
 
+        // Alerte visible si une formule casse cote Sheet (ex: ticker
+        // GOOGLEFINANCE invalide qui fait planter un SUM entier en
+        // #VALUE!) : sans ca, la valeur atterrit silencieusement a 0
+        // sur le dashboard, indiscernable d'un compte reellement vide.
+        [["Budget", DATA.budget], ["CTO", DATA.cto], ["PEA", DATA.pea]].forEach(([label, data]) => {
+            if (data.__erreursFormule && data.__erreursFormule.length) {
+                addAlert(
+                    `⚠️ ${label} : erreur de formule dans le Google Sheet pour ${data.__erreursFormule.join(", ")} — affiché à 0 en attendant la correction côté Sheet.`,
+                    "warning"
+                );
+            }
+        });
+
 
         // Taux EUR/CHF : vient directement du Sheet CTO (colonne eur_chf),
         // qui utilise une formule GOOGLEFINANCE cote Sheet et se met donc

@@ -27,6 +27,15 @@ function nettoyerNombre(valeur) {
 
 }
 
+/* Detecte une erreur de formule Google Sheets non calculee (#VALUE!,
+   #N/A, #REF!, #NAME?, #DIV/0!, #NULL!, #NUM!, #ERROR!) plutot que de
+   la laisser silencieusement devenir 0 via nettoyerNombre() ci-dessus -
+   un compte a 0\u20AC ressemble a une vraie valeur, une formule cassee dans
+   le Sheet source doit rester visible comme une erreur. */
+function estErreurFormule(valeurBrute) {
+    return /^#(VALUE!|N\/A|REF!|NAME\?|DIV\/0!|NULL!|NUM!|ERROR!?)$/i.test((valeurBrute || "").trim());
+}
+
 function formatEUR(valeur) {
 
     return Number(
@@ -102,6 +111,7 @@ function lireCSVKPI(csv) {
         const sep = detectSeparator(sample);
 
         const resultat = {};
+        const cellsEnErreur = [];
 
         for (let i = 1; i < lignes.length; i++) {
             const ligne = lignes[i];
@@ -110,11 +120,23 @@ function lireCSVKPI(csv) {
             if (cols.length < 2) continue;
             const key = cols[0].trim().replace(/^\"|\"$/g, "");
             const valRaw = cols.slice(1).join(sep).trim().replace(/^\"|\"$/g, "");
+            if (estErreurFormule(valRaw)) cellsEnErreur.push(key);
             resultat[key] = nettoyerNombre(valRaw);
         }
 
         if (Object.keys(resultat).length === 0) {
             showError("Parser CSV : aucune clé reconnue dans le CSV des KPI. Vérifie le format (séparateur ',' vs ';').");
+        }
+
+        if (cellsEnErreur.length) {
+            // Propriete non-enumerable : n'apparait pas dans un simple
+            // for...in / Object.entries sur les KPI (evite de la
+            // confondre avec une vraie cle numerique), mais reste
+            // accessible explicitement par son nom pour l'alerte.
+            Object.defineProperty(resultat, "__erreursFormule", {
+                value: cellsEnErreur,
+                enumerable: false,
+            });
         }
 
         return resultat;
