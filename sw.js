@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v14"; // v14 : positions dedupliquees (raccourci compte -> Mes investissements)
+const CACHE_VERSION = "shell-v15"; // v15 : objectif 250k affiche une seule fois (carte FIRE)
 
 const PRECACHE_URLS = [
     "./",
