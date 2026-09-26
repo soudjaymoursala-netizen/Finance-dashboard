@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v13"; // v13 : masquage des montants, fix re-attachement listener theme, resync precache
+const CACHE_VERSION = "shell-v14"; // v14 : positions dedupliquees (raccourci compte -> Mes investissements)
 
 const PRECACHE_URLS = [
     "./",

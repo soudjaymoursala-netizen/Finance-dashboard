@@ -218,64 +218,40 @@ function rendreLignePosition(pos) {
     return html;
 }
 
-let historiqueSectionsOuvertes = new Set();
-
+/* Dans les cartes PEA/CTO : plus de liste d'achats dupliquee (elle
+   existe deja, en mieux - recherche, filtres, tri - dans la section
+   "Mes investissements"). A la place, un raccourci qui ouvre cette
+   section directement filtree sur le compte concerne. */
 function rendrePositionsDansConteneur(containerId, compteData) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const positions = Object.values(compteData.positions).sort((a, b) => b.totalGain - a.totalGain);
-    const estOuvert = historiqueSectionsOuvertes.has(containerId);
+    const positions = Object.values(compteData.positions);
+    const nb = positions.length;
+    const compte = compteData.compte;
 
-    let html = `
-        <div class="historique-inline-header ${estOuvert ? 'open' : ''}" role="button" tabindex="0" aria-expanded="${estOuvert}">
+    container.innerHTML = `
+        <div class="historique-inline-header" role="button" tabindex="0" aria-label="Voir mes ${nb} positions ${compte}">
             <span class="icon-badge violet"><svg class="icon" width="16" height="16"><use href="#icon-target"></use></svg></span>
-            <span>Performance par achat</span>
-            <span class="historique-inline-count">${positions.length} actif${positions.length > 1 ? 's' : ''}</span>
-            <span class="historique-chevron ${estOuvert ? 'open' : ''}">▼</span>
+            <span>Voir mes positions</span>
+            <span class="historique-inline-count">${nb} actif${nb > 1 ? 's' : ''}</span>
+            <span class="historique-chevron">→</span>
         </div>
     `;
-
-    if (estOuvert) {
-        html += '<div class="historique-positions">';
-        positions.forEach((pos) => { html += rendreLignePosition(pos); });
-        html += '</div>';
-    }
-
-    container.innerHTML = html;
     container.style.display = "";
 
-    const inlineHeader = container.querySelector(".historique-inline-header");
-    if (inlineHeader) {
-        const activerSection = () => {
-            if (historiqueSectionsOuvertes.has(containerId)) {
-                historiqueSectionsOuvertes.delete(containerId);
-            } else {
-                historiqueSectionsOuvertes.add(containerId);
-            }
-            rendrePositionsDansConteneur(containerId, compteData);
-        };
-        inlineHeader.addEventListener("click", activerSection);
-        inlineHeader.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activerSection(); }
-        });
-    }
-
-    container.querySelectorAll(".historique-position-header").forEach((header) => {
-        const activer = (e) => {
-            e.stopPropagation(); // ne pas re-declencher le toggle de la carte compte parente
-            const row = header.closest(".historique-position-row");
-            const positionId = row.getAttribute("data-position");
-            if (historiqueExpandedPositions.has(positionId)) {
-                historiqueExpandedPositions.delete(positionId);
-            } else {
-                historiqueExpandedPositions.add(positionId);
-            }
-            rendrePositionsDansConteneur(containerId, compteData);
-        };
-        header.addEventListener("click", activer);
-        header.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activer(e); }
-        });
+    const lien = container.querySelector(".historique-inline-header");
+    const ouvrir = (e) => {
+        e.stopPropagation(); // ne pas replier la carte compte parente
+        const chip = document.querySelector('.invest-chip[data-filter="compte"][data-value="' + compte + '"]');
+        if (chip) chip.click(); // applique le filtre + re-rend la vue unifiee
+        const toggle = document.getElementById("investToggle");
+        if (toggle && toggle.getAttribute("aria-expanded") !== "true") toggle.click();
+        const section = document.getElementById("navInvestissements");
+        if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    lien.addEventListener("click", ouvrir);
+    lien.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); ouvrir(e); }
     });
 }
