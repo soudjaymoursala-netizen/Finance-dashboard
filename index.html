@@ -26,7 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=31">
+    <link rel="stylesheet" href="css/style.css?v=32">
     <link rel="stylesheet" href="css/alerts.css">
     <link rel="stylesheet" href="css/historique.css?v=12">
 </head>
@@ -389,6 +389,11 @@
                             <button type="button" class="invest-chip positive" data-filter="statut" data-value="GAGNANT" aria-pressed="false">Gagnants</button>
                             <button type="button" class="invest-chip negative" data-filter="statut" data-value="PERDANT" aria-pressed="false">Perdants</button>
                         </div>
+                        <div class="invest-chip-group" role="group" aria-label="Période du gain">
+                            <button type="button" class="invest-chip active" data-filter="periode" data-value="ACHAT" aria-pressed="true" title="Gain depuis la date d'achat">Depuis l'achat</button>
+                            <button type="button" class="invest-chip" data-filter="periode" data-value="JOUR" aria-pressed="false" title="Variation depuis la clôture de la veille">Aujourd'hui</button>
+                            <button type="button" class="invest-chip" data-filter="periode" data-value="MOIS" aria-pressed="false" title="Variation sur les 30 derniers jours">30 jours</button>
+                        </div>
                         <select id="investSort" class="invest-sort" aria-label="Trier par">
                             <option value="perf_desc">Performance ↓</option>
                             <option value="perf_asc">Performance ↑</option>
@@ -398,7 +403,7 @@
                             <option value="nom_asc">Nom A→Z</option>
                         </select>
                     </div>
-                    <p class="help-text">Gain et performance sont calculés depuis la date d'achat. « Poids » = part de la valeur de tes placements (PEA + CTO).</p>
+                    <p class="help-text">Le gain suit la période choisie : depuis l'achat, depuis la clôture de la veille, ou sur 30 jours (pour un achat plus récent, depuis le prix d'achat). « — » = cours de référence indisponible. « Poids » = part de la valeur de tes placements (PEA + CTO).</p>
                     <div id="investissementsSummary" class="invest-summary"></div>
                     <div id="investissementsContainer" class="historique-positions"></div>
                     </div>
@@ -550,10 +555,10 @@
     <script src="js/dataCache.js?v=1"></script>
     <script src="js/mouvements.js?v=3"></script>
     <script src="js/suiviAnnuel.js?v=5"></script>
-    <script src="js/historiqueAchats.js?v=8"></script>
-    <script src="js/investissementInsights.js?v=1"></script>
+    <script src="js/historiqueAchats.js?v=9"></script>
+    <script src="js/investissementInsights.js?v=2"></script>
     <script src="js/depenses.js?v=1"></script>
-    <script src="js/investissements.js?v=5"></script>
+    <script src="js/investissements.js?v=6"></script>
     <script src="js/celebration.js?v=1"></script>
     <script src="js/repartitionActifs.js?v=1"></script>
     <script src="js/googleSheets.js?v=31"></script>

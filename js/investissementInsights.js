@@ -7,10 +7,10 @@
 /* tierce). Informatif uniquement (performance, risque  */
 /* de concentration) - jamais de conseil d'achat/vente.  */
 /*                                                        */
-/* "Gain/perte" porte sur toute la periode suivie depuis */
-/* l'achat (pas de notion "ce mois-ci" : les positions    */
-/* sont des totaux cumules, sans historique de valeur     */
-/* mois par mois pour chaque titre individuel).           */
+/* "Gain/perte" suit la periode choisie dans la vue       */
+/* "Mes investissements" : depuis l'achat, aujourd'hui ou */
+/* sur 30 jours (valeurs de reference calculees cote      */
+/* Sheet par GOOGLEFINANCE, cf. gainPosition()).          */
 /* ================================================== */
 
 function echapperHtmlInvest(str) {
@@ -21,17 +21,22 @@ function echapperHtmlInvest(str) {
 
 /* Convertit toutes les positions en euros (le CTO est en CHF) pour
    pouvoir comparer gains/pertes et poids entre PEA et CTO sur une
-   base commune - reutilise le taux deja calcule ailleurs (DATA.cto.eur_chf). */
+   base commune. Taux : DATA.tauxChange = combien de CHF pour 1 EUR, donc
+   CHF -> EUR = DIVISER (meme convention que googleSheets.js). NB : DATA est
+   une const globale, pas une propriete de window. */
 function construirePositionsAvecValeurEur() {
-    const tauxEurChf = (window.DATA && window.DATA.cto && window.DATA.cto.eur_chf) || 1;
+    const taux = (typeof DATA !== "undefined" && DATA.tauxChange) || 1;
+    const periode = (typeof investFiltres !== "undefined" && investFiltres.periode) || "ACHAT";
     const positions = [];
     Object.values(historiqueComptesGroupes || {}).forEach((compteData) => {
         Object.values(compteData.positions).forEach((pos) => {
-            const enChf = pos.devise === "CHF";
+            const diviseur = pos.devise === "CHF" ? taux : 1;
+            const g = gainPosition(pos, periode);
             positions.push(
                 Object.assign({}, pos, {
-                    valeurEur: enChf ? pos.totalValeur * tauxEurChf : pos.totalValeur,
-                    gainEur: enChf ? pos.totalGain * tauxEurChf : pos.totalGain,
+                    valeurEur: pos.totalValeur / diviseur,
+                    gainEur: g.gain / diviseur,
+                    dispoP: g.dispo,
                 })
             );
         });
@@ -43,7 +48,11 @@ function construireCartesInvestissement(positions) {
     const cartes = [];
     if (!positions.length) return cartes;
 
-    const parGain = positions.slice().sort((a, b) => b.gainEur - a.gainEur);
+    const periodeCle = (typeof investFiltres !== "undefined" && investFiltres.periode) || "ACHAT";
+    const quand = (PERIODES_GAIN[periodeCle] || PERIODES_GAIN.ACHAT).court;
+    // Seules les positions avec une reference pour la periode sont comparees.
+    const parGain = positions.filter((p) => p.dispoP).sort((a, b) => b.gainEur - a.gainEur);
+    if (!parGain.length) return cartes;
     const meilleur = parGain[0];
     const pire = parGain[parGain.length - 1];
 
@@ -53,8 +62,8 @@ function construireCartesInvestissement(positions) {
             variant: "emerald",
             titre: "Plus gros gain",
             texte:
-                `<strong>${echapperHtmlInvest(meilleur.ticker)}</strong> (${echapperHtmlInvest(meilleur.compte)}) est votre meilleure performance : ` +
-                `+${Math.round(meilleur.gainEur).toLocaleString("fr-FR")} € depuis l'achat.`,
+                `<strong>${echapperHtmlInvest(meilleur.ticker)}</strong> (${echapperHtmlInvest(meilleur.compte)}) est votre meilleure performance (en euros) : ` +
+                `+${Math.round(meilleur.gainEur).toLocaleString("fr-FR")} € ${quand}.`,
         });
     }
 
@@ -65,7 +74,7 @@ function construireCartesInvestissement(positions) {
             titre: "Plus grosse perte",
             texte:
                 `<strong>${echapperHtmlInvest(pire.ticker)}</strong> (${echapperHtmlInvest(pire.compte)}) affiche la perte la plus importante : ` +
-                `${Math.round(pire.gainEur).toLocaleString("fr-FR")} € depuis l'achat.`,
+                `${Math.round(pire.gainEur).toLocaleString("fr-FR")} € ${quand}.`,
         });
     }
 

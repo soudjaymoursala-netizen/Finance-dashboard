@@ -7,7 +7,11 @@
    juste une autre facon de les regarder toutes ensemble.
    ================================================== */
 
-let investFiltres = { compte: "TOUS", statut: "TOUS", recherche: "", tri: "perf_desc" };
+let investFiltres = { compte: "TOUS", statut: "TOUS", recherche: "", tri: "perf_desc", periode: "ACHAT" };
+try {
+    const periodeMemo = localStorage.getItem("financeDashboard_investPeriode");
+    if (periodeMemo === "JOUR" || periodeMemo === "MOIS" || periodeMemo === "ACHAT") investFiltres.periode = periodeMemo;
+} catch (e) { /* stockage indisponible */ }
 let investExpandedPositions = new Set();
 let investExpandedGroups = new Set(); // "PEA" / "CTO" - vide = tout replie par defaut
 
@@ -17,8 +21,12 @@ function construirePositionsUnifiees() {
     const positions = [];
     Object.values(historiqueComptesGroupes || {}).forEach((compteData) => {
         Object.values(compteData.positions).forEach((pos) => {
-            const perf = pos.totalInvesti > 0 ? pos.totalGain / pos.totalInvesti : 0;
-            positions.push(Object.assign({}, pos, { perf: perf }));
+            const g = gainPosition(pos, investFiltres.periode);
+            // gainP / perfP : gain et performance sur la PERIODE choisie
+            // (achat / jour / 30 jours) ; dispoP faux si la reference manque.
+            positions.push(Object.assign({}, pos, {
+                perf: g.perf, gainP: g.gain, perfP: g.perf, dispoP: g.dispo,
+            }));
         });
     });
 
@@ -44,16 +52,19 @@ function filtrerEtTrierPositions(positions) {
     const q = investFiltres.recherche.trim().toLowerCase();
     let res = positions.filter((p) => {
         if (investFiltres.compte !== "TOUS" && p.compte !== investFiltres.compte) return false;
-        if (investFiltres.statut === "GAGNANT" && p.totalGain < 0) return false;
-        if (investFiltres.statut === "PERDANT" && p.totalGain >= 0) return false;
+        if (investFiltres.statut === "GAGNANT" && (!p.dispoP || p.gainP < 0)) return false;
+        if (investFiltres.statut === "PERDANT" && (!p.dispoP || p.gainP >= 0)) return false;
         if (q && !((p.ticker + " " + p.societe).toLowerCase().includes(q))) return false;
         return true;
     });
 
+    // Une position sans reference pour la periode (dispoP faux) passe
+    // toujours en dernier, quel que soit le sens du tri.
+    const avecDispo = (cmp) => (a, b) => (a.dispoP === b.dispoP ? cmp(a, b) : (a.dispoP ? -1 : 1));
     const tris = {
-        perf_desc: (a, b) => b.perf - a.perf,
-        perf_asc: (a, b) => a.perf - b.perf,
-        gain_desc: (a, b) => b.totalGain - a.totalGain,
+        perf_desc: avecDispo((a, b) => b.perfP - a.perfP),
+        perf_asc: avecDispo((a, b) => a.perfP - b.perfP),
+        gain_desc: avecDispo((a, b) => b.gainP - a.gainP),
         valeur_desc: (a, b) => b.valeurEUR - a.valeurEUR, // en EUR : compare PEA (EUR) et CTO (CHF) sur la meme base
         poids_desc: (a, b) => b.poids - a.poids,
         nom_asc: (a, b) => a.ticker.localeCompare(b.ticker),
@@ -78,32 +89,39 @@ function rendreResumeInvestissements(positions) {
     // Conversion CHF -> EUR pour un total combine indicatif (chaque ligne
     // individuelle garde elle sa devise native, comme dans le detail CTO).
     const taux = (typeof DATA !== "undefined" && DATA.tauxChange) || 1;
-    let investiEUR = 0, valeurEUR = 0, gainEUR = 0;
+    let investiEUR = 0, valeurEUR = 0, gainEUR = 0, sansReference = 0;
     positions.forEach((p) => {
         const diviseur = p.devise === "CHF" ? taux : 1;
         investiEUR += p.totalInvesti / diviseur;
         valeurEUR += p.totalValeur / diviseur;
-        gainEUR += p.totalGain / diviseur;
+        if (p.dispoP) gainEUR += p.gainP / diviseur; else sansReference++;
     });
-    const gagnants = positions.filter((p) => p.totalGain >= 0).length;
+    const avecReference = positions.length - sansReference;
+    const gagnants = positions.filter((p) => p.dispoP && p.gainP >= 0).length;
+    const infoPeriode = PERIODES_GAIN[investFiltres.periode] || PERIODES_GAIN.ACHAT;
     const cls = gainEUR >= 0 ? "historique-positif" : "historique-negatif";
 
     el.innerHTML =
         '<div class="invest-summary-stat"><span class="invest-summary-label">Positions</span><span class="invest-summary-value">' + positions.length + '</span></div>' +
         '<div class="invest-summary-stat"><span class="invest-summary-label">Investi ≈</span><span class="invest-summary-value">' + formatMontantDevise(investiEUR, "€") + '</span></div>' +
         '<div class="invest-summary-stat"><span class="invest-summary-label">Valeur ≈</span><span class="invest-summary-value">' + formatMontantDevise(valeurEUR, "€") + '</span></div>' +
-        '<div class="invest-summary-stat"><span class="invest-summary-label">Gain ≈</span><span class="invest-summary-value ' + cls + '">' + (gainEUR >= 0 ? "+" : "") + formatMontantDevise(gainEUR, "€") + '</span></div>' +
-        '<div class="invest-summary-stat"><span class="invest-summary-label">Gagnantes</span><span class="invest-summary-value">' + gagnants + '/' + positions.length + '</span></div>';
+        '<div class="invest-summary-stat"><span class="invest-summary-label">' + infoPeriode.libelleSomme + '</span><span class="invest-summary-value ' + cls + '">' + (gainEUR >= 0 ? "+" : "") + formatMontantDevise(gainEUR, "€") + '</span></div>' +
+        '<div class="invest-summary-stat"><span class="invest-summary-label">Gagnantes</span><span class="invest-summary-value">' + gagnants + '/' + avecReference + '</span></div>' +
+        (sansReference ? '<div class="invest-summary-note">' + sansReference + ' position' + (sansReference > 1 ? 's' : '') + ' sans cours de référence pour cette période (non comptée' + (sansReference > 1 ? 's' : '') + ').</div>' : '');
 }
 
 function rendreLignePositionUnifiee(pos) {
     const positionId = pos.compte + "|" + pos.ticker;
     const isExpanded = investExpandedPositions.has(positionId);
-    const cls = classeGainPerte(pos.totalGain);
+    const infoPeriode = PERIODES_GAIN[investFiltres.periode] || PERIODES_GAIN.ACHAT;
+    // Sans reference pour la periode : on affiche "—" (neutre), pas 0.
+    const cls = pos.dispoP ? classeGainPerte(pos.gainP) : "";
+    const gainTxt = pos.dispoP ? (pos.gainP >= 0 ? "+" : "") + formatMontantDevise(pos.gainP, pos.devise) : "—";
+    const perfTxt = pos.dispoP ? (pos.perfP >= 0 ? "+" : "") + (pos.perfP * 100).toFixed(1) + "%" : "—";
     const badgeClasse = pos.compte === "PEA" ? "emerald" : "gold";
 
     let html = `
-        <div class="historique-position-row ${cls}" data-position="${positionId}">
+        <div class="historique-position-row ${cls || "historique-neutre"}" data-position="${positionId}">
             <div class="historique-position-header invest-header" role="button" tabindex="0" aria-expanded="${isExpanded}">
                 <div class="historique-position-toggle">
                     <span class="historique-chevron ${isExpanded ? 'open' : ''}">▼</span>
@@ -128,12 +146,12 @@ function rendreLignePositionUnifiee(pos) {
                         <span class="invest-weight-bar" aria-hidden="true"><span style="width:${Math.min(100, pos.poids).toFixed(1)}%"></span></span>
                     </div>
                     <div class="historique-stat">
-                        <span class="historique-stat-label ${cls}">Gain</span>
-                        <span class="historique-stat-value ${cls}">${pos.totalGain >= 0 ? "+" : ""}${formatMontantDevise(pos.totalGain, pos.devise)}</span>
+                        <span class="historique-stat-label ${cls}">${infoPeriode.libelleGain}</span>
+                        <span class="historique-stat-value ${cls}">${gainTxt}</span>
                     </div>
                     <div class="historique-stat">
                         <span class="historique-stat-label ${cls}">Perf</span>
-                        <span class="historique-stat-value ${cls}">${pos.perf >= 0 ? "+" : ""}${(pos.perf * 100).toFixed(1)}%</span>
+                        <span class="historique-stat-value ${cls}">${perfTxt}</span>
                     </div>
                 </div>
             </div>
@@ -173,7 +191,7 @@ function rendreGroupeCompte(compte, positions) {
     const rechercheActive = !!investFiltres.recherche.trim();
     const isOpen = investExpandedGroups.has(compte) || rechercheActive;
     const badgeClasse = compte === "PEA" ? "emerald" : "gold";
-    const gainTotal = positions.reduce((s, p) => s + p.totalGain, 0);
+    const gainTotal = positions.reduce((s, p) => s + (p.dispoP ? p.gainP : 0), 0);
     const cls = classeGainPerte(gainTotal);
     const devise = positions[0].devise;
     // Poids du compte dans les placements : somme des poids de ses lignes
@@ -288,6 +306,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const filtre = chip.getAttribute("data-filter");
             const valeur = chip.getAttribute("data-value");
             investFiltres[filtre] = valeur;
+            if (filtre === "periode") {
+                try { localStorage.setItem("financeDashboard_investPeriode", valeur); } catch (e) { /* stockage indisponible */ }
+                if (typeof afficherInvestissementInsights === "function") afficherInvestissementInsights();
+            }
             barre.querySelectorAll('.invest-chip[data-filter="' + filtre + '"]').forEach((c) => {
                 const actif = c === chip;
                 c.classList.toggle("active", actif);
@@ -295,6 +317,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             rendreInvestissements();
         });
+    });
+
+    barre.querySelectorAll('.invest-chip[data-filter="periode"]').forEach((c) => {
+        const actif = c.getAttribute("data-value") === investFiltres.periode;
+        c.classList.toggle("active", actif);
+        c.setAttribute("aria-pressed", actif ? "true" : "false");
     });
 
     const tri = document.getElementById("investSort");

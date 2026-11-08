@@ -34,6 +34,50 @@ function parseDateFr(str) {
     return new Date(y, m - 1, d).getTime();
 }
 
+/* Cellule vide, absente, "—" ou erreur de formule -> null (et non 0). */
+function nombreOuNull(brut) {
+    if (brut === undefined || brut === null) return null;
+    const t = String(brut).trim().replace(/^"|"$/g, "");
+    if (t === "" || t === "—" || t.charAt(0) === "#") return null;
+    const n = nettoyerNombre(t);
+    return isFinite(n) ? n : null;
+}
+
+/* Gain d'une position sur une periode :
+     ACHAT = depuis l'achat, JOUR = depuis la veille, MOIS = depuis 30 jours.
+   Pour un lot achete apres le debut de la periode, la Sheet part du prix
+   d'achat. Une periode est indisponible si UNE ligne de la position n'a pas
+   de valeur de reference (ticker non supporte par GOOGLEFINANCE...) : on
+   prefere "—" a un chiffre partiel faux.
+   Retourne { dispo, gain, base, perf } (perf en ratio, 0.05 = 5 %). */
+function gainPosition(pos, periode) {
+    if (periode === "JOUR" || periode === "MOIS") {
+        const cle = periode === "JOUR" ? "valeurVeille" : "valeurJ30";
+        let base = 0;
+        for (let i = 0; i < pos.transactions.length; i++) {
+            const v = pos.transactions[i][cle];
+            if (v === null || v === undefined) return { dispo: false, gain: 0, base: 0, perf: 0 };
+            base += v;
+        }
+        const gain = pos.totalValeur - base;
+        return { dispo: true, gain: gain, base: base, perf: base > 0 ? gain / base : 0 };
+    }
+    return {
+        dispo: true,
+        gain: pos.totalGain,
+        base: pos.totalInvesti,
+        perf: pos.totalInvesti > 0 ? pos.totalGain / pos.totalInvesti : 0,
+    };
+}
+window.gainPosition = gainPosition;
+
+const PERIODES_GAIN = {
+    ACHAT: { court: "depuis l'achat", libelleGain: "Gain", libelleSomme: "Gain ≈" },
+    JOUR: { court: "aujourd'hui", libelleGain: "Gain jour", libelleSomme: "Gain jour ≈" },
+    MOIS: { court: "sur 30 jours", libelleGain: "Gain 30 j", libelleSomme: "Gain 30 j ≈" },
+};
+window.PERIODES_GAIN = PERIODES_GAIN;
+
 async function fetchHistoriqueCsv(url, compte, devise) {
     try {
         const r = await fetch(url);
@@ -61,6 +105,12 @@ async function fetchHistoriqueCsv(url, compte, devise) {
                 valeurActuelle: nettoyerNombre(cols[7]),
                 gain: nettoyerNombre(cols[8]),
                 perf: nettoyerNombre(cols[9]),
+                // Colonnes optionnelles 11 et 12 (Valeur_veille, Valeur_J30) :
+                // calculees cote Sheet avec GOOGLEFINANCE. null si absentes,
+                // vides ou en erreur ("—") : la periode correspondante est
+                // alors indisponible pour cette ligne.
+                valeurVeille: nombreOuNull(cols[10]),
+                valeurJ30: nombreOuNull(cols[11]),
             });
         }
         return lignes;

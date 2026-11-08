@@ -647,3 +647,15 @@ body.light .historique-badge.emerald {
     width: 100%;
   }
 }
+
+
+/* Position sans cours de reference pour la periode choisie ("—") */
+.historique-position-row.historique-neutre {
+  border-left-color: var(--border-color);
+}
+
+.invest-summary-note {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+  color: var(--text-secondary-color);
+}
