@@ -26,7 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=26">
+    <link rel="stylesheet" href="css/style.css?v=27">
     <link rel="stylesheet" href="css/alerts.css">
     <link rel="stylesheet" href="css/historique.css?v=8">
 </head>
@@ -358,6 +358,9 @@
                 </div>
                 <div class="collapsible-block" id="investContent">
                     <div class="collapsible-inner">
+                    <div id="navInvestissementInsights" style="display:none">
+                        <div id="investissementInsightsContainer" class="insight-grid"></div>
+                    </div>
                     <div class="invest-filters" id="investFiltersBar">
                         <input type="search" id="investSearch" class="invest-search" placeholder="Rechercher un ticker, une société…" aria-label="Rechercher un investissement">
                         <div class="invest-chip-group" role="group" aria-label="Filtrer par compte">
@@ -417,6 +420,7 @@
                     <button type="button" data-tab="mensuel" role="tab" aria-selected="false" id="budgetTabMensuel" style="display:none">Mensuel</button>
                     <button type="button" data-tab="annuel" role="tab" aria-selected="true" class="active" id="budgetTabAnnuel">Annuel</button>
                     <button type="button" data-tab="epargne" role="tab" aria-selected="false" id="budgetTabEpargne">Épargne</button>
+                    <button type="button" data-tab="depenses" role="tab" aria-selected="false" id="budgetTabDepenses" style="display:none">Dépenses</button>
                 </div>
 
                 <div class="budget-tab-panel" data-panel="mensuel" id="monthlyBudgetSection">
@@ -467,6 +471,10 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="budget-tab-panel" data-panel="depenses" id="navDepenses">
+                    <div id="depensesInsightsContainer" class="insight-grid"></div>
+                </div>
             </section>
         </main>
     </div>
@@ -502,7 +510,7 @@
     <!-- JavaScript -->
     <!-- ApexCharts chargé ici (pas dans le head) pour ne pas bloquer
          l'affichage initial de la page -->
-    <script src="js/config.js?v=3"></script>
+    <script src="js/config.js?v=4"></script>
     <script src="js/lock.js?v=11"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="js/charts.js?v=12"></script>
@@ -512,9 +520,11 @@
     <script src="js/mouvements.js?v=3"></script>
     <script src="js/suiviAnnuel.js?v=5"></script>
     <script src="js/historiqueAchats.js?v=8"></script>
+    <script src="js/investissementInsights.js?v=1"></script>
+    <script src="js/depenses.js?v=1"></script>
     <script src="js/investissements.js?v=2"></script>
     <script src="js/celebration.js?v=1"></script>
-    <script src="js/googleSheets.js?v=27"></script>
+    <script src="js/googleSheets.js?v=28"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=6"></script>

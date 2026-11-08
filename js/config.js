@@ -55,6 +55,7 @@
       BUDGET_MENSUEL: buildSheetUrl("MENSUEL", "VITE_URL_BUDGET_MENSUEL"),
       CTO_HISTORIQUE: buildSheetUrl("CTO_HISTORIQUE", "VITE_URL_CTO_HISTORIQUE"),
       PEA_HISTORIQUE: buildSheetUrl("PEA_HISTORIQUE", "VITE_URL_PEA_HISTORIQUE"),
+      DEPENSES: buildSheetUrl("DEPENSES", "VITE_URL_DEPENSES"),
     },
     CHARTS: {
       PATRIMOINE: {
@@ -107,6 +108,7 @@
     URL_BUDGET_MENSUEL: CONFIG.SHEETS.BUDGET_MENSUEL,
     URL_CTO_HISTORIQUE: CONFIG.SHEETS.CTO_HISTORIQUE,
     URL_PEA_HISTORIQUE: CONFIG.SHEETS.PEA_HISTORIQUE,
+    URL_DEPENSES: CONFIG.SHEETS.DEPENSES,
     CHARTS: CONFIG.CHARTS,
     GOALS: CONFIG.GOALS,
     FIRE: CONFIG.FIRE,
@@ -119,7 +121,7 @@
   // une alerte tant que ce n'est pas branche.
 
   // Aide au debug et message utilisateur si config manquante
-  const OPTIONAL_URLS = ["URL_BUDGET_MENSUEL", "URL_CTO_HISTORIQUE", "URL_PEA_HISTORIQUE"];
+  const OPTIONAL_URLS = ["URL_BUDGET_MENSUEL", "URL_CTO_HISTORIQUE", "URL_PEA_HISTORIQUE", "URL_DEPENSES"];
   const missing = Object.entries(window.CONFIG)
     .filter(([k, v]) => k.startsWith("URL_") && !OPTIONAL_URLS.includes(k) && (!v || v === ""))
     .map(([k]) => k);

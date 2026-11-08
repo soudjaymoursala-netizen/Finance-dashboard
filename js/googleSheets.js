@@ -589,6 +589,20 @@ async function chargerDashboard() {
         if (typeof chargerHistoriqueAchats === "function") {
             await chargerHistoriqueAchats();
         }
+
+        // Insights Dépenses en langage naturel (optionnel, cf. depenses.js) :
+        // repose sur l'onglet API_DEPENSES_CATEGORIES qui agrege deja cote
+        // Sheet les donnees de 📊 Analyse & KPI.
+        if (typeof chargerDepensesInsights === "function") {
+            await chargerDepensesInsights();
+        }
+
+        // Insights Investissement en langage naturel (optionnel, cf.
+        // investissementInsights.js) : calcules en JS a partir des positions
+        // deja chargees par historiqueAchats.js, aucun appel reseau de plus.
+        if (typeof afficherInvestissementInsights === "function") {
+            afficherInvestissementInsights();
+        }
         // theme handling unchanged
         const themeButton = document.getElementById("themeToggle");
         const themeIconUse = document.getElementById("themeIcon");

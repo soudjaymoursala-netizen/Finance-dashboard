@@ -260,6 +260,64 @@ main > section > h2 {
 }
 
 /* ==================================================
+   INSIGHTS — cartes de phrases en langage naturel
+   (Dépenses : onglet du module Budget ; Investissement :
+   bloc en tête de "Mes investissements"). Texte genere
+   cote JS (depenses.js / investissementInsights.js) a
+   partir de donnees deja chargees, pas de calcul ici.
+   ================================================== */
+.insight-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.insight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.insight-card .icon-badge {
+  margin-right: 0;
+  margin-top: 0.1rem;
+}
+
+.insight-body {
+  min-width: 0;
+}
+
+.insight-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+.insight-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary-color);
+  line-height: 1.5;
+}
+
+.insight-text strong {
+  color: var(--text-color);
+  font-weight: 700;
+}
+
+.insight-empty {
+  font-size: 0.82rem;
+  color: var(--text-secondary-color);
+  padding: 1rem;
+  text-align: center;
+}
+
+/* ==================================================
    HERO — Patrimoine Total
    ================================================== */
 .hero-card {
@@ -782,6 +840,7 @@ main > section > h2 {
 }
 
 .icon-badge.emerald { background: rgba(52, 211, 153, 0.14); border: 1px solid rgba(52, 211, 153, 0.28); color: var(--accent-text); }
+.icon-badge.negative { background: rgba(248, 113, 113, 0.14); border: 1px solid rgba(248, 113, 113, 0.28); color: var(--negative-color); }
 /* gold/violet/blue/warn : neutralises en gris - ce sont des marqueurs
    de categorie (compte, type d'actif...), pas un signal financier. Un
    seul accent de marque (emerald) reste utilise dans tout le systeme,

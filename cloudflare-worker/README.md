@@ -21,6 +21,8 @@ sans exposer vos identifiants de Sheet.
      (performance individuelle par achat)
    - `SHEET_PEA_HISTORIQUE` — onglet API_PEA_Historique du fichier PEA
      (performance individuelle par achat)
+   - `SHEET_DEPENSES` — onglet API_DEPENSES_CATEGORIES (répartition des
+     dépenses par catégorie + conseils d'économie + projections d'objectifs)
    - `LOCK_CODE` — le code d'accès de l'écran de verrouillage (remplace la
      constante `CODE` qui était en clair dans `js/lock.js`). Choisissez une
      valeur ici, c'est elle qui compte désormais ; le code côté client a
@@ -46,3 +48,13 @@ Une fois déployé, testez dans le navigateur :
 
 Si vous obtenez "Forbidden", vérifiez que `ALLOWED_ORIGIN` correspond
 exactement à l'URL de votre site GitHub Pages.
+
+## Important : redéployez après chaque mise à jour de worker.js
+
+Ce dépôt documente le code du Worker, mais Cloudflare ne le redéploie pas
+automatiquement depuis Git — il faut recoller le contenu de `worker.js`
+dans l'éditeur (**Edit code** → coller → **Deploy**) à chaque fois qu'il
+change ici. Ce fichier a aussi corrigé un bug qui empêchait les clés
+contenant un underscore (`CTO_HISTORIQUE`, `PEA_HISTORIQUE`) de fonctionner
+(`/^\/api\/([A-Z]+)$/` ne matchait pas le underscore) — à redéployer même
+si vous n'utilisez pas encore `DEPENSES`.
