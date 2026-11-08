@@ -94,7 +94,7 @@ function getMonoPalette(n) {
 const MOIS_ABREGES = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
 const MOIS_LONGS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 const MOIS_COURTS_INDEX = {
-  jan: 0, janv: 0, fev: 1, fevr: 1, mar: 2, mars: 2, avr: 3, mai: 4, juin: 5, juil: 6, aout: 7, aou: 7,
+  jan: 0, janv: 0, fev: 1, fevr: 1, mar: 2, mars: 2, avr: 3, mai: 4, juin: 5, juil: 6, jul: 6, aout: 7, aou: 7,
   sep: 8, sept: 8, oct: 9, nov: 10, dec: 11
 };
 

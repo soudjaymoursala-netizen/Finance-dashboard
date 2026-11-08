@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v19"; // v19 : accessibilite (lexique, aides, aria, cibles tactiles) ; v18 : lignes de positions sans coupure, labels de mois ambigus ; v17 : gain de marche vs apports, projection informative (v16 : repartition par classe, poids, axe hero)
+const CACHE_VERSION = "shell-v20"; // v20 : colonnes vides = null, mois Jul ; v19 : accessibilite (lexique, aides, aria, cibles tactiles) ; v18 : lignes de positions sans coupure, labels de mois ambigus ; v17 : gain de marche vs apports, projection informative (v16 : repartition par classe, poids, axe hero)
 
 const PRECACHE_URLS = [
     "./",

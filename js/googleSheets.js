@@ -378,8 +378,16 @@ async function chargerDashboard() {
                 // Colonnes optionnelles : historique PEA (col 3) et CTO en CHF
                 // (col 4). Si absentes du Sheet, les sparklines correspondants
                 // restent simplement masqués (voir updateAccountSparkline).
-                peaRaw.push(cols.length > 2 ? nettoyerNombre(cols[2].trim().replace(/^\"|\"$/g, "")) : null);
-                ctoRaw.push(cols.length > 3 ? nettoyerNombre(cols[3].trim().replace(/^\"|\"$/g, "")) : null);
+                // Cellule absente OU vide -> null (et non 0) : sinon ajouter la
+                // colonne "apports" (5e) avec les colonnes PEA/CTO (3e/4e)
+                // vides afficherait de fausses sparklines a zero.
+                const celluleOuNull = (idx) => {
+                    if (cols.length <= idx) return null;
+                    const brut = cols[idx].trim().replace(/^\"|\"$/g, "");
+                    return brut === "" ? null : nettoyerNombre(brut);
+                };
+                peaRaw.push(celluleOuNull(2));
+                ctoRaw.push(celluleOuNull(3));
                 const apportBrut = cols.length > 4 ? cols[4].trim().replace(/^\"|\"$/g, "") : "";
                 apportsRaw.push(apportBrut !== "" && !estErreurFormule(apportBrut) ? nettoyerNombre(apportBrut) : null);
             }
