@@ -82,6 +82,54 @@ function getMonoPalette(n) {
   return palette.slice(0, n);
 }
 
+
+/* ==================================================
+   LIBELLES D'AXE — graphique hero
+   Les labels de la Sheet sont bruts ("Jan_25", "Mars 2026"...) :
+   affiches tels quels ils se chevauchent. On les normalise en
+   "janv. 25" pour l'axe (et "janvier 2025" dans l'infobulle), et on
+   n'en montre qu'un sur N selon le nombre de points et la largeur
+   d'ecran. Si un label n'est pas reconnu, il est affiche tel quel.
+   ================================================== */
+const MOIS_ABREGES = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+const MOIS_LONGS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+const MOIS_COURTS_INDEX = {
+  jan: 0, janv: 0, fev: 1, fevr: 1, mar: 2, mars: 2, avr: 3, mai: 4, juin: 5, juil: 6, aout: 7, aou: 7,
+  sep: 8, sept: 8, oct: 9, nov: 10, dec: 11
+};
+
+function normaliserLabelMois(label) {
+  if (label === null || label === undefined) return null;
+  const brut = label.toString().trim();
+  // "Jan_25" / "Dec_25" / "Janv-26"
+  const m = brut.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").match(/^([a-z]+)[_\-\s.]+(\d{2}|\d{4})$/);
+  if (m && MOIS_COURTS_INDEX[m[1]] !== undefined) {
+    const annee = m[2].length === 2 ? 2000 + parseInt(m[2], 10) : parseInt(m[2], 10);
+    return { mois: MOIS_COURTS_INDEX[m[1]], annee: annee };
+  }
+  const d = parseLabelDate(brut);
+  if (d && !isNaN(d.getTime())) return { mois: d.getMonth(), annee: d.getFullYear() };
+  return null;
+}
+
+function formaterLabelAxe(label) {
+  const n = normaliserLabelMois(label);
+  return n ? MOIS_ABREGES[n.mois] + " " + String(n.annee).slice(-2) : String(label);
+}
+
+function formaterLabelLong(label) {
+  const n = normaliserLabelMois(label);
+  return n ? MOIS_LONGS[n.mois] + " " + n.annee : String(label);
+}
+
+/* Nombre maximal de libelles visibles sur l'axe selon la largeur. */
+function maxLibellesAxe() {
+  const w = window.innerWidth || 1024;
+  if (w < 480) return 4;
+  if (w < 768) return 6;
+  return 8;
+}
+
 function updatePatrimoineChart(labels, valeurs, objectifCible) {
 
     lastPatrimoine.labels = labels || [];
@@ -166,8 +214,24 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
             categories: labels,
             axisBorder: { show: false },
             axisTicks: { show: false },
+            tooltip: { enabled: false },
             labels: {
-                style: { colors: getChartMutedColor() }
+                rotate: 0,
+                hideOverlappingLabels: true,
+                style: { colors: getChartMutedColor() },
+                // Un libelle sur "pas" (toujours le dernier point), le
+                // reste est masque : evite le chevauchement.
+                formatter: function (value, timestamp, opts) {
+                    const total = (labels || []).length;
+                    // Pour un axe "category", Apex ne fournit pas l'index
+                    // (opts vide) : on le retrouve par la valeur du label.
+                    const i = (labels || []).indexOf(value);
+                    if (i < 0 || total <= 1) return formaterLabelAxe(value);
+                    const pas = Math.max(1, Math.ceil(total / maxLibellesAxe()));
+                    const dernier = total - 1;
+                    const visible = i === dernier || (i % pas === 0 && dernier - i >= Math.ceil(pas / 2));
+                    return visible ? formaterLabelAxe(value) : "";
+                }
             }
         },
 
@@ -181,6 +245,13 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
 
         tooltip: {
             theme: getThemeMode(),
+            x: {
+                formatter: function (value, opts) {
+                    const i = opts && typeof opts.dataPointIndex === "number" ? opts.dataPointIndex : -1;
+                    const brut = i >= 0 && labels ? labels[i] : value;
+                    return formaterLabelLong(brut);
+                }
+            },
             y: {
                 formatter: value =>
                     Math.round(value).toLocaleString("fr-FR") + " €"
@@ -450,7 +521,9 @@ function updateAllocationChart(cash, pea, cto, patrimoineTotal) {
     const options = {
         chart: {
             type: "donut",
-            height: 420,
+            // 300px = hauteur du conteneur (.chart). Avant : 420/320, ce qui
+            // depassait du conteneur et rognait le bas du donut + la legende.
+            height: 300,
             background: "transparent",
             events: {
                 // Clic sur une part du donut -> ouvre et scroll vers la
@@ -532,7 +605,7 @@ function updateAllocationChart(cash, pea, cto, patrimoineTotal) {
         responsive: [{
             breakpoint: 768,
             options: {
-                chart: { height: 320 },
+                chart: { height: 300 },
                 legend: { position: "bottom" }
             }
         }],
@@ -768,6 +841,7 @@ function refreshCharts() {
   if (lastCtoSeries.valeurs && lastCtoSeries.valeurs.length) updateCtoSparkline(lastCtoSeries.valeurs);
   // même si les valeurs valent 0, on peut forcer la mise à jour
   updateAllocationChart(lastAllocation.cash, lastAllocation.pea, lastAllocation.cto, lastAllocation.patrimoineTotal);
+  if (typeof window.refreshAssetMix === "function") window.refreshAssetMix();
   updatePeaCompositionChart(lastPeaComposition.actions, lastPeaComposition.etf);
   updateCtoCompositionChart(lastCtoComposition.actions, lastCtoComposition.etf, lastCtoComposition.crypto);
   Object.keys(lastMonthlyBudgetByYear).forEach((containerId) => {

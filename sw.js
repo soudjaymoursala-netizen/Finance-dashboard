@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v15"; // v15 : objectif 250k affiche une seule fois (carte FIRE)
+const CACHE_VERSION = "shell-v16"; // v16 : repartition par classe d'actifs, poids des positions, axe du graphique hero
 
 const PRECACHE_URLS = [
     "./",
@@ -35,6 +35,7 @@ const PRECACHE_URLS = [
     "./js/suiviAnnuel.js",
     "./js/historiqueAchats.js",
     "./js/investissements.js",
+    "./js/repartitionActifs.js",
     "./js/celebration.js",
     "./js/googleSheets.js",
     "./js/runtimeConfigUI.js",

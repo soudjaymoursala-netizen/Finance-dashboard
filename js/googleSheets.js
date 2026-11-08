@@ -350,6 +350,12 @@ async function chargerDashboard() {
             updateAllocationChart(DATA.budget.cash_dispo_total || 0, DATA.pea.pea_valeur || 0, DATA.ctoValeurEUR || 0, DATA.patrimoine || 0);
         }
 
+        // Repartition par classe d'actifs (hero) : calculee a partir de
+        // DATA, aucune donnee supplementaire necessaire (cf. repartitionActifs.js)
+        if (typeof afficherRepartitionActifs === "function") {
+            try { afficherRepartitionActifs(DATA); } catch (e) { console.warn("Répartition par classe d'actifs non affichable:", e); }
+        }
+
         // Evolution chart parsing (robust)
         try {
             const sample = evolutionTxt || "";

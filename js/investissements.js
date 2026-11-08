@@ -21,7 +21,23 @@ function construirePositionsUnifiees() {
             positions.push(Object.assign({}, pos, { perf: perf }));
         });
     });
+
+    // Poids = part de la valeur de la position dans la valeur TOTALE des
+    // placements (PEA + CTO, CHF converti en EUR), calcule sur toutes les
+    // positions - pas seulement celles qui passent les filtres - pour que
+    // le pourcentage d'une ligne ne change pas quand on filtre/cherche.
+    const taux = (typeof DATA !== "undefined" && DATA.tauxChange) || 1;
+    const enEUR = (p) => (p.devise === "CHF" ? p.totalValeur / taux : p.totalValeur);
+    const totalEUR = positions.reduce((somme, p) => somme + Math.max(0, enEUR(p)), 0);
+    positions.forEach((p) => {
+        p.valeurEUR = enEUR(p);
+        p.poids = totalEUR > 0 ? (Math.max(0, p.valeurEUR) / totalEUR) * 100 : 0;
+    });
     return positions;
+}
+
+function formatPoids(poids) {
+    return poids.toFixed(1).replace(".", ",") + " %";
 }
 
 function filtrerEtTrierPositions(positions) {
@@ -38,7 +54,8 @@ function filtrerEtTrierPositions(positions) {
         perf_desc: (a, b) => b.perf - a.perf,
         perf_asc: (a, b) => a.perf - b.perf,
         gain_desc: (a, b) => b.totalGain - a.totalGain,
-        valeur_desc: (a, b) => b.totalValeur - a.totalValeur,
+        valeur_desc: (a, b) => b.valeurEUR - a.valeurEUR, // en EUR : compare PEA (EUR) et CTO (CHF) sur la meme base
+        poids_desc: (a, b) => b.poids - a.poids,
         nom_asc: (a, b) => a.ticker.localeCompare(b.ticker),
     };
     res.sort(tris[investFiltres.tri] || tris.perf_desc);
@@ -96,7 +113,7 @@ function rendreLignePositionUnifiee(pos) {
                     <strong>${pos.ticker}</strong>
                 </div>
                 <div class="historique-position-societe">${pos.societe}</div>
-                <div class="historique-position-stats">
+                <div class="historique-position-stats avec-poids">
                     <div class="historique-stat">
                         <span class="historique-stat-label">Investi</span>
                         <span class="historique-stat-value">${formatMontantDevise(pos.totalInvesti, pos.devise)}</span>
@@ -104,6 +121,11 @@ function rendreLignePositionUnifiee(pos) {
                     <div class="historique-stat">
                         <span class="historique-stat-label">Valeur</span>
                         <span class="historique-stat-value">${formatMontantDevise(pos.totalValeur, pos.devise)}</span>
+                    </div>
+                    <div class="historique-stat" title="Part de la valeur de tes placements (PEA + CTO)">
+                        <span class="historique-stat-label">Poids</span>
+                        <span class="invest-weight-value">${formatPoids(pos.poids)}</span>
+                        <span class="invest-weight-bar" aria-hidden="true"><span style="width:${Math.min(100, pos.poids).toFixed(1)}%"></span></span>
                     </div>
                     <div class="historique-stat">
                         <span class="historique-stat-label ${cls}">Gain</span>
@@ -154,13 +176,16 @@ function rendreGroupeCompte(compte, positions) {
     const gainTotal = positions.reduce((s, p) => s + p.totalGain, 0);
     const cls = classeGainPerte(gainTotal);
     const devise = positions[0].devise;
+    // Poids du compte dans les placements : somme des poids de ses lignes
+    // (poids deja calcule sur l'ensemble PEA + CTO, donc stable sous filtre).
+    const poidsGroupe = positions.reduce((somme, p) => somme + p.poids, 0);
 
     let html = `
         <div class="invest-group" data-group="${compte}">
             <div class="invest-group-header ${cls}" role="button" tabindex="0" aria-expanded="${isOpen}">
                 <span class="historique-badge ${badgeClasse}">${compte}</span>
                 <span class="invest-group-name">${COMPTE_LABELS[compte] || compte}</span>
-                <span class="historique-inline-count">${positions.length} position${positions.length > 1 ? 's' : ''}</span>
+                <span class="historique-inline-count">${positions.length} position${positions.length > 1 ? 's' : ''} · ${formatPoids(poidsGroupe)} des placements</span>
                 <span class="invest-group-gain ${cls}">${gainTotal >= 0 ? "+" : ""}${formatMontantDevise(gainTotal, devise)}</span>
                 <span class="historique-chevron ${isOpen ? 'open' : ''}">▼</span>
             </div>

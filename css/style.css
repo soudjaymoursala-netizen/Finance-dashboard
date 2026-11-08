@@ -411,6 +411,85 @@ main > section > h2 {
   margin-bottom: 0.3rem;
 }
 
+/* Repartition par classe d'actifs (hero). Palette monochrome posee en
+   inline par JS (proportion, pas un signal). Se lit au-dessus de la
+   legende "variation du jour" du hero. */
+.asset-mix {
+  margin-top: 1.25rem;
+}
+
+.asset-mix-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.asset-mix-bar {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--border-color);
+}
+
+.asset-mix-seg {
+  display: block;
+  height: 100%;
+  min-width: 3px;
+}
+
+.asset-mix-legend {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.4rem 1rem;
+}
+
+.asset-mix-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "dot name pct" ". amount amount";
+  align-items: baseline;
+  column-gap: 0.45rem;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.asset-mix-dot {
+  grid-area: dot;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  align-self: center;
+}
+
+.asset-mix-name {
+  grid-area: name;
+  color: var(--text-secondary-color);
+}
+
+.asset-mix-pct {
+  grid-area: pct;
+  font-weight: 600;
+}
+
+.asset-mix-amount {
+  grid-area: amount;
+  font-size: 0.72rem;
+  color: var(--text-secondary-color);
+}
+
+body.amounts-hidden .asset-mix-amount {
+  filter: blur(6px);
+  user-select: none;
+}
+
 .account-sparkline {
   height: 40px;
   margin-top: 0.6rem;

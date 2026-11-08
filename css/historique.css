@@ -138,6 +138,35 @@
   gap: 0.75rem;
 }
 
+/* Vue "Mes investissements" : 5 colonnes (Investi, Valeur, Poids, Gain,
+   Perf). Les regles mobiles/tablette plus bas gardent la priorite via
+   leur propre selecteur .avec-poids. */
+.historique-position-stats.avec-poids {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.invest-weight-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color);
+}
+
+.invest-weight-bar {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border-color);
+  overflow: hidden;
+}
+
+.invest-weight-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--text-secondary-color);
+  border-radius: inherit;
+}
+
 .historique-stat {
   display: flex;
   flex-direction: column;
@@ -354,6 +383,11 @@ body.light .historique-badge.emerald {
     grid-template-columns: repeat(2, 1fr);
     border-top: 1px solid var(--border-color);
     padding-top: 0.5rem;
+  }
+
+  /* 5 stats : 3 colonnes (3 + 2) plutot que 2 (2 + 2 + 1 orphelin) */
+  .historique-position-stats.avec-poids {
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .historique-transaction-header,
