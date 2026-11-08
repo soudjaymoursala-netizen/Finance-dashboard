@@ -104,7 +104,7 @@ function rendreLignePositionUnifiee(pos) {
 
     let html = `
         <div class="historique-position-row ${cls}" data-position="${positionId}">
-            <div class="historique-position-header" role="button" tabindex="0" aria-expanded="${isExpanded}">
+            <div class="historique-position-header invest-header" role="button" tabindex="0" aria-expanded="${isExpanded}">
                 <div class="historique-position-toggle">
                     <span class="historique-chevron ${isExpanded ? 'open' : ''}">▼</span>
                 </div>
@@ -122,7 +122,7 @@ function rendreLignePositionUnifiee(pos) {
                         <span class="historique-stat-label">Valeur</span>
                         <span class="historique-stat-value">${formatMontantDevise(pos.totalValeur, pos.devise)}</span>
                     </div>
-                    <div class="historique-stat" title="Part de la valeur de tes placements (PEA + CTO)">
+                    <div class="historique-stat" title="Part de la valeur de tes placements (PEA + CTO)" aria-label="Poids dans les placements : ${formatPoids(pos.poids)}">
                         <span class="historique-stat-label">Poids</span>
                         <span class="invest-weight-value">${formatPoids(pos.poids)}</span>
                         <span class="invest-weight-bar" aria-hidden="true"><span style="width:${Math.min(100, pos.poids).toFixed(1)}%"></span></span>

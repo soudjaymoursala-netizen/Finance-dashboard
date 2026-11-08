@@ -142,7 +142,19 @@
    Perf). Les regles mobiles/tablette plus bas gardent la priorite via
    leur propre selecteur .avec-poids. */
 .historique-position-stats.avec-poids {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* Ligne de la vue unifiee : la grille d'origine donnait aux stats UNE seule
+   colonne 1fr (le reste de la ligne restait vide) -> les montants se
+   coupaient sur 2 lignes. On leur reserve la place a droite. */
+.historique-position-header.invest-header {
+  grid-template-columns: auto minmax(110px, 1fr) minmax(0, 1.2fr) minmax(400px, 2.6fr);
+}
+
+.historique-position-stats.avec-poids .historique-stat-value,
+.invest-weight-value {
+  white-space: nowrap;
 }
 
 .invest-weight-value {
@@ -344,7 +356,8 @@ body.light .historique-badge.emerald {
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .historique-position-header {
+  .historique-position-header,
+  .historique-position-header.invest-header {
     grid-template-columns: auto 1fr 1fr;
   }
 
@@ -367,7 +380,8 @@ body.light .historique-badge.emerald {
 }
 
 @media (max-width: 768px) {
-  .historique-position-header {
+  .historique-position-header,
+  .historique-position-header.invest-header {
     grid-template-columns: auto 1fr;
     gap: 0.5rem;
     padding: 0.75rem;
@@ -387,7 +401,15 @@ body.light .historique-badge.emerald {
 
   /* 5 stats : 3 colonnes (3 + 2) plutot que 2 (2 + 2 + 1 orphelin) */
   .historique-position-stats.avec-poids {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  /* La grille d'origine donnait a la zone de stats une largeur minimale
+     liee a son contenu : sans min-width:0 elle debordait de l'ecran et la
+     colonne Poids etait rognee. */
+  .historique-position-header > * {
+    min-width: 0;
   }
 
   .historique-transaction-header,
@@ -609,6 +631,12 @@ body.light .historique-badge.emerald {
   .invest-filters {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  /* flex: 1 1 220px (desktop) devenait une HAUTEUR de 220px en colonne :
+     la barre de recherche etait un grand bloc vide sur telephone. */
+  .invest-search {
+    flex: 0 0 auto;
   }
 
   .invest-chip-group {

@@ -11,6 +11,13 @@
     const buttons = Array.from(tabBar.querySelectorAll("[data-tab]"));
     const panels = Array.from(document.querySelectorAll(".budget-tab-panel"));
 
+    // Semantique ARIA : chaque panneau est un "tabpanel" lie a son onglet.
+    panels.forEach((panel) => {
+        const btn = buttons.find((b) => b.getAttribute("data-tab") === panel.getAttribute("data-panel"));
+        panel.setAttribute("role", "tabpanel");
+        if (btn && btn.id) panel.setAttribute("aria-labelledby", btn.id);
+    });
+
     function activate(tabName) {
         buttons.forEach((btn) => {
             const isActive = btn.getAttribute("data-tab") === tabName;

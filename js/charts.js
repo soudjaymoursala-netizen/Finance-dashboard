@@ -112,13 +112,31 @@ function normaliserLabelMois(label) {
   return null;
 }
 
-function formaterLabelAxe(label) {
-  const n = normaliserLabelMois(label);
+/* Label ambigu ou inconnu (ex: "Jui_26" = juin OU juillet) : on le deduit
+   de ses voisins reconnus, puisque la Sheet est une suite mensuelle. */
+function normaliserLabelContexte(labels, i) {
+  const direct = normaliserLabelMois(labels ? labels[i] : null);
+  if (direct || !labels || i < 0) return direct;
+  const decaler = (n, k) => {
+    const total = n.annee * 12 + n.mois + k;
+    return { mois: ((total % 12) + 12) % 12, annee: Math.floor(total / 12) };
+  };
+  for (let k = 1; k <= 3; k++) {
+    const avant = i - k >= 0 ? normaliserLabelMois(labels[i - k]) : null;
+    if (avant) return decaler(avant, k);
+    const apres = i + k < labels.length ? normaliserLabelMois(labels[i + k]) : null;
+    if (apres) return decaler(apres, -k);
+  }
+  return null;
+}
+
+function formaterLabelAxe(label, labels, i) {
+  const n = labels ? normaliserLabelContexte(labels, i) : normaliserLabelMois(label);
   return n ? MOIS_ABREGES[n.mois] + " " + String(n.annee).slice(-2) : String(label);
 }
 
-function formaterLabelLong(label) {
-  const n = normaliserLabelMois(label);
+function formaterLabelLong(label, labels, i) {
+  const n = labels ? normaliserLabelContexte(labels, i) : normaliserLabelMois(label);
   return n ? MOIS_LONGS[n.mois] + " " + n.annee : String(label);
 }
 
@@ -189,8 +207,8 @@ let projectionRate = (function () {
   } catch (e) { return null; }
 })();
 
-function genererLabelsFuturs(dernierLabel, n) {
-  const base = normaliserLabelMois(dernierLabel);
+function genererLabelsFuturs(dernierLabel, n, contexte) {
+  const base = contexte ? normaliserLabelContexte(contexte, contexte.length - 1) : normaliserLabelMois(dernierLabel);
   if (!base) return null;
   const labels = [];
   let mois = base.mois, annee = base.annee;
@@ -214,7 +232,7 @@ function construireProjection(labels, valeurs, objectif) {
   const epargneAn = typeof DATA !== "undefined" ? DATA.epargneAnnuelle : 0;
   const dernier = valeurs[valeurs.length - 1];
   if (!(epargneAn > 0) || !(dernier > 0) || !(objectif > 0)) return null;
-  if (!normaliserLabelMois(labels[labels.length - 1])) return null;
+  if (!normaliserLabelContexte(labels, labels.length - 1)) return null;
 
   const mensuel = epargneAn / 12;
   const tauxMensuel = Math.pow(1 + projectionRate / 100, 1 / 12) - 1;
@@ -231,13 +249,13 @@ function construireProjection(labels, valeurs, objectif) {
   // Horizon affiche : assez court pour garder la partie reelle lisible
   const horizon = Math.min(moisAtteinte || 600, Math.max(12, valeurs.length * 2), 180);
   const serieAffichee = serie.slice(0, horizon);
-  const futurs = genererLabelsFuturs(labels[labels.length - 1], serieAffichee.length);
+  const futurs = genererLabelsFuturs(labels[labels.length - 1], serieAffichee.length, labels);
   if (!futurs) return null;
 
   const fmtTaux = projectionRate === 0 ? "0 %" : projectionRate + " %";
   let phrase;
   if (moisAtteinte) {
-    const f = genererLabelsFuturs(labels[labels.length - 1], moisAtteinte);
+    const f = genererLabelsFuturs(labels[labels.length - 1], moisAtteinte, labels);
     phrase = "objectif de " + Math.round(objectif).toLocaleString("fr-FR") + " € atteint vers " + formaterLabelLong(f[f.length - 1]);
   } else {
     phrase = "objectif non atteint dans les 50 prochaines années";
@@ -293,6 +311,20 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
     const chartElement = document.querySelector("#heroSparkline");
     if (!chartElement) return;
     if (patrimoineChart) patrimoineChart.destroy();
+
+    // Alternative textuelle au graphique (lecteurs d'ecran) : premier et
+    // dernier point de la periode affichee.
+    try {
+        const pts = (valeurs || []).map((v, i) => ({ v: v, i: i })).filter((p) => p.v > 0);
+        if (pts.length >= 2) {
+            const a = pts[0], b = pts[pts.length - 1];
+            const fmtE = (x) => Math.round(x).toLocaleString("fr-FR") + " euros";
+            chartElement.setAttribute("aria-label",
+                "Évolution du patrimoine : de " + fmtE(a.v) + " (" + formaterLabelLong(labels[a.i], labels, a.i) + ") à " +
+                fmtE(b.v) + " (" + formaterLabelLong(labels[b.i], labels, b.i) + ")");
+        }
+    } catch (e) { /* alternative textuelle non critique */ }
+    const reduireMouvement = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // La ligne "Objectif" (250k) a ete retiree du trace : elle forcait
     // l'axe vertical a couvrir 50k-250k, ecrasant la vraie courbe (70k-95k)
     // dans le tiers bas du graphique. L'objectif reste visible ailleurs
@@ -325,7 +357,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
             background: "transparent",
             toolbar: { show: false },
             animations: {
-                enabled: true,
+                enabled: !reduireMouvement,
                 easing: "easeinout",
                 speed: 1200
             }
@@ -389,11 +421,11 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
                     // Pour un axe "category", Apex ne fournit pas l'index
                     // (opts vide) : on le retrouve par la valeur du label.
                     const i = (labels || []).indexOf(value);
-                    if (i < 0 || total <= 1) return formaterLabelAxe(value);
+                    if (i < 0 || total <= 1) return formaterLabelAxe(value, labels, i);
                     const pas = Math.max(1, Math.ceil(total / maxLibellesAxe()));
                     const dernier = total - 1;
                     const visible = i === dernier || (i % pas === 0 && dernier - i >= Math.ceil(pas / 2));
-                    return visible ? formaterLabelAxe(value) : "";
+                    return visible ? formaterLabelAxe(value, labels, i) : "";
                 }
             }
         },
@@ -417,7 +449,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
                 formatter: function (value, opts) {
                     const i = opts && typeof opts.dataPointIndex === "number" ? opts.dataPointIndex : -1;
                     const brut = i >= 0 && labels ? labels[i] : value;
-                    return (i >= nbActuel ? "Projection · " : "") + formaterLabelLong(brut);
+                    return (i >= nbActuel ? "Projection · " : "") + formaterLabelLong(brut, labels, i);
                 }
             },
             y: {
@@ -644,7 +676,7 @@ function afficherVariationPeriode(labels, valeurs) {
     if (el) {
         el.className = "period-variation " + (deltaPct >= 0 ? "up" : "down");
         el.textContent = (deltaPct >= 0 ? "▲ " : "▼ ") + signe + deltaPct.toFixed(1) + "% (" + signe +
-            Math.round(deltaAbs).toLocaleString("fr-FR") + " €) depuis " + premier.label;
+            Math.round(deltaAbs).toLocaleString("fr-FR") + " €) depuis " + formaterLabelAxe(premier.label);
     }
 
     // Le halo ambiant de la hero-card reagit a la tendance de la periode

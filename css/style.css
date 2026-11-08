@@ -402,7 +402,7 @@ main > section > h2 {
    contexte. Visibilite pilotee en JS (afficherVarJour), en meme temps
    que le badge associe. */
 .hero-invest-caption {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -436,7 +436,7 @@ main > section > h2 {
 }
 
 .projection-label {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -474,7 +474,7 @@ main > section > h2 {
 
 .projection-note {
   margin-top: 0.5rem;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   line-height: 1.45;
   color: var(--text-secondary-color);
 }
@@ -493,7 +493,7 @@ body.amounts-hidden .projection-note {
 }
 
 .asset-mix-title {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1845,4 +1845,92 @@ body.amounts-hidden .value:active {
   body.amounts-hidden .chip-value {
     transition: none;
   }
+}
+
+
+/* ==================================================
+   Accessibilite et comprehension
+   ================================================== */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 10000;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--accent-color);
+  color: #04120D;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
+}
+
+#mainContent:focus {
+  outline: none;
+}
+
+.help-text {
+  margin: 0.75rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-secondary-color);
+}
+
+.glossary {
+  margin-top: 2rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 12px);
+  color: var(--text-secondary-color);
+}
+
+.glossary summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.glossary summary:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 3px;
+}
+
+.glossary dl {
+  margin: 0.75rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.glossary dt {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.glossary dd {
+  margin: 0 0 0.25rem;
+}
+
+/* Cibles tactiles plus confortables sur telephone (WCAG 2.5.8 / usage au pouce) */
+@media (max-width: 768px) {
+  .period-selector button,
+  .projection-controls button,
+  .invest-chip {
+    min-height: 40px;
+  }
+
+  .theme-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root { --text-secondary-color: #B4BBC8; }
+  body.light { --text-secondary-color: #475467; }
 }

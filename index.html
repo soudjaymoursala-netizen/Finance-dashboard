@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=30">
+    <link rel="stylesheet" href="css/style.css?v=31">
     <link rel="stylesheet" href="css/alerts.css">
-    <link rel="stylesheet" href="css/historique.css?v=9">
+    <link rel="stylesheet" href="css/historique.css?v=12">
 </head>
 <body>
     <!-- Sprite d'icones SVG inline (aucune requete externe, coherent avec
@@ -166,7 +166,7 @@
             <h2>Finance Dashboard</h2>
             <p>Entrez le code d'accès</p>
             <div class="lock-input-wrap">
-                <input type="password" id="lockInput" class="lock-input" placeholder="Code" autocomplete="off">
+                <input type="password" id="lockInput" class="lock-input" placeholder="Code" aria-label="Code d'accès" autocomplete="off">
                 <button type="button" id="lockToggleVisibility" class="lock-eye" aria-label="Afficher le code"><svg class="icon" width="18" height="18"><use id="lockEyeIcon" href="#icon-eye"></use></svg></button>
             </div>
             <button id="lockSubmit" class="lock-submit">Déverrouiller</button>
@@ -180,6 +180,7 @@
             <button type="button" id="faceIdOfferDecline" class="faceid-offer-decline">Non merci</button>
         </div>
     </div>
+    <a class="skip-link" href="#mainContent">Aller au contenu</a>
     <div class="container blurred" id="mainContainer">
         <div id="pullToRefreshIndicator" class="ptr-indicator" aria-hidden="true">
             <span class="ptr-icon"><svg class="icon" width="16" height="16"><use href="#icon-refresh"></use></svg></span>
@@ -199,7 +200,7 @@
             </div>
         </header>
 
-        <main>
+        <main id="mainContent" tabindex="-1">
             <section id="alerts" aria-live="polite"></section>
 
             <section class="hero-section" id="navAccueil">
@@ -213,24 +214,24 @@
                     </div>
                     <div class="hero-value skeleton" id="networth">...</div>
                     <div class="period-selector hero-period-selector" id="patrimoinePeriodSelector" role="group" aria-label="Période affichée">
-                        <button type="button" data-period="1J" aria-pressed="false">1J</button>
-                        <button type="button" data-period="1M" aria-pressed="false">1M</button>
-                        <button type="button" data-period="2M" aria-pressed="false">2M</button>
-                        <button type="button" data-period="3M" aria-pressed="false">3M</button>
-                        <button type="button" data-period="6M" aria-pressed="false">6M</button>
-                        <button type="button" data-period="1A" aria-pressed="false">1A</button>
-                        <button type="button" data-period="YTD" aria-pressed="false">YTD</button>
-                        <button type="button" data-period="ALL" aria-pressed="true" class="active">Tout</button>
+                        <button type="button" data-period="1J" aria-label="Depuis ma dernière visite" title="Depuis ma dernière visite sur ce tableau de bord" aria-pressed="false">1J</button>
+                        <button type="button" data-period="1M" aria-label="1 mois" title="Les 2 derniers relevés (environ 1 mois)" aria-pressed="false">1M</button>
+                        <button type="button" data-period="2M" aria-label="2 mois" title="Les 3 derniers relevés (environ 2 mois)" aria-pressed="false">2M</button>
+                        <button type="button" data-period="3M" aria-label="3 mois" title="Les 4 derniers relevés (environ 3 mois)" aria-pressed="false">3M</button>
+                        <button type="button" data-period="6M" aria-label="6 mois" title="Les 7 derniers relevés (environ 6 mois)" aria-pressed="false">6M</button>
+                        <button type="button" data-period="1A" aria-label="1 an" title="Les 13 derniers relevés (environ 1 an)" aria-pressed="false">1A</button>
+                        <button type="button" data-period="YTD" aria-label="Depuis le 1er janvier" title="Depuis le 1er janvier de cette année (year to date)" aria-pressed="false">YTD</button>
+                        <button type="button" data-period="ALL" aria-label="Depuis le début" title="Tout l'historique disponible" aria-pressed="true" class="active">Tout</button>
                     </div>
                     <div id="patrimoinePeriodVariation" class="period-variation"></div>
                     <div id="patrimoineMarche" class="period-marche" style="display:none"></div>
-                    <div id="heroSparkline" class="hero-evolution-chart"></div>
-                    <div class="projection-controls" id="projectionControls" role="group" aria-label="Scénario de projection (rendement annuel supposé)">
+                    <div id="heroSparkline" class="hero-evolution-chart" role="img" aria-label="Graphique de l'évolution du patrimoine"></div>
+                    <div class="projection-controls" id="projectionControls" role="group" aria-describedby="projectionNote" aria-label="Scénario de projection (rendement annuel supposé)">
                         <span class="projection-label">Projection</span>
-                        <button type="button" data-rate="off" aria-pressed="true" class="active">Off</button>
-                        <button type="button" data-rate="0" aria-pressed="false">0 %</button>
-                        <button type="button" data-rate="3" aria-pressed="false">3 %</button>
-                        <button type="button" data-rate="5" aria-pressed="false">5 %</button>
+                        <button type="button" data-rate="off" aria-label="Projection désactivée" title="Projection désactivée" aria-pressed="true" class="active">Off</button>
+                        <button type="button" data-rate="0" aria-label="Projection avec 0 % de rendement annuel supposé" title="Projection avec 0 % de rendement annuel supposé" aria-pressed="false">0 %</button>
+                        <button type="button" data-rate="3" aria-label="Projection avec 3 % de rendement annuel supposé" title="Projection avec 3 % de rendement annuel supposé" aria-pressed="false">3 %</button>
+                        <button type="button" data-rate="5" aria-label="Projection avec 5 % de rendement annuel supposé" title="Projection avec 5 % de rendement annuel supposé" aria-pressed="false">5 %</button>
                     </div>
                     <div class="projection-note" id="projectionNote" style="display:none"></div>
                     <div class="asset-mix" id="assetMix" style="display:none">
@@ -357,9 +358,10 @@
                     <div class="fire-label"><span class="icon-badge emerald"><svg class="icon" width="16" height="16"><use href="#icon-flame"></use></svg></span>Route vers l'indépendance financière</div>
                     <div id="fireProgress" class="fire-percentage skeleton">...</div>
                     <div id="fireDetails" class="fire-details skeleton">...</div>
-                    <div class="fire-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="fire-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progression vers l'objectif de patrimoine">
                         <div id="fireBar" class="fire-progress-fill"></div>
                     </div>
+                    <p class="help-text">Part de ton objectif de patrimoine déjà atteinte. L'horizon est une estimation : il suppose que tu continues à épargner au rythme actuel.</p>
                 </div>
             </section>
 
@@ -396,6 +398,7 @@
                             <option value="nom_asc">Nom A→Z</option>
                         </select>
                     </div>
+                    <p class="help-text">Gain et performance sont calculés depuis la date d'achat. « Poids » = part de la valeur de tes placements (PEA + CTO).</p>
                     <div id="investissementsSummary" class="invest-summary"></div>
                     <div id="investissementsContainer" class="historique-positions"></div>
                     </div>
@@ -491,6 +494,19 @@
                     <div id="depensesInsightsContainer" class="insight-grid"></div>
                 </div>
             </section>
+            <details class="glossary" id="glossary">
+                <summary>Lexique : comprendre les termes</summary>
+                <dl>
+                    <dt>PEA / CTO</dt><dd>Deux types de comptes-titres : le PEA (Plan d'Épargne en Actions) et le CTO (compte-titres ordinaire).</dd>
+                    <dt>ETF</dt><dd>Fonds indiciel coté en bourse, qui regroupe de nombreuses entreprises en un seul titre.</dd>
+                    <dt>Poids</dt><dd>La part d'une position dans la valeur totale de tes placements.</dd>
+                    <dt>Apports</dt><dd>L'argent que tu as réellement versé, par opposition aux gains ou pertes des marchés.</dd>
+                    <dt>Gain de marché</dt><dd>La variation de ton patrimoine moins tes apports : ce que les placements ont réellement rapporté ou perdu sur la période.</dd>
+                    <dt>YTD</dt><dd>« Year to date » : depuis le 1er janvier de l'année en cours.</dd>
+                    <dt>Indépendance financière (FIRE)</dt><dd>Objectif de patrimoine à partir duquel tu pourrais vivre de tes avoirs. Ici, c'est la cible de la Sheet (par défaut 250 000 €).</dd>
+                    <dt>Projection</dt><dd>Un scénario « et si » à partir de ton épargne et d'un rendement que tu choisis. Ce n'est ni une prévision ni un conseil.</dd>
+                </dl>
+            </details>
         </main>
     </div>
 
@@ -528,7 +544,7 @@
     <script src="js/config.js?v=4"></script>
     <script src="js/lock.js?v=11"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="js/charts.js?v=15"></script>
+    <script src="js/charts.js?v=17"></script>
     <script src="js/errorHandler.js?v=1"></script>
     <script src="js/parsing.js?v=2"></script>
     <script src="js/dataCache.js?v=1"></script>
@@ -537,14 +553,14 @@
     <script src="js/historiqueAchats.js?v=8"></script>
     <script src="js/investissementInsights.js?v=1"></script>
     <script src="js/depenses.js?v=1"></script>
-    <script src="js/investissements.js?v=3"></script>
+    <script src="js/investissements.js?v=5"></script>
     <script src="js/celebration.js?v=1"></script>
     <script src="js/repartitionActifs.js?v=1"></script>
     <script src="js/googleSheets.js?v=30"></script>
     <script src="js/runtimeConfigUI.js?v=1"></script>
     <script src="js/rippleEffect.js?v=1"></script>
     <script src="js/collapsibleSections.js?v=6"></script>
-    <script src="js/budgetTabs.js?v=1"></script>
+    <script src="js/budgetTabs.js?v=2"></script>
     <script src="js/bottomNav.js?v=2"></script>
     <script src="js/pullToRefresh.js?v=1"></script>
 
