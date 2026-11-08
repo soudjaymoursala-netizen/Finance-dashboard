@@ -130,6 +130,158 @@ function maxLibellesAxe() {
   return 8;
 }
 
+
+/* ==================================================
+   GAIN DE MARCHE vs APPORTS (chantier 4)
+   Optionnel : necessite la colonne 5 "apports cumules" dans
+   API_EVOLUTION. Sur la periode affichee :
+     gain de marche = variation du patrimoine - variation des apports
+   Sans cette colonne (ou sur 1J), la ligne reste masquee.
+   ================================================== */
+let patrimoineApports = [];
+
+function setPatrimoineApports(apports) {
+  patrimoineApports = Array.isArray(apports) ? apports : [];
+}
+window.setPatrimoineApports = setPatrimoineApports;
+
+function afficherGainMarche(startIndex) {
+  const el = document.getElementById("patrimoineMarche");
+  if (!el) return;
+  const cacher = () => { el.style.display = "none"; el.innerHTML = ""; };
+
+  const { valeurs } = patrimoineHistoryFull;
+  if (!valeurs || !valeurs.length || !patrimoineApports.length || typeof startIndex !== "number") return cacher();
+
+  // Premier point de la tranche qui a a la fois un patrimoine et un apport
+  let debut = -1;
+  for (let i = startIndex; i < valeurs.length; i++) {
+    if (valeurs[i] > 0 && typeof patrimoineApports[i] === "number") { debut = i; break; }
+  }
+  const fin = valeurs.length - 1;
+  if (debut < 0 || debut >= fin || typeof patrimoineApports[fin] !== "number") return cacher();
+
+  const deltaPatrimoine = valeurs[fin] - valeurs[debut];
+  const deltaApports = patrimoineApports[fin] - patrimoineApports[debut];
+  const gainMarche = deltaPatrimoine - deltaApports;
+  const fmt = (v) => (v >= 0 ? "+" : "−") + Math.abs(Math.round(v)).toLocaleString("fr-FR") + " €";
+
+  el.style.display = "";
+  el.innerHTML =
+    '<span class="marche-item ' + (gainMarche >= 0 ? "up" : "down") + '"><span class="marche-label">Gain de marché</span> ' + fmt(gainMarche) + '</span>' +
+    '<span class="marche-item"><span class="marche-label">Apports</span> ' + fmt(deltaApports) + '</span>';
+}
+
+/* ==================================================
+   PROJECTION INFORMATIVE (chantier 5)
+   Prolonge la courbe en pointille a partir de TES chiffres : l'epargne
+   annuelle de la carte FIRE (DATA.epargneAnnuelle) et un rendement
+   annuel hypothetique que tu choisis (0 / 3 / 5 %). Ce n'est ni une
+   prevision ni un conseil : un simple "et si". Desactivee par defaut ;
+   choix memorise dans ce navigateur uniquement.
+   ================================================== */
+const PROJECTION_KEY = "financeDashboard_projectionRate";
+const MOIS_CODES = ["jan", "fev", "mar", "avr", "mai", "juin", "juil", "aout", "sep", "oct", "nov", "dec"];
+let projectionRate = (function () {
+  try {
+    const v = localStorage.getItem(PROJECTION_KEY);
+    return v !== null && v !== "off" && !isNaN(parseFloat(v)) ? parseFloat(v) : null;
+  } catch (e) { return null; }
+})();
+
+function genererLabelsFuturs(dernierLabel, n) {
+  const base = normaliserLabelMois(dernierLabel);
+  if (!base) return null;
+  const labels = [];
+  let mois = base.mois, annee = base.annee;
+  for (let i = 0; i < n; i++) {
+    mois++;
+    if (mois > 11) { mois = 0; annee++; }
+    labels.push(MOIS_CODES[mois] + "_" + String(annee).slice(-2));
+  }
+  return labels;
+}
+
+/* Renvoie {labels, actuel, projection, nbActuel, texte} ou null si la
+   projection n'est pas applicable (desactivee, 1J, labels non datables,
+   pas d'epargne positive). */
+function construireProjection(labels, valeurs, objectif) {
+  const note = document.getElementById("projectionNote");
+  const ecrire = (txt) => { if (note) { note.textContent = txt; note.style.display = txt ? "" : "none"; } };
+  ecrire("");
+  if (projectionRate === null || currentPatrimoinePeriod === "1J" || !labels || labels.length < 2) return null;
+
+  const epargneAn = typeof DATA !== "undefined" ? DATA.epargneAnnuelle : 0;
+  const dernier = valeurs[valeurs.length - 1];
+  if (!(epargneAn > 0) || !(dernier > 0) || !(objectif > 0)) return null;
+  if (!normaliserLabelMois(labels[labels.length - 1])) return null;
+
+  const mensuel = epargneAn / 12;
+  const tauxMensuel = Math.pow(1 + projectionRate / 100, 1 / 12) - 1;
+
+  // Mois necessaires pour atteindre l'objectif (plafond 50 ans)
+  let v = dernier, moisAtteinte = null;
+  const serie = [];
+  for (let m = 1; m <= 600; m++) {
+    v = v * (1 + tauxMensuel) + mensuel;
+    serie.push(v);
+    if (moisAtteinte === null && v >= objectif) { moisAtteinte = m; break; }
+  }
+
+  // Horizon affiche : assez court pour garder la partie reelle lisible
+  const horizon = Math.min(moisAtteinte || 600, Math.max(12, valeurs.length * 2), 180);
+  const serieAffichee = serie.slice(0, horizon);
+  const futurs = genererLabelsFuturs(labels[labels.length - 1], serieAffichee.length);
+  if (!futurs) return null;
+
+  const fmtTaux = projectionRate === 0 ? "0 %" : projectionRate + " %";
+  let phrase;
+  if (moisAtteinte) {
+    const f = genererLabelsFuturs(labels[labels.length - 1], moisAtteinte);
+    phrase = "objectif de " + Math.round(objectif).toLocaleString("fr-FR") + " € atteint vers " + formaterLabelLong(f[f.length - 1]);
+  } else {
+    phrase = "objectif non atteint dans les 50 prochaines années";
+  }
+  ecrire("Hypothèse : " + Math.round(epargneAn).toLocaleString("fr-FR") + " €/an d'épargne (carte FIRE) et " + fmtTaux +
+    " de rendement annuel supposé → " + phrase + ". Simple scénario avec tes propres chiffres, ni prévision ni conseil." +
+    (projectionRate > 0 ? " Attention : cette épargne annuelle inclut déjà une part de performance passée, le rendement peut donc être compté deux fois." : ""));
+
+  return {
+    labels: labels.concat(futurs),
+    actuel: valeurs.concat(futurs.map(() => null)),
+    projection: valeurs.map((x, i) => (i === valeurs.length - 1 ? x : null)).concat(serieAffichee),
+    nbActuel: valeurs.length,
+  };
+}
+
+function majBoutonsProjection() {
+  document.querySelectorAll("#projectionControls [data-rate]").forEach((btn) => {
+    const r = btn.getAttribute("data-rate");
+    const actif = projectionRate === null ? r === "off" : parseFloat(r) === projectionRate;
+    btn.classList.toggle("active", actif);
+    btn.setAttribute("aria-pressed", actif ? "true" : "false");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const ctrl = document.getElementById("projectionControls");
+  if (!ctrl) return;
+  majBoutonsProjection();
+  // La hero-card est cliquable (ouvre/ferme le detail) : on bloque la
+  // propagation, comme pour le selecteur de periode.
+  ctrl.addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-rate]");
+    if (!btn) return;
+    e.stopPropagation();
+    const r = btn.getAttribute("data-rate");
+    projectionRate = r === "off" ? null : parseFloat(r);
+    try { localStorage.setItem(PROJECTION_KEY, r); } catch (err) { /* stockage indisponible */ }
+    majBoutonsProjection();
+    applyPatrimoinePeriod(currentPatrimoinePeriod);
+  });
+  ctrl.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") e.stopPropagation(); });
+});
+
 function updatePatrimoineChart(labels, valeurs, objectifCible) {
 
     lastPatrimoine.labels = labels || [];
@@ -160,6 +312,12 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
     // plus honnetes que "smooth" dans ce cas.
     const courbe = (valeurs || []).length <= 3 ? "straight" : "smooth";
 
+    // Projection optionnelle (chantier 5) : 2e serie en pointille, labels
+    // futurs ajoutes. Sans projection : comportement identique a avant.
+    const proj = construireProjection(labels, valeurs, lastPatrimoine.objectif);
+    if (proj) labels = proj.labels;
+    const nbActuel = proj ? proj.nbActuel : (labels || []).length;
+
     const options = {
         chart: {
             type: "area",
@@ -173,18 +331,23 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
             }
         },
 
-        series: [
-            { name: "Patrimoine", data: valeurs }
-        ],
+        series: proj
+            ? [{ name: "Patrimoine", data: proj.actuel }, { name: "Projection", data: proj.projection }]
+            : [{ name: "Patrimoine", data: valeurs }],
 
-        colors: [couleurTendance],
+        colors: proj ? [couleurTendance, couleurTendance] : [couleurTendance],
 
-        stroke: {
-            curve: courbe,
-            width: 2.5
-        },
+        stroke: proj
+            ? { curve: "smooth", width: [2.5, 2], dashArray: [0, 6] }
+            : { curve: courbe, width: 2.5 },
 
-        fill: {
+        legend: { show: false },
+
+        fill: proj ? {
+            type: ["gradient", "solid"],
+            opacity: [1, 0],
+            gradient: { shade: "dark", shadeIntensity: 0.3, opacityFrom: 0.22, opacityTo: 0.02, stops: [0, 100] }
+        } : {
             type: "gradient",
             gradient: {
                 shade: "dark",
@@ -235,13 +398,18 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
             }
         },
 
-        yaxis: {
+        yaxis: Object.assign({
             labels: {
                 style: { colors: getChartMutedColor() },
                 formatter: value =>
                     Math.round(value).toLocaleString("fr-FR") + " €"
             }
-        },
+        }, proj ? {
+            // Avec la projection l'axe peut retomber a 0 et ecraser la
+            // partie reelle : on le borne sous la plus petite valeur reelle.
+            min: Math.floor((Math.min.apply(null, pointsValides) * 0.9) / 10000) * 10000,
+            forceNiceScale: true
+        } : {}),
 
         tooltip: {
             theme: getThemeMode(),
@@ -249,7 +417,7 @@ function updatePatrimoineChart(labels, valeurs, objectifCible) {
                 formatter: function (value, opts) {
                     const i = opts && typeof opts.dataPointIndex === "number" ? opts.dataPointIndex : -1;
                     const brut = i >= 0 && labels ? labels[i] : value;
-                    return formaterLabelLong(brut);
+                    return (i >= nbActuel ? "Projection · " : "") + formaterLabelLong(brut);
                 }
             },
             y: {
@@ -421,6 +589,7 @@ function applyPeriode1J() {
 function applyPatrimoinePeriod(periode) {
     if (periode === "1J") {
         applyPeriode1J();
+        afficherGainMarche(null); // pas de decomposition sur "depuis la derniere visite"
         return;
     }
 
@@ -448,6 +617,7 @@ function applyPatrimoinePeriod(periode) {
     // desormais la meme periode selectionnee, au lieu de la sparkline
     // hero figee sur l'historique complet.
     renderPatrimoinePeriodSlice(labelsSlice, valeursSlice, objectif, periode);
+    afficherGainMarche(startIndex);
 }
 window.applyPatrimoinePeriod = applyPatrimoinePeriod;
 

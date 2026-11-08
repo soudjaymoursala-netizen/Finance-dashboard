@@ -16,7 +16,7 @@
  * la mise a jour du cache chez les utilisateurs deja installes.
  */
 
-const CACHE_VERSION = "shell-v16"; // v16 : repartition par classe d'actifs, poids des positions, axe du graphique hero
+const CACHE_VERSION = "shell-v17"; // v17 : gain de marche vs apports, projection informative (v16 : repartition par classe, poids, axe hero)
 
 const PRECACHE_URLS = [
     "./",

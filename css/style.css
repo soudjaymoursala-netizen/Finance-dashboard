@@ -411,6 +411,80 @@ main > section > h2 {
   margin-bottom: 0.3rem;
 }
 
+/* Gain de marche vs apports (sous le badge de variation) */
+.period-marche {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary-color);
+}
+
+.marche-item.up { color: var(--accent-color); }
+.marche-item.down { color: var(--negative-color); }
+.marche-label { color: var(--text-secondary-color); margin-right: 0.15rem; }
+
+/* Projection informative (hypothese, pas une prevision) */
+.projection-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.projection-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary-color);
+  margin-right: 0.25rem;
+}
+
+.projection-controls button {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary-color);
+  cursor: pointer;
+}
+
+.projection-controls button.active {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.projection-controls button:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .projection-controls { gap: 0.25rem; }
+  .projection-controls button { padding: 0.25rem 0.5rem; }
+  .projection-label { margin-right: 0; }
+}
+
+.projection-note {
+  margin-top: 0.5rem;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--text-secondary-color);
+}
+
+body.amounts-hidden .period-marche,
+body.amounts-hidden .projection-note {
+  filter: blur(7px);
+  user-select: none;
+}
+
 /* Repartition par classe d'actifs (hero). Palette monochrome posee en
    inline par JS (proportion, pas un signal). Se lit au-dessus de la
    legende "variation du jour" du hero. */

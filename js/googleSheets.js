@@ -365,6 +365,10 @@ async function chargerDashboard() {
             const valeursRaw = [];
             const peaRaw = [];
             const ctoRaw = [];
+            // Colonne 5 optionnelle : apports cumules (argent reellement verse
+            // depuis le debut), pour separer gain de marche et versements.
+            // Absente = fonction masquee, aucun effet sur le reste.
+            const apportsRaw = [];
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
                 const cols = splitCsvLine(lines[i], sep);
@@ -376,6 +380,8 @@ async function chargerDashboard() {
                 // restent simplement masqués (voir updateAccountSparkline).
                 peaRaw.push(cols.length > 2 ? nettoyerNombre(cols[2].trim().replace(/^\"|\"$/g, "")) : null);
                 ctoRaw.push(cols.length > 3 ? nettoyerNombre(cols[3].trim().replace(/^\"|\"$/g, "")) : null);
+                const apportBrut = cols.length > 4 ? cols[4].trim().replace(/^\"|\"$/g, "") : "";
+                apportsRaw.push(apportBrut !== "" && !estErreurFormule(apportBrut) ? nettoyerNombre(apportBrut) : null);
             }
 
             // Certains Sheets reportent automatiquement la derniere valeur
@@ -421,6 +427,7 @@ async function chargerDashboard() {
             // afficherVariationPeriode() dans charts.js. Un seul badge de
             // tendance au lieu de deux superposes (l'ancien "depuis le
             // dernier point" duplique desormais avec "Tout").
+            if (typeof setPatrimoineApports === "function") setPatrimoineApports(apportsRaw.slice(0, coupureIndex));
             if (typeof setPatrimoineHistory === "function") setPatrimoineHistory(labels, valeurs, DATA.objectif250k);
             if (typeof updatePeaSparkline === "function") updatePeaSparkline(peaSeries);
             if (typeof updateCtoSparkline === "function") updateCtoSparkline(ctoSeries);

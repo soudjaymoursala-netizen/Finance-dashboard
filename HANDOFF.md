@@ -52,6 +52,14 @@ Dashboard financier personnel, **site statique vanilla JS** (pas de build, pas d
    - **Purement informatif, calculé en JS à partir des données déjà chargées — aucun appel réseau, aucune API externe, aucun conseil d'achat/vente**
 3. Fix d'un bug réel dans `cloudflare-worker/worker.js` : la regex de routage `^/api/([A-Z]+)$` ne matchait jamais les clés contenant un underscore (`CTO_HISTORIQUE`, `PEA_HISTORIQUE`) — corrigée en `[A-Z_]+`. **Potentiellement cassé en prod depuis le début si ces clés sont utilisées.**
 
+**C. Session "rapprochement Finary" (2026-11-08)**
+1. **Répartition par classe d'actifs** dans le hero (`js/repartitionActifs.js`) : barre Cash/Actions/ETF/Crypto (+ "Autres" si > 0,5 %), calculée depuis `DATA`, aucune colonne Sheet requise.
+2. **Poids des positions** dans "Mes investissements" (`js/investissements.js`) : colonne "Poids" (part de la valeur PEA+CTO, CHF converti en EUR, stable sous filtre), tri "Poids ↓", poids par compte. Le tri "Valeur ↓" compare désormais en EUR.
+3. **Graphique hero** (`js/charts.js`) : libellés d'axe normalisés ("janv. 25", espacés selon la largeur), infobulle en mois complet. Piège Apex : pour un axe `category`, `xaxis.labels.formatter` ne reçoit PAS l'index (3ᵉ arg vide) — retrouver l'index via `labels.indexOf(value)`. Donut Allocation : hauteur 300 px = celle de `.chart` (avant 420 → rogné).
+4. **Gain de marché vs apports** (optionnel) : si `API_EVOLUTION` a une **5ᵉ colonne "apports cumulés"** (après MOIS, PATRIMOINE, PEA, CTO), le hero affiche "Gain de marché / Apports" sur la période choisie (= Δpatrimoine − Δapports). Colonne absente ou période 1J → ligne masquée. **Action Sheet à faire par l'utilisateur** : ajouter la colonne E dans `API_EVOLUTION` (un total cumulé de versements par mois, à remplir à la main pour l'historique).
+5. **Projection informative** : boutons Off/0/3/5 % sous le graphique (désactivée par défaut, choix en `localStorage`, clé `financeDashboard_projectionRate`). Prolonge la courbe en pointillé avec `DATA.epargneAnnuelle` (même épargne que la carte FIRE, donc à 0 % l'horizon est identique) et le rendement choisi. **Limite connue** : `epargneAnnuelle` = `patrimoine_annuel` (croissance du patrimoine, performance incluse) → avec un rendement > 0 la performance peut être comptée deux fois (mentionné dans la note affichée). Purement informatif, pas une prévision.
+6. `sw.js` : `CACHE_VERSION` passé à `shell-v17`, `repartitionActifs.js` ajouté au précache.
+
 ### ⚠️ Action manuelle requise AVANT que "Dépenses" fonctionne en ligne
 
 Le Worker Cloudflare **n'est pas redéployé automatiquement depuis Git** (confirmé dans `cloudflare-worker/README.md`) — il faut coller le code à la main :
