@@ -131,11 +131,14 @@ function normaliserLabelContexte(labels, i) {
 }
 
 function formaterLabelAxe(label, labels, i) {
+  // En 1J les libelles sont "09/11 12:30" et "Maintenant", pas des mois.
+  if (currentPatrimoinePeriod === "1J") return String(label);
   const n = labels ? normaliserLabelContexte(labels, i) : normaliserLabelMois(label);
   return n ? MOIS_ABREGES[n.mois] + " " + String(n.annee).slice(-2) : String(label);
 }
 
 function formaterLabelLong(label, labels, i) {
+  if (currentPatrimoinePeriod === "1J") return String(label);
   const n = labels ? normaliserLabelContexte(labels, i) : normaliserLabelMois(label);
   return n ? MOIS_LONGS[n.mois] + " " + n.annee : String(label);
 }
@@ -227,7 +230,11 @@ function construireProjection(labels, valeurs, objectif) {
   const note = document.getElementById("projectionNote");
   const ecrire = (txt) => { if (note) { note.textContent = txt; note.style.display = txt ? "" : "none"; } };
   ecrire("");
-  if (projectionRate === null || currentPatrimoinePeriod === "1J" || !labels || labels.length < 2) return null;
+  if (projectionRate !== null && currentPatrimoinePeriod === "1J") {
+    ecrire("La projection n'est pas affichée en 1J (comparaison avec ta dernière visite). Choisis 1M, 3M, 1A ou Tout pour la voir.");
+    return null;
+  }
+  if (projectionRate === null || !labels || labels.length < 2) return null;
 
   const epargneAn = typeof DATA !== "undefined" ? DATA.epargneAnnuelle : 0;
   const dernier = valeurs[valeurs.length - 1];
